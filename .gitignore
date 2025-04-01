@@ -15,8 +15,12 @@ lerna-debug.log*
 # OS
 .DS_Store
 
+# credentials
+/credentials
+
 # Tests
 /coverage
+/tests
 /.nyc_output
 
 # IDEs and editors
