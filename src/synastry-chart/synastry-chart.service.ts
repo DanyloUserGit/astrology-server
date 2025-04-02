@@ -132,7 +132,8 @@ export class SynastryService {
         try {
             console.log("Sending email to:", email);
             const transporter = nodemailer.createTransport({
-                service: "gmail",
+                host: "mail.adm.tools",
+                secure: false,
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
