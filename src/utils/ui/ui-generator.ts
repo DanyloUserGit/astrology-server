@@ -1042,7 +1042,11 @@ export class UIGeneratorService implements UIGenerator{
     }
     async createPdfFile(body: PDFInfo){
         console.log("Launching Puppeteer...");
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        });        
+        
         const page = await browser.newPage();
         const formatter = DateTimeFormatter.ofPattern("d MMM, yyyy 'at' hh:mm a").withLocale(Locale.ENGLISH);
         
