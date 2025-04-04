@@ -139,12 +139,14 @@ export class SynastryService {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
                 },
+                {
+                    from: process.env.EMAIL_USER_NAME,
+                }
                 logger: true, // Додати логування для відправки
                 debug: true,  // Вивести додаткові відомості для діагностики
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER_NAME,
                 to: email,
                 subject: "Your Synastry Chart PDF",
                 text: "Please find the attached PDF.",
