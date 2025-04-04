@@ -144,7 +144,7 @@ export class SynastryService {
             });
 
             const mailOptions = {
-                from: `from: "Synastry chart service" <${process.env.EMAIL_USER}>`,
+                from: process.env.EMAIL_USER,
                 to: email,
                 subject: "Your Synastry Chart PDF",
                 text: "Please find the attached PDF.",
