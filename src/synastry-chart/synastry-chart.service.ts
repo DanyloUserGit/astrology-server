@@ -141,10 +141,13 @@ export class SynastryService {
                 },
                 logger: true, // Додати логування для відправки
                 debug: true,  // Вивести додаткові відомості для діагностики
-            });
+            },
+            {
+                from: process.env.EMAIL_USER_NAME,
+            },                                          
+            );
 
             const mailOptions = {
-                from: process.env.EMAIL_USER_NAME,
                 to: email,
                 subject: "Your Synastry Chart PDF",
                 text: "Please find the attached PDF.",
