@@ -141,7 +141,7 @@ export class SynastryService {
                 },
                 {
                     from: process.env.EMAIL_USER_NAME,
-                }
+                },
                 logger: true, // Додати логування для відправки
                 debug: true,  // Вивести додаткові відомості для діагностики
             });
