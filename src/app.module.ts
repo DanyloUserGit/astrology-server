@@ -1,11 +1,32 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SynastryModule } from './synastry-chart/synastry-chart.module';
+import { PaypalModule } from './paypal/paypal.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ZodiacSignsModule } from './zodiac_signs/zodiac_signs.module';
+import { NatalModule } from './natal-chart/natal-chart.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ envFilePath: `${process.env.NODE_ENV}.env` }),
-    SynastryModule
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get('MONGO_LINK');
+        const appEnv = configService.get('APP_ENV');
+        console.log(uri);
+        
+        return {
+          uri,
+          dbName: "Astrology-app"
+        };
+      },
+    }),
+    SynastryModule,
+    PaypalModule,
+    ZodiacSignsModule,
+    NatalModule
   ],
   controllers: [],
   providers: [],

@@ -1,19 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
 import * as nodemailer from "nodemailer";
-import { SVG } from '@svgdotjs/svg.js';
-import { JSDOM } from 'jsdom';
-import puppeteer from "puppeteer";
-import { GoogleSheetsService } from "src/google-sheets-service/google-sheets.service";
-import { Partner, SynastryDto } from "./synastry-chart.dto";
-import { NatalChart } from "src/types";
 import { UIGenerator } from "src/utils/ui";
 import { UIGeneratorService } from "src/utils/ui/ui-generator";
+import { Partner, SynastryDto } from "./synastry-chart.dto";
 
 @Injectable()
 export class SynastryService {
     uiGenerator: UIGenerator;
-    constructor(private readonly googleSheetsService: GoogleSheetsService) {
+    constructor() {
         this.uiGenerator = new UIGeneratorService();
     }
 
