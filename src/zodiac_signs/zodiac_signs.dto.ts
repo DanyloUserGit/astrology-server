@@ -1,6 +1,6 @@
-import { IsDateString } from "class-validator";
+import { IsDateString, IsString } from "class-validator";
 
 export class SignDto{
-    @IsDateString() 
-    birthDate: string;
+    @IsString() 
+    sign: string;
 }

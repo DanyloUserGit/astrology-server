@@ -19,23 +19,10 @@ export class ZodiacSignsService {
 
     async getZodiacData(body: SignDto){
         try {
-            const {birthDate} = body;
+            const {sign} = body;
 
-            const data = await this.zodiacModel.find().lean().exec();
-            const date = ZonedDateTime.parse(birthDate).withZoneSameInstant(ZoneId.of('UTC'));
-            const day = date.dayOfMonth();
-            const month = date.monthValue();
-
-            const element = data.find((item) => {
-                const range1 = item.date_range.range1;
-                const range2 = item.date_range.range2;
-              
-                const isAfterRange1 = (month > range1.month || (month === range1.month && day >= range1.day));
-                const isBeforeRange2 = (month < range2.month || (month === range2.month && day <= range2.day));
-              
-                return isAfterRange1 && isBeforeRange2;
-              });
-              console.log(element, data)
+            const element = await this.zodiacModel.findOne({Sign:sign}).lean();
+              console.log(element)
               if (element){
                 const signContent = this.loadSignSvgByName(element.Sign);
 

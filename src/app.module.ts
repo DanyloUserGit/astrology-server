@@ -19,7 +19,7 @@ import { NatalModule } from './natal-chart/natal-chart.module';
         
         return {
           uri,
-          dbName: "Astrology-app"
+          dbName: "zodiac_signs"
         };
       },
     }),
