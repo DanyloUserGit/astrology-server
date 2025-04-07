@@ -3,7 +3,7 @@ import { PDFInfo, planetNames, planetsDescription, UIGenerator } from ".";
 import puppeteer from "puppeteer";
 import * as path from "path";
 import * as fs from "fs";
-import { DateTimeFormatter, ZonedDateTime, ZoneId } from "@js-joda/core";
+import { DateTimeFormatter, LocalDate, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Locale } from "@js-joda/locale_en";
 
 export class UIGeneratorService implements UIGenerator{
@@ -1148,12 +1148,16 @@ export class UIGeneratorService implements UIGenerator{
          // -- down -- //
 
         // -- Page 1 -- //
+        const date = new Date();
+        const localDate = LocalDate.of(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        const formatted = localDate.month().toString().charAt(0) + localDate.month().toString().slice(1).toLowerCase()
+        + ' ' + localDate.dayOfMonth() + ', ' + localDate.year();
         const page1 = `
         <div class="p1-content">
                 <div class="logo">${logoContent}</div>
                 <div class="p1-content-text">
                     <h1 class="p1-content-title">Your Personalized Synastry Chart</h1>
-                    <h2 class="p1-content-subtitle">March 13, 2025</h2>
+                    <h2 class="p1-content-subtitle">${formatted}</h2>
                 </div>
                 <div class="p1-twins">
                     ${twinsContent}
