@@ -153,8 +153,7 @@ export class SynastryService {
             };
 
             const info = await transporter.sendMail(mailOptions);
-            console.log("Email sent successfully:", info.response);
-            return { message: "Email sent successfully" };
+            return { success: true, message: "Email sent successfully" };
         } catch (error) {
             console.error("Email sending failed:", error);
             throw new Error("Failed to send email");
