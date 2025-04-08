@@ -114,9 +114,8 @@ export class SynastryService {
             console.log("Sending email...");
             // await this.googleSheetsService.appendRow(body.email);
             const status = await this.sendMail(body.email, pdf);
-            console.log("Email sent successfully.");
 
-            return status?.message;
+            return status;
         } catch (error) {
             console.error("Error in generatePdf():", error);
             throw new Error("Failed to generate and send PDF");
