@@ -5,6 +5,7 @@ import { PaypalModule } from './paypal/paypal.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ZodiacSignsModule } from './zodiac_signs/zodiac_signs.module';
 import { NatalModule } from './natal-chart/natal-chart.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { NatalModule } from './natal-chart/natal-chart.module';
     SynastryModule,
     PaypalModule,
     ZodiacSignsModule,
-    NatalModule
+    NatalModule,
+    StripeModule
   ],
   controllers: [],
   providers: [],
