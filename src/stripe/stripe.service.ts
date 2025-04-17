@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { SynastryDto } from 'src/synastry-chart/synastry-chart.dto';
+import { SynastryService } from 'src/synastry-chart/synastry-chart.service';
 import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
 
-  constructor() {
+  constructor(private readonly synastryService:SynastryService) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
 
@@ -22,4 +24,15 @@ export class PaymentService {
       clientSecret: paymentIntent.client_secret,
     };
   }
+  async captureOrder(paymentIntentId: string, body: SynastryDto) {
+    const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
+    if(paymentIntent.status==="succeeded"){
+      return await this.synastryService.generatePdf(body)
+    }else{
+      return {
+        status: paymentIntent.status,
+      };
+    }
+  }
+  
 }
