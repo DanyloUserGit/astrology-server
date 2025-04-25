@@ -46,12 +46,14 @@
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.2",
     "nodemailer": "^6.10.0",
+    "openai": "^4.95.0",
     "pdfkit": "^0.16.0",
     "puppeteer": "^24.4.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "stripe": "^18.0.0",
-    "svg-to-pdfkit": "^0.1.8"
+    "svg-to-pdfkit": "^0.1.8",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

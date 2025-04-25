@@ -4,12 +4,17 @@ import * as nodemailer from "nodemailer";
 import { UIGenerator } from "src/utils/ui";
 import { UIGeneratorService } from "src/utils/ui/ui-generator";
 import { Partner, SynastryDto } from "./synastry-chart.dto";
+import { PromptService } from "src/prompts/prompt.service";
+import { ProcessTimer } from "src/utils/process-timer";
+import { ProcessTimerImpl } from "src/utils/process-timer/impl";
 
 @Injectable()
 export class SynastryService {
     uiGenerator: UIGenerator;
-    constructor() {
+    processTimer: ProcessTimer;
+    constructor(private readonly promptService:PromptService) {
         this.uiGenerator = new UIGeneratorService();
+        this.processTimer = new ProcessTimerImpl();
     }
 
     subjectObj(body: Partner) {
@@ -27,7 +32,7 @@ export class SynastryService {
     async generatePdf(body: SynastryDto) {
         try {
             console.log("Generating PDF for:", body);
-
+            this.processTimer.start();
             // Prepare API request payload
             const first_subject = {
                 ...this.subjectObj(body.first_subject),
@@ -98,7 +103,11 @@ export class SynastryService {
             if (!resNatalSecond.data) {
                 throw new Error("API response is missing chart data");
             }
-
+            let pages: any = [];
+            for(let i = 8; i<12; i++){
+                const page = await this.promptService.generateSummary(resSynastry.data, body.lang, i);
+                if(page) pages.push(page);
+            }
             const pdf = await this.uiGenerator.createPdfFile({
                 name1: first_subject.name,
                 name2: second_subject.name,
@@ -108,7 +117,9 @@ export class SynastryService {
                 birthPlace2: `${second_subject.nation}, ${second_subject.city}`,
                 natal1: resNatalFirst.data,
                 natal2: resNatalSecond.data,
-                synastry: resSynastry.data
+                synastry: resSynastry.data,
+                pages,
+                lang:body.lang
             });
 
             console.log("Sending email...");
@@ -152,6 +163,7 @@ export class SynastryService {
             };
 
             const info = await transporter.sendMail(mailOptions);
+            this.processTimer.end();
             return { success: true, message: "Email sent successfully" };
         } catch (error) {
             console.error("Email sending failed:", error);

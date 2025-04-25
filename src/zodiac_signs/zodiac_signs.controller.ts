@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
-import { ZodiacSignsService } from './zodiac_signs.service';
+import { Body, Controller, Post } from '@nestjs/common';
 import { SignDto } from './zodiac_signs.dto';
+import { ZodiacSignsService } from './zodiac_signs.service';
 
 @Controller('zodiac-signs')
 export class ZodiacSignsController {

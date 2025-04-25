@@ -1,0 +1,31 @@
+[
+    {
+        "prompt": "You are an expert in synastry astrology and relationship interpretation. Based on synastry between Person1 and Person2, generate a structured JSON report describing their key planetary interactions in a warm, human tone.\nWrite a JSON object containing the following:\n- \"title\": A short, warm label like “Sun Trine Moon”.\n- \"text\": A paragraph (500–600 characters) explaining how Person1’s Sun in Taurus trines Person2’s Moon in Libra (orb ≈ 2.13°), including both planetary positions (e.g., degrees and signs). Describe how this aspect supports emotional understanding and balance.\n- \"takeaway\": One or two short sentences of kind advice on nurturing emotional connection.",
+        "instruction": "Format your answer as a JSON object.\n Always include planetary degrees, signs, aspect type, and orb in the text.",
+        "page": 10,
+        "isPlanet":true 
+    },
+    {
+        "prompt": "You are an expert in synastry astrology and relationship interpretation. Based on synastry between Person1 and Person2, generate a structured JSON report describing their communication dynamics in a warm, human tone.\nWrite a JSON object containing the following:\n- \"title\": A short label like “Mercury Square Mars”.\n- \"text\": A paragraph (500–600 characters) describing how Person1’s Mercury squares Person2’s Mars, including both planetary degrees, signs, aspect type, and orb. Reflect on how this affects intellectual pacing, potential for debates, or conflict in conversations.\n- \"takeaway\": One or two short supportive sentences offering practical advice on improving communication and understanding.",
+        "instruction": "Format your answer as a JSON object.\n Always include planetary degrees, signs, aspect type, and orb in the text.",
+        "page": 10,
+        "isPlanet": true
+    },
+    {
+        "prompt": "You are an expert in synastry astrology and relationship interpretation. Based on synastry between Person1 and Person2, generate a structured JSON report describing their romantic and physical attraction in a warm, human tone.\nWrite a JSON object containing the following:\n- \"title\": A thematic label like “Venus Meets Mars” or “Love and Passion”.\n- \"text\": A paragraph (500–600 characters) describing how Person1’s Venus contrasts with Person2’s Mars, including both planetary degrees, signs, aspect type (if available), and orb. Explain how this influences chemistry, love languages, and emotional tension or excitement.\n- \"takeaway\": One or two kind, actionable sentences to help them find balance in expressing love and passion.",
+        "instruction": "Format your answer as a JSON object.\n Always include planetary degrees, signs, aspect type, and orb in the text.",
+        "page": 10,
+        "isPlanet": true
+    },
+    {
+        "prompt": "You are an expert in synastry astrology and relationship interpretation. Based on synastry between Person1 and Person2, generate a structured JSON report exploring long-term compatibility and karmic lessons.\nWrite a JSON object containing the following:\n- \"title\": A short, symbolic title like “Saturn Lessons” or “Growth Through Time”.\n- \"text\": A paragraph (500–600 characters) analyzing how Person1’s Sun squares Person2’s Nodes (or any Saturn/Nodal interaction), including planetary degrees, signs, aspect type, and orb. Reflect on themes of purpose, responsibility, life timing, or soul lessons.\n- \"takeaway\": One or two short, warm sentences that encourage aligned vision and patience in growth.",
+        "instruction": "Format your answer as a JSON object.\n Always include planetary degrees, signs, aspect type, and orb in the text.",
+        "page": 10,
+        "isPlanet": true
+    },
+    {
+        "prompt":"You are an expert in synastry astrology and relationship interpretation. Based on synastry between Person1 and Person2, generate a structured JSON report describing their key planetary interactions in a warm, human tone.\nCreate a JSON object with these field:\n \"reflection\" – A paragraph (250–350 characters) that offers a holistic view of the relationship based on these aspects. It should focus on emotional growth, balance, mutual understanding, and how to make the most of their potential together.",
+        "instruction": "Format your answer as a JSON object.",
+        "page": 10
+    }
+]

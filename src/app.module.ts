@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ZodiacSignsModule } from './zodiac_signs/zodiac_signs.module';
 import { NatalModule } from './natal-chart/natal-chart.module';
 import { StripeModule } from './stripe/stripe.module';
+import { PromptModule } from './prompts/prompt.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { StripeModule } from './stripe/stripe.module';
     PaypalModule,
     ZodiacSignsModule,
     NatalModule,
-    StripeModule
+    StripeModule,
+    PromptModule
   ],
   controllers: [],
   providers: [],

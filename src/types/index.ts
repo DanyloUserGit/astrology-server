@@ -21,3 +21,14 @@ export interface NatalChart {
     data: { [key: string]: CelestialBody | any };
     aspects: Aspect[];
 }
+
+export type ElementType = 'Fire' | 'Earth' | 'Water' | 'Air';
+
+export interface PlanetAspect {
+  p1_name: string;
+  p2_name: string;
+  p1_abs_pos: number;
+  p2_abs_pos: number;
+  aspect: string;
+  orbit: number;
+}

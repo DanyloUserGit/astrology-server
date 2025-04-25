@@ -10,6 +10,8 @@ export interface PDFInfo {
     natal1:NatalChart;
     natal2:NatalChart;
     synastry:NatalChart;
+    pages: any;
+    lang:string;
 }
 
 export interface UIGenerator {

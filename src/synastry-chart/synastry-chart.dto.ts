@@ -36,4 +36,7 @@ export class SynastryDto {
 
     @IsEmail()
     email:string;
+
+    @IsString()
+    lang:string;
 }

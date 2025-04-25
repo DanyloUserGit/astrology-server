@@ -5,9 +5,15 @@ import * as path from "path";
 import * as fs from "fs";
 import { DateTimeFormatter, LocalDate, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Locale } from "@js-joda/locale_en";
+import { OpenAIIntr } from "../openai";
+import { OpenAIService } from "../openai/openai";
+import { getTitle } from "..";
 
 export class UIGeneratorService implements UIGenerator{
-    constructor () {}
+    private promptGenerator: OpenAIIntr;
+    constructor () {
+        this.promptGenerator = new OpenAIService();
+    }
     loadPlanetSvgByName(dir:string){
         const directoryPath = path.resolve(__dirname, `../../../src/files/planets/${dir}.svg`);
         return fs.readFileSync(directoryPath, 'utf-8')
@@ -542,14 +548,14 @@ export class UIGeneratorService implements UIGenerator{
                     padding: 8px;
                     border-radius: 8px;
                 }
-                .p2-chart {
+                .p2-chart, .p8-chart {
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     width: 100%;
                     height: 300px;
                 }
-                .p2-chart svg {
+                .p2-chart svg, .p8-chart svg {
                     transform: scale(0.4615);
                 }
                 .p2-plus{
@@ -870,10 +876,9 @@ export class UIGeneratorService implements UIGenerator{
                 }
                 .p11-arcadeon{
                     margin: 10px 0;
-                    padding:4px;
+                    padding:8px;
                     display:flex;
-                    justify-content:center;
-                    gap:10%;
+                    justify-content:space-between;
                     width:100%;
                     border-radius:8px;
                     border: 1px solid #FAE4C8;
@@ -883,13 +888,15 @@ export class UIGeneratorService implements UIGenerator{
                     gap:4px;
                 }
                 .p11-arcadeon-text h3{
-                    font-size: 20px;
+                    font-size: 16px;
+                    font-weight:400;
                     color: #CB8020;
                     margin:auto 0;
                     max-width:30%;
                 }
                 .p11-arcadeon-text span{
-                    font-size: 13px;
+                    font-size: 10px;
+                    font-weight:400;
                     color: #CB8020;
                     margin:auto 0;
                     max-width:30%;
@@ -902,19 +909,26 @@ export class UIGeneratorService implements UIGenerator{
                 .p11-block h3{
                     text-align:center;
                     color: #CB8020;
-                    font-size:14px;
+                    font-size:10px;
+                    font-weight:400;
                 }
                 .p11-title{
                     color: #000000;
-                    font-size:12px;
+                    font-size:10px;
+                    font-weight:400;
                     text-align:left;
                 }
                 .p11-arcadeon-info ul{
                     display: flex;
                     flex-direction: column;
+                    gap: 6px;
                     align-items: flex-start;
                     list-style:none;
                     text-align:left;
+                }
+                .p11-arcadeon-info ul li{
+                    font-size: 8px;
+                    font-weight:200;
                 }
                 .p9-planets{
                     display: flex;
@@ -933,7 +947,12 @@ export class UIGeneratorService implements UIGenerator{
                     text-align:center;
                     margin:0 auto;
                     color: #CB8020;
-                    font-size:13px;
+                    font-size:10px;
+                    font-weight:400;
+                }
+                .p9-mini, .p11-mini{
+                    font-size:8px !important;
+                    font-weight:400 !important;
                 }
                 .p9-planet-img{
                     margin: 10px 0;
@@ -941,35 +960,27 @@ export class UIGeneratorService implements UIGenerator{
                 .p9-planet-text{
                     text-align:left;
                     color: #000000;
-                    font-size:10px;
+                    font-size:8px;
+                    font-weight:200;
                 }
                 .p9-planet-sub{
                     margin: 10px 0;
-                    font-weight: 600;
-                    font-size: 11px;
+                    font-size:8px;
+                    font-weight:400;
                     color: #000000;
                     text-align:left;
                 }
                 .p8-section{
-                    position:relative;
                     width: 100%;
-                    min-height: 350px;
                 }
                 .p8-chart svg{
-                    transform: scale(0.4);
                     margin: 0 auto;
-                }
-                .p8-chart{
-                    position: absolute;
-                    top: -780px;
-                    left: 20px;
                 }
                 .p8-title{
                     color: #CB8020;
-                    font-size: 15px;
-                    position: absolute;
-                    top: 92%;
-                    left: 260px;
+                    font-size: 12px;
+                    font-weight: 400;
+                    text-align:center;
                 }
                 .p8-info{
                     display: flex;
@@ -983,9 +994,16 @@ export class UIGeneratorService implements UIGenerator{
                     border-radius:8px;
                     border: 1px solid #FAE4C8;
                 }
+                .p8-divider{
+                    width: 48px;
+                    height: 1px;
+                    margin: 8px auto;
+                    background-color:#CB8020;
+                }
                 .p8-card-title{
                     color: #CB8020;
-                    font-size: 12px;
+                    font-size: 10px;
+                    font-weight: 400;
                 }
                 .p8-card-el{
                     margin: 8px 0;
@@ -995,7 +1013,8 @@ export class UIGeneratorService implements UIGenerator{
                 .p8-card-el p{
                     text-align:left;
                     color: #000000;
-                    font-size: 9.5px;
+                    font-size: 8px;
+                    font-weight: 200;
                 }
                 .p8-card-el-img{
                 
@@ -1008,7 +1027,8 @@ export class UIGeneratorService implements UIGenerator{
                 }
                 .p8-last-title{
                     color: #CB8020;
-                    font-size: 12px;
+                    font-size: 10px;
+                    font-weight: 400;
                 }
                 .p8-line{
                     display:flex;
@@ -1021,13 +1041,22 @@ export class UIGeneratorService implements UIGenerator{
                     border-radius:4px;
                     border: 1px solid #FAE4C8;
                     color: #000000;
-                    font-size: 9.5px;
+                    font-size: 8px;
+                    font-weight:200;
+                }
+                .p8-text-desc{
+                    max-width: calc(100% - 28px) !important;
+                    margin: 8px 12px;
+                }
+                .p8-end{
+                    font-size: 8px !important;
+                    font-weight: 400;
                 }
                 .p8-last-sub{
                     color: #000000;
-                    font-size:10px;
+                    font-size:8px;
+                    font-weight: 400;
                     text-align:left;
-                    font-weight: 600;
                 }
                 .content-container{
                     width: calc(100% - 60px);
@@ -1618,161 +1647,135 @@ export class UIGeneratorService implements UIGenerator{
             return str;
         }
         // -- Page 8 -- //
+        const lang = body.lang;
+        const promptP8 = body.pages[0];
         const page8 = `
             <div class="p8">
-                ${topElement("Key Aspects Overview for  and Nastia")}
+                ${topElement(`${getTitle[lang].tit[0]} ${body.name1} ${getTitle[lang].tit[1]} ${body.name2}`)}
                     <div class="p8-content">
                         <p class="p2-text">
-                            Your synastry chart shows both beautiful harmony and clear challenges that shape your unique bond.
-                            We use precise data from your birth charts to highlight where your energies naturally align
-                            and where they may clash. This analysis is based on the exact degrees and orbs from your charts.
+                            ${promptP8.intro}
                         </p>
                         <div class="p8-section">
                             <div class="p8-chart">
                                 ${chart1}
                             </div>
-                            <span class="p8-title">${body.name2}’s and ${body.name1}’s Chart</span>
+                            <span class="p8-title">${promptP8.chartTitle}</span>
                         </div>
                         <div class="p8-info">
                             <div class="p8-card">
-                                <h3 class="p8-card-title">Key Strengths</h3>
+                                <h3 class="p8-card-title">${getTitle[lang].ks}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p8-card-el">
                                     <div class="p8-card-el-img">${n1Content}</div>
-                                    <p>Your charts reveal strong emotional support. For example,
-                                    Danylo’s Moon sits at 18°17'00", which aligns well with Nastia’s
-                                    Venus at 7°05'07". This suggests warmth and a nurturing connection.</p>
+                                    <p>${promptP8.strengths[0]}</p>
                                 </div>
                                 <div class="p8-card-el">
                                     <div class="p8-card-el-img">${n2Content}</div>
-                                    <p>The overall element mix—38% Fire and 27% Water—creates a dynamic interplay.
-                                    This blend fuels creative passion and adds depth to your interactions.</p>
+                                    <p>${promptP8.strengths[1]}</p>
                                 </div>
-                                <p class="p2-text">
-                                    Favorable alignments between personal planets indicate mutual
-                                    respect and the ability to learn from each other.
-                                    These aspects encourage growth and add excitement to your journey together.
+                                <p class="p2-text p8-text-desc">
+                                   ${promptP8.strengths[2]}
                                 </p>
                             </div>
                             <div class="p8-card">
-                                <h3 class="p8-card-title">Potential Challenges</h3>
+                                <h3 class="p8-card-title">${getTitle[lang].pc}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p8-card-el">
                                     <div class="p8-card-el-img">${n3Content}</div>
-                                    <p>A critical aspect is Danylo’s Sun at 29°04'15" squaring Nastia’s Moon at 1°12'12".
-                                    With a tight orb of about 2°07'57", this square can stir tension between Danylo’s
-                                    core identity and Nastia’s emotional needs. For Danylo, this aspect may feel like
-                                    a push to assert his individuality during emotional highs, while Nastia might sense
-                                    unpredictable mood shifts.</p>
+                                    <p>${promptP8.challenges[0]}</p>
                                 </div>
                                 <div class="p8-card-el">
                                     <div class="p8-card-el-img">${n4Content}</div>
-                                    <p>Other data points, such as the interaction between Danylo’s Mercury at 17°21'54"
-                                    and Nastia’s Mars at 27°10'41", hint at moments of miscommunication where assertive
-                                    speech could trigger impulsive reactions.</p>
+                                    <p>${promptP8.challenges[1]}</p>
                                 </div>
                             </div>
                         </div>
                         <div class="p8-last">
-                            <h3 class="p8-last-title">Balance & Recommendations</h3>
+                            <h3 class="p8-last-title">${getTitle[lang].br}</h3>
                             <div class="p8-line">
-                                <p class="p8-line-p">Lean into the strengths that support you. Celebrate the aspects that bring warmth and mutual understanding.</p>
-                                <p class="p8-line-p">When challenges arise, practice active listening. Address tension with patience and open dialogue.</p>
-                                <p class="p8-line-p">Use each difficult aspect as a chance to learn more about each other’s inner worlds and build resilience.</p>
+                                <p class="p8-line-p">${promptP8.recommendations[0]}</p>
+                                <p class="p8-line-p">${promptP8.recommendations[1]}</p>
+                                <p class="p8-line-p">${promptP8.recommendations[2]}</p>
                             </div>
-                            <h4 class="p8-last-sub">Key Takeaway:</h4>
-                            <p class="p12-text">
-                                Respect and clear communication are your secret ingredients.
-                                Embrace your strengths and work together to turn challenges
-                                into opportunities for deeper connection.
+                            <h4 class="p8-last-sub">${getTitle[lang].tk}</h4>
+                            <p class="p12-text p8-end">
+                                ${promptP8.takeaway}
                             </p>
                         </div>
                     </div>
             </div>
             <div class="page-break"></div>
         `;
-        // -- Page 8 -- //
+       // -- Page 8 -- //
         // -- Page 9 -- //
+        const promptP9 = body.pages[1];
         const page9 = `
             <div class="p9">
-                ${topElement("Detailed Planetary Interactions")}
+                ${topElement(getTitle[lang].p9.title[0])}
                     <div class="p9-content">
                         <div class="p9-planets">
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Moon (Emotions)</h3>
+                                <h3 class="p9-planet-title">${promptP9.planets[0].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${moonContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Moon at 18°17'00" and Nastia’s Moon at 1°12'12"
-                                    shape how each of you processes feelings. 
-                                    Danylo tends to express warmth and seeks reassurance when stressed.
-                                    Nastia appears more guarded, then opens up with gentle support.
-                                    This difference can create confusion,
-                                    yet it also encourages both partners to learn each other’s emotional language.
+                                    ${promptP9.planets[0].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Practice patient listening. Validate each other’s feelings before jumping into solutions.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP9.planets[0].takeaway}
                                 </p>
                             </div>
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Mercury (Communication)</h3>
+                                <h3 class="p9-planet-title">${promptP9.planets[1].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${moonContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Mercury at 17°21'54" squares Nastia’s Mars at 27°10'41" by about 10 degrees.
-                                    This indicates strong mental energy that can spark lively debates or heated arguments.
-                                    For Danylo, this aspect can feel like he needs more space to share
-                                    thoughts without interruption. Nastia may feel an urge to respond quickly and prove a point.
+                                    ${promptP9.planets[1].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Slow down the conversation. Let each partner finish their idea, then respond calmly.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP9.planets[1].takeaway}
                                 </p>
                             </div>
                         </div>
                         <div class="p9-planets">
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Venus & Mars (Love and Passion)</h3>
+                                <h3 class="p9-planet-title">${promptP9.planets[2].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${venus_marsContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Venus at 13°14'55" highlights his affectionate style,
-                                    which values gentle bonding. Nastia’s Mars at 27°10'41" shows a bold,
-                                    action-oriented approach to romance. This pairing can create intense chemistry.
-                                    Yet it may also lead to disagreements about how love should be expressed.
-                                    When tension rises, step back and remember that both of you crave closeness.
+                                    ${promptP9.planets[2].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Find a balance between sweet gestures and spontaneous excitement.
-                                    Alternate planning dates that suit each partner’s style.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP9.planets[2].takeaway}
                                 </p>
                             </div>
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Saturn (Long-Term Focus)</h3>
+                                <h3 class="p9-planet-title">${promptP9.planets[3].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${saturnContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Saturn at 18°58'29" and Nastia’s Saturn at 5°14'26"
-                                    remind you to build a solid foundation. These placements reveal that you both value stability,
-                                    but you might clash over methods and timing.
-                                    For Danylo, structure comes through steady effort.
-                                    Nastia often seeks quick results, then adjusts if needed.
+                                    ${promptP9.planets[3].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                 Agree on a shared plan.
-                                 Break big goals into smaller steps and celebrate each milestone.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP9.planets[3].takeaway}
                                 </p>
                             </div>
                         </div>
                         <p class="p2-text">
-                            These planetary interactions create a rich tapestry of emotion, communication, and growth.
-                            Embrace the differences, honor each other’s style, 
-                            and use these insights to nurture a balanced relationship.
+                            ${promptP9.reflection}
                         </p>
                     </div>
             </div>
@@ -1780,88 +1783,73 @@ export class UIGeneratorService implements UIGenerator{
         `;
         // -- Page 9 -- //
         // -- Page 10 -- //
+            const promptP10 = body.pages[2]; 
             const page10 = `
             <div class="p9">
-                ${topElement("Detailed Planetary Interactions")}
+                ${topElement(getTitle[lang].p10.title[0])}
                     <div class="p9-content">
                         <div class="p9-planets">
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Sun Square Moon</h3>
+                                <h3 class="p9-planet-title">${promptP10.planets[0].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${moonContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Moon at 18°17'00" and Nastia’s Moon at 1°12'12"
-                                    shape how each of you processes feelings. 
-                                    Danylo tends to express warmth and seeks reassurance when stressed.
-                                    Nastia appears more guarded, then opens up with gentle support.
-                                    This difference can create confusion,
-                                    yet it also encourages both partners to learn each other’s emotional language.
+                                    ${promptP10.planets[0].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Practice patient listening. Validate each other’s feelings before jumping into solutions.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP10.planets[0].takeaway}
                                 </p>
                             </div>
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Mercury Square Mars</h3>
+                                <h3 class="p9-planet-title">${promptP10.planets[1].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${moonContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Mercury at 17°21'54" squares Nastia’s Mars at 27°10'41" by about 10 degrees.
-                                    This indicates strong mental energy that can spark lively debates or heated arguments.
-                                    For Danylo, this aspect can feel like he needs more space to share
-                                    thoughts without interruption. Nastia may feel an urge to respond quickly and prove a point.
+                                    ${promptP10.planets[1].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Slow down the conversation. Let each partner finish their idea, then respond calmly.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP10.planets[1].takeaway}
                                 </p>
                             </div>
                         </div>
                         <div class="p9-planets">
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Moon-Venus Synergy</h3>
+                                <h3 class="p9-planet-title">${promptP10.planets[2].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${venus_marsContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Venus at 13°14'55" highlights his affectionate style,
-                                    which values gentle bonding. Nastia’s Mars at 27°10'41" shows a bold,
-                                    action-oriented approach to romance. This pairing can create intense chemistry.
-                                    Yet it may also lead to disagreements about how love should be expressed.
-                                    When tension rises, step back and remember that both of you crave closeness.
+                                    ${promptP10.planets[2].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                    Find a balance between sweet gestures and spontaneous excitement.
-                                    Alternate planning dates that suit each partner’s style.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP10.planets[2].takeaway}
                                 </p>
                             </div>
                             <div class="p9-planet">
-                                <h3 class="p9-planet-title">Saturn Lessons</h3>
+                                <h3 class="p9-planet-title">${promptP10.planets[3].title}</h3>
+                                <div class="p8-divider"></div>
                                 <div class="p9-planet-img">
                                     ${saturnContent}
                                 </div>
                                 <p class="p9-planet-text">
-                                    Danylo’s Saturn at 18°58'29" and Nastia’s Saturn at 5°14'26"
-                                    remind you to build a solid foundation. These placements reveal that you both value stability,
-                                    but you might clash over methods and timing.
-                                    For Danylo, structure comes through steady effort.
-                                    Nastia often seeks quick results, then adjusts if needed.
+                                    ${promptP10.planets[3].text}
                                 </p>
-                                <h4 class="p9-planet-sub">Key Takeaway:</h4>
-                                <p class="p12-text">
-                                 Agree on a shared plan.
-                                 Break big goals into smaller steps and celebrate each milestone.
+                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p9-mini">
+                                    ${promptP10.planets[3].takeaway}
                                 </p>
                             </div>
                         </div>
                         <p class="p2-text">
-                            These planetary interactions create a rich tapestry of emotion, communication, and growth.
-                            Embrace the differences, honor each other’s style, 
-                            and use these insights to nurture a balanced relationship.
+                            ${promptP10.reflection}
                         </p>
                     </div>
             </div>
@@ -1869,89 +1857,73 @@ export class UIGeneratorService implements UIGenerator{
         `;
         // -- Page 10-- //
         // -- Page 11 -- //
+        const promptP11 = body.pages[3];
         const page11 = `
             <div class="p11">
-                ${topElement("Practical Recommendations and Conclusions")}
+                ${topElement(getTitle[lang].p11.title[0])}
                     <div class="p11-content">
                         <p class="p3-text">
-                            ${body.name1} and ${body.name2}, your synastry report presents a blend of supportive energies and growth challenges.
-                            Your chart is a roadmap, not a rulebook.
-                            Use these insights to nurture a fulfilling and balanced relationship.
+                            ${promptP11.intro}
                         </p>
                         <div class="p11-block">
-                            <h3>Overall Summary</h3>
-                            <p class="p12-text">
-                                Your chart shows both warmth and tension. For instance, Danylo’s Sun at 29°04'15"
-                                squares Nastia’s Moon at 1°12'12". This aspect can spark conflicts between Danylo’s
-                                need for self-expression and Nastia’s demand for emotional reassurance.
-                                Meanwhile, a strong Mercury square Mars hints at lively debates,
-                                where rapid ideas might escalate into heated exchanges.
-                                Yet, the Moon-Venus connection supports gentle understanding and affectionate moments.
+                            <h3>${getTitle[lang].p11.overall}</h3>
+                            <p class="p12-text p9-mini">
+                                ${promptP11.planets[0].text}
                             </p>
                         </div>
-                        <h3 class="p11-title">Practical Steps to Strengthen Your Bond</h3>
+                        <h3 class="p11-title">${getTitle[lang].p11.bond}</h3>
                         <div class="p11-arcadeons">
                             <div class="p11-arcadeon">
                                 <div class="p11-arcadeon-text">
                                     <h3>1</h3>
-                                    <span>Enhance</br>Communication:</span>
+                                    <span>${promptP11.planets[1].title.replaceAll(" ", "</br>")}:</span>
                                 </div>
                                 <div class="p11-arcadeon-info">
                                     <ul>
-                                        <li>${markerContent}Practice active listening. Allow each partner to share thoughts without interruption.</li>
-                                        <li>${markerContent}Pause and reflect during intense discussions. This helps both sides feel heard.</li>
+                                        <li>${markerContent}${promptP11.planets[1].steps[0]}</li>
+                                        <li>${markerContent}${promptP11.planets[1].steps[1]}</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="p11-arcadeon">
                                 <div class="p11-arcadeon-text">
                                     <h3>2</h3>
-                                    <span>Manage Emotional</br> Dynamics:</span>
+                                    <span>${promptP11.planets[2].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[2].title.split(' ').slice(2).join(' ')}:</span>
                                 </div>
                                 <div class="p11-arcadeon-info">
                                     <ul>
-                                        <li>${markerContent}Recognize when Danylo’s assertiveness might clash with Nastia’s sensitivity.</li>
-                                        <li>${markerContent}Set aside time for weekly check-ins or a relaxing walk to reconnect emotionally.</li>
+                                        <li>${markerContent}${promptP11.planets[2].steps[0]}</li>
+                                        <li>${markerContent}${promptP11.planets[2].steps[1]}</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="p11-arcadeon">
                                 <div class="p11-arcadeon-text">
                                     <h3>3</h3>
-                                    <span>Resolve Conflicts</br> Constructively:</span>
+                                    <span>${promptP11.planets[3].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[3].title.split(' ').slice(2).join(' ')}:</span>
                                 </div>
                                 <div class="p11-arcadeon-info">
                                     <ul>
-                                        <li>${markerContent}Use challenging aspects like the Sun-Moon square as opportunities for growth.</li>
-                                        <li>${markerContent}Write down feelings and discuss them calmly later to avoid impulsive reactions.</li>
+                                        <li>${markerContent}${promptP11.planets[3].steps[0]}</li>
+                                        <li>${markerContent}${promptP11.planets[3].steps[1]}</li>
                                     </ul>
                                 </div>
                             </div>
                             <div class="p11-arcadeon">
                                 <div class="p11-arcadeon-text">
                                     <h3>4</h3>
-                                    <span>Celebrate Strengths:</span>
+                                    <span>${promptP11.planets[4].title}:</span>
                                 </div>
                                 <div class="p11-arcadeon-info">
                                     <ul>
-                                        <li>${markerContent}Acknowledge supportive aspects that bring warmth, such as the harmonious Moon-Venus synergy.</li>
-                                        <li>${markerContent}Use these positive energies to build trust and boost intimacy.</li>
+                                        <li>${markerContent}${promptP11.planets[4].steps[0]}</li>
+                                        <li>${markerContent}${promptP11.planets[4].steps[1]}</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
-                        <h3 class="p11-title">Key Takeaway:</h3>
-                        <p class="p12-text">
-                            Embrace both the strengths and challenges in your unique dynamic.
-                            Open dialogue and mutual respect can turn obstacles into stepping stones toward deeper connection.
-                        </p>
-                        <p class="p3-text">
-                            By combining structure with spontaneous gestures,
-                            you can merge Danylo’s methodical approach with Nastia’s vibrant energy.
-                            Adapt, communicate honestly, and celebrate every small victory.
-                            Your synastry chart offers practical guidance to help you grow together,
-                            turning potential conflicts into opportunities for lasting harmony.
-                        </p>
+                        <h3 class="p11-title">${getTitle[lang].tk}</h3>
+                        ${promptP11.planets[5].text}
                     </div>
             </div>
             <div class="page-break"></div>
@@ -2012,6 +1984,10 @@ export class UIGeneratorService implements UIGenerator{
             ${page5}
             ${page6}
             ${page7}
+            ${page8}
+            ${page9}
+            ${page10}
+            ${page11}
             ${page12}
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #f9f9f9; z-index: -1;"></div>
         </body>
