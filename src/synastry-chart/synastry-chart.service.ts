@@ -124,7 +124,7 @@ export class SynastryService {
 
             console.log("Sending email...");
             // await this.googleSheetsService.appendRow(body.email);
-            const status = await this.sendMail(body.email, pdf);
+            const status = await this.sendMail(body.email, pdf, {name1:body.first_subject.name, name2:body.second_subject.name});
 
             return status;
         } catch (error) {
@@ -133,7 +133,7 @@ export class SynastryService {
         }
     }
 
-    async sendMail(email: string, pdf: Buffer) {
+    async sendMail(email: string, pdf: Buffer, names:{name1:string, name2:string}) {
         try {
             console.log("Sending email to:", email);
             const transporter = nodemailer.createTransport({
@@ -144,23 +144,27 @@ export class SynastryService {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
                 },
-                logger: true, // Додати логування для відправки
-                debug: true,  // Вивести додаткові відомості для діагностики
+                logger: true,
+                debug: true,  
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: `"${process.env.EMAIL_USER_NAME}" <${process.env.EMAIL_USER}>`,
                 to: email,
-                subject: "Your Synastry Chart PDF",
-                text: "Please find the attached PDF.",
+                subject: "Your Compatibility Report Is Ready 💫",
+                html: `
+                  <p>Thank you for your order. Your synastry report for ${names.name1} and ${names.name2} is attached to this email as a PDF.</p>
+                  <p><i>→ Click to download. It’s yours to keep forever.</i></p>
+                `,
                 attachments: [
-                    {
-                        filename: "synastry.pdf",
-                        content: pdf,
-                        contentType: "application/pdf",
-                    },
-                ],
-            };
+                  {
+                    filename: `Synastry Chart for ${names.name1} and ${names.name2}.pdf`,
+                    content: pdf,
+                    contentType: "application/pdf",
+                  },
+                ]
+              };
+              
 
             const info = await transporter.sendMail(mailOptions);
             this.processTimer.end();

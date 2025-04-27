@@ -12,8 +12,9 @@ export class PaymentService {
   }
 
   async createPaymentIntent() {
+    const pdfPrice = parseFloat(process.env.PDF_PRICE || '9.99');
     const paymentIntent = await this.stripe.paymentIntents.create({
-      amount: 9.99 * 100,
+      amount: pdfPrice * 100,
       currency: 'usd',
       automatic_payment_methods: {
         enabled: true,

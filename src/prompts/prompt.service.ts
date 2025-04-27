@@ -10,7 +10,7 @@ import { OpenAIService } from "src/utils/openai/openai";
 export class PromptService {
     private openAiService: OpenAIIntr;
     constructor(
-        @InjectModel(Prompt.name) private promptModel: Model<Prompt>,
+        @InjectModel(Prompt.name, 'synastryConnection') private promptModel: Model<Prompt>,
       ) {
         this.openAiService = new OpenAIService();
       }

@@ -5,9 +5,10 @@ import { Prompt, PromptSchema } from "./prompt.schema";
 import { PromptController } from "./prompt.controller";
 @Module({
     imports: [
-        MongooseModule.forFeature([
-            { name: Prompt.name, schema: PromptSchema },
-        ])
+        MongooseModule.forFeature(
+            [{ name: Prompt.name, schema: PromptSchema }],
+            'synastryConnection'
+        )
     ],
     providers: [PromptService],
     exports: [PromptService],

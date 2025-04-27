@@ -25,6 +25,21 @@ import { PromptModule } from './prompts/prompt.module';
         };
       },
     }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      connectionName: 'synastryConnection',
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get('MONGO_LINK');
+        const appEnv = configService.get('APP_ENV');
+        console.log(uri);
+        
+        return {
+          uri,
+          dbName: "synastry"
+        };
+      },
+    }),
     SynastryModule,
     PaypalModule,
     ZodiacSignsModule,
