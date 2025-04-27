@@ -1,5 +1,4 @@
 import { ProcessTimer } from ".";
-import { logger } from "../logger";
 
 export class ProcessTimerImpl implements ProcessTimer{
     private timeStart:number;
