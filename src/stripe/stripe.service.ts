@@ -42,10 +42,16 @@ export class PaymentService {
         enabled: true,
       },
     });
-
-    return {
-      clientSecret: paymentIntent.client_secret,
-    };
+    if(realPrice){
+      return {
+        price:realPrice,
+        clientSecret: paymentIntent.client_secret,
+      };
+    }else{
+      return {
+        clientSecret: paymentIntent.client_secret,
+      };
+    }
   }
   async captureOrder(body: SynastryDto, paymentIntentId?: string | null, ) {
     if(!paymentIntentId){

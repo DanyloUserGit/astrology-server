@@ -19,8 +19,8 @@ export class PromoService {
                 discount: promo.discount,
                 title:promo.title,
                 promo: promo.promo,
-                discountNumber,
-                priceAfterDiscount,
+                discountNumber:parseFloat(discountNumber.toFixed(2)),
+                priceAfterDiscount:parseFloat(priceAfterDiscount.toFixed(2)),
             }
         } catch (error) {
             console.log(error);
