@@ -17,7 +17,7 @@ export interface PDFInfo {
 export interface UIGenerator {
     createSvg: (rawData: NatalChart)=>void;
     createSvgNatal: (rawData: NatalChart)=>string;
-    createPdfFile: (body: PDFInfo)=>Promise<Buffer<ArrayBufferLike>>;
+    createPdfFile: (body: PDFInfo)=>any;
     loadStyles: ()=>string;
     loadSvg: (dir:string)=>string[];
     loadPlanetSvgByName: (dir:string)=>string;

@@ -1069,945 +1069,957 @@ export class UIGeneratorService implements UIGenerator{
             </style>
         `;
     }
-    async createPdfFile(body: PDFInfo){
-        console.log("Launching Puppeteer...");
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"]
-        });        
-        
-        const page = await browser.newPage();
-        const formatter = DateTimeFormatter.ofPattern("d MMM, yyyy 'at' hh:mm a").withLocale(Locale.ENGLISH);
-        
-        // -- Content -- //
-        const twinsPath = path.join(__dirname, "../../../src/files/twins.svg");
-        const twinsContent = fs.readFileSync(twinsPath, "utf-8");
-
-        const miniPath = path.join(__dirname, "../../../src/files/cover-picture.svg");
-        const miniContent = fs.readFileSync(miniPath, "utf-8");
-
-        const QRPath = path.join(__dirname, "../../../src/files/QR.svg");
-        const QRContent = fs.readFileSync(QRPath, "utf-8");
-
-        const telegramPath = path.join(__dirname, "../../../src/files/telegram.svg");
-        const telegramContent = fs.readFileSync(telegramPath, "utf-8");
-
-        const logoPath = path.join(__dirname, "../../../src/files/logo.svg");
-        const logoContent = fs.readFileSync(logoPath, "utf-8");
-
-        const starsPath = path.join(__dirname, "../../../src/files/stars.svg");
-        const starsContent = fs.readFileSync(starsPath, "utf-8");
-
-        const plusPath = path.join(__dirname, "../../../src/files/plus.svg");
-        const plusContent = fs.readFileSync(plusPath, "utf-8");
-
-        const markerPath = path.join(__dirname, "../../../src/files/marker.svg");
-        const markerContent = fs.readFileSync(markerPath, "utf-8");
-
-        const waterPath = path.join(__dirname, "../../../src/files/water.svg");
-        const waterContent = fs.readFileSync(waterPath, "utf-8");
-
-        const firePath = path.join(__dirname, "../../../src/files/fire.svg");
-        const fireContent = fs.readFileSync(firePath, "utf-8");
-
-        const ariesPath = path.join(__dirname, "../../../src/files/signs_big/Aries.svg");
-        const ariesContent = fs.readFileSync(ariesPath, "utf-8");
-
-        const moonPath = path.join(__dirname, "../../../src/files/explonation/Moon.svg");
-        const moonContent = fs.readFileSync(moonPath, "utf-8");
-
-        const saturnPath = path.join(__dirname, "../../../src/files/explonation/Saturn.svg");
-        const saturnContent = fs.readFileSync(saturnPath, "utf-8");
-
-        const venus_marsPath = path.join(__dirname, "../../../src/files/explonation/Venus_Mars.svg");
-        const venus_marsContent = fs.readFileSync(venus_marsPath, "utf-8");
-
-        const n1Path = path.join(__dirname, "../../../src/files/page8/1.svg");
-        const n1Content = fs.readFileSync(n1Path, "utf-8");
-
-        const n2Path = path.join(__dirname, "../../../src/files/page8/2.svg");
-        const n2Content = fs.readFileSync(n2Path, "utf-8");
-
-        const n3Path = path.join(__dirname, "../../../src/files/page8/3.svg");
-        const n3Content = fs.readFileSync(n3Path, "utf-8");
-
-        const n4Path = path.join(__dirname, "../../../src/files/page8/4.svg");
-        const n4Content = fs.readFileSync(n4Path, "utf-8");
-        // -- Content -- //
-
-        // -- Styles -- //
-        const styles = this.loadStyles();
-        // -- Styles -- //
-
-        // -- chart -- //
-        const chart1 = this.createSvg(body.synastry);
-        // -- chart -- //
-
-        // -- Top -- //
-        const topElement = (title: string)=>{
-            return `
-            <div class="top-element">
-                <div class="sub">
-                    <div class="line"></div>
-                    <div class="star">${starsContent}</div>
-                </div>
-                <h2 class="page-title">${title}</h2>
-                <div class="sub">
-                    <div class="star">${starsContent}</div>
-                    <div class="line"></div>
-                </div>
-            </div>
-            `;
-        }
-        // -- Top -- //
-         // -- down -- //
-         const downElement = (number: number)=>{
-             return `
-             <div class="bottom-element">
-                 <div class="sub">
-                     <div class="line"></div>
-                 </div>
-                 <h2 class="page-title">${number}</h2>
-                 <div class="sub">
-                     <div class="line"></div>
-                 </div>
-             </div>
-             `;
-         }
-         // -- down -- //
-
-        // -- Page 1 -- //
-        const date = new Date();
-        const localDate = LocalDate.of(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        const formatted = localDate.month().toString().charAt(0) + localDate.month().toString().slice(1).toLowerCase()
-        + ' ' + localDate.dayOfMonth() + ', ' + localDate.year();
-        const page1 = `
-        <div class="p1-content">
-                <div class="logo">${logoContent}</div>
-                <div class="p1-content-text">
-                    <h1 class="p1-content-title">Your Personalized Synastry Chart</h1>
-                    <h2 class="p1-content-subtitle">${formatted}</h2>
-                </div>
-                <div class="p1-twins">
-                    ${twinsContent}
-                </div>
-                <div class="p1-content-under">
-                    <h2 class="p1-content-under-text">This cosmic report is crafted exclusively for</h2>
-                    <div class="p1-content-names">
-                        <div class="p1-content-name">${body.name1}</div>
-                         <span>and</span>
-                        <div class="p1-content-name">${body.name2}</div>
-                    </div> 
-                </div>
-                <div class="p1-footer">
-                    <h1 class="p1-footer-text">
-                        In this report, you'll find a unique analysis of your relationship dynamics, 
-                        including your shared strengths and growth areas.
-                    </h1>
-                </div>
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 1 -- //
-        const signsSvg = this.loadSvg("signs");
-        const planetsSvg = this.loadSvg("planets");
-        const signNames = ["aries", "taurus", "gemini", "cancer",
-            "leo", "virgo", "libra", "scorpio", "sagittarius", 
-            "carpicorn", "aquarius", "pisces"
-        ];
-        const planetNames = ["sun", "moon", "mercury", "venus", "mars", "jupiter",
-            "saturn", "uranus", "neptune", "pluto", "chiron", "ascendant", "mc", 
-            "north node"
-        ];
-        const renderSignList = () => {
-            let list:string = "";
-            let list1:string = "";
-            let list2:string = "";
-            signNames.splice(6, 6).map((item, index)=>{
-                list1 += `
-                    <li class="text-right"><div class="text-right-svg">${signsSvg[index]}</div> <span>${item.toUpperCase()}</span></li>
-                `;
-            })
-            signNames.splice(0, 6).map((item, index)=>{
-                list2 += `
-                    <li class="text-right"><div class="text-right-svg">${signsSvg[index+5]}</div> <span>${item.toUpperCase()}</span></li>
-                `;
-            })
-            list = `
-                <ul>
-                    ${list1}
-                </ul>
-                <ul>
-                    ${list2}
-                </ul>
-            `;
-            return `<div class="p2-symbols-list">${list}</div>`;
-        }
-        const renderPlanetList = () => {
-            let list:string = "";
-            let list1:string = "";
-            let list2:string = "";
-            planetNames.splice(7, 7).map((item, index)=>{
-                list1 += `
-                    <li><span class="text-left">${item.toUpperCase()}</span> ${planetsSvg[index]}</li>
-                `;
-            })
-            planetNames.splice(0, 7).map((item, index)=>{
-                list2 += `
-                    <li><span class="text-left">${item.toUpperCase()}</span> ${planetsSvg[index+6]}</li>
-                `;
-            })
-            list = `
-                <ul>
-                    ${list1}
-                </ul>
-                <ul>
-                    ${list2}
-                </ul>
-            `;
-            return `<div class="p2-symbols-list">${list}</div>`;
-        }
-        // -- Page 2 -- //
-        const page2 = `
-            <div class="p2 parent-container">
-                ${topElement("Synastry Chart")}
-                <div class="p2-content">
-                    <p class="p2-text p2-start">
-                        Synastry is a branch of astrology that compares the birth charts of two people.
-                        It examines how the planetary positions at the time of birth interact between partners.
-                        We overlay your charts to highlight key points such as the Sun, Moon, and Ascendant.
-                        These markers reveal core personality traits and relationship energies.
-                        Synastry transforms complex astrological data into clear insights you can use.
-                    </p>
-                    <div class="p2-chart">${chart1}</div>
-                    <div class="p2-userinfo">
-                        <div class="p2-users">
-                            <div class="p2-user">
-                                <div class="p2-content-name">${body.name1}</div>
-                                <span class="p2-user-text">${ZonedDateTime.parse(body.birthDate1).withZoneSameInstant(ZoneId.of('UTC')).format(formatter)}</span>
-                                <span class="p2-user-text">${body.birthPlace1}</span>
-                            </div>
-                            <div class="p2-plus">
-                                ${plusContent}
-                            </div>
-                            <div class="p2-user">
-                                <div class="p2-content-name">${body.name2}</div>
-                                <span class="p2-user-text">${ZonedDateTime.parse(body.birthDate2).withZoneSameInstant(ZoneId.of('UTC')).format(formatter)}</span>
-                                <span class="p2-user-text">${body.birthPlace2}</span>
-                            </div>
-                        </div>
-                        <div class="p2-symbols">
-                            <div class="p2-symbols-signs">
-                                <span class="p2-symbols-title">Zodiac Signs</span>
-                                    ${renderSignList()}
-                            </div>
-                            <div class="p2-symbols-planets">
-                                <span class="p2-symbols-title">Planet Symbols</span>
-                                    ${renderPlanetList()}
-                            </div>
-                        </div>
-                        <p class="p12-text p2-down">
-                            Sun-Moon connections: potential for emotional synergy.
-                        </p>
-                    </div>
-                    <p class="p2-text p2-end">
-                        The legend below decodes each sign and planet, helping you see where your energies align or clash.
-                    </p>
-                </div>
-                ${downElement(2)}
-            </div>
-        `;
-        // -- Page 2 -- //
-        // -- Page 3 -- //
-        const page3 = `
-            <div class="p3 parent-container">
-                ${topElement("What is Synastry?")}
-                <div class="p3-content content-container">
-                    <p class="p3-text">
-                        Synastry is a branch of astrology that compares the birth charts of two people.
-                        It examines how the planetary positions at the time of birth interact between partners.
-                        We overlay your charts to highlight key points such as the Sun, Moon, and Ascendant.
-                        These markers reveal core personality traits and relationship energies.
-                        Synastry transforms complex astrological data into clear insights you can use.
-                    </p>
-                    <div class="text-block">
-                        <span class="text-block-title">
-                            Key benefits of synastry:
-                        </span>
-                        <ul class="text-block-list">
-                            <li>${markerContent}<b>Clarity: </b>Understand how each partner’s energy influences the relationship.</li>
-                            <li>${markerContent}<b>Guidance: </b>Identify strengths and potential challenges.</li>
-                            <li>${markerContent}<b>Awareness: </b>Learn which traits blend well and which may clash.</li>
-                        </ul>
-                    </div>
-                    <p class="p3-text">
-                        Synastry does not predict fate. It uncovers the hidden layers of your relationship.
-                        It shows how you and your partner influence each other.
-                        You gain a clear picture of your communication style and emotional balance.
-                        Each planetary aspect comes with a brief explanation in plain language.
-                        This way, you know exactly what the energies mean for your connection.
-                    </p>
-                    <h2 class="p3-title">The Purpose of Your Report</h2>
-                    <p class="p3-text">
-                        The purpose of this report is to offer deep insight into your relationship and provide actionable guidance.
-                        Our goal is to simplify complex astrological data into practical advice you can apply every day.
-                    </p>
-                    <div class="text-block">
-                        <span class="text-block-title">
-                            This report does the following:
-                        </span>
-                        <ul class="text-block-list">
-                            <li>${markerContent}<b>Breaks Down Your Charts: </b>We analyze your individual natal charts and then compare them. You see how your energies interact.</li>
-                            <li>${markerContent}<b>Offers Detailed Analysis: </b>You learn why you click in some areas and face friction in others. We highlight key planetary aspects that influence your connection.</li>
-                            <li>${markerContent}<b>Provides Practical Guidance: </b>Clear tips help you use your strengths and manage potential conflicts. The advice is direct and ready to apply.</li>
-                            <li>${markerContent}<b>Promotes Personal Growth: </b>You discover how your relationship can help you grow. The report serves as a roadmap for building a balanced, harmonious bond.</li>
-                        </ul>
-                    </div>
-                    <div class="text-block">
-                        <span class="text-block-title">
-                            Inside this report, you will find:
-                        </span>
-                        <ul class="text-block-list">
-                            <li>${markerContent}<b>Individual Natal Charts: </b>Detailed breakdowns of your core traits, including your Sun, Moon, and Ascendant signs.</li>
-                            <li>${markerContent}<b>Synastry Analysis: </b>A comprehensive look at how your charts interact, with each aspect explained briefly.</li>
-                            <li>${markerContent}<b>Actionable Recommendations: </b>Clear steps to boost communication and manage emotional dynamics.</li>
-                        </ul>
-                    </div>
-                    <p class="p3-text">
-                        This report acts as your personal guide. It uses simple language without confusing astrological jargon.
-                        You gain a clear view of your relationship’s strengths and challenges.
-                        This clarity empowers you to nurture your connection confidently.
-                    </p>
-                    <h2 class="p3-title">How to Read This Report</h2>
-                    <p class="p3-text">
-                        This report is divided into clear, concise sections.
-                        Each section builds on the previous one, making it easy to follow.
-                    </p>
-                    <p class="p3-text">
-                        You will first read an introduction that explains what synastry is.
-                        Next, you review your individual natal charts.
-                        In this section, you see each partner’s core traits presented in simple graphics and bullet points.
-                    </p>
-                    <p class="p3-text">
-                        The following section focuses on the synastry analysis.
-                        Here, you find a breakdown of major planetary aspects between you and your partner.
-                        Each aspect comes with a short, direct explanation.
-                        We use tables and lists to make the information easy to scan.
-                    </p>
-                    <p class="p3-text">
-                        After the analysis, you receive practical recommendations.
-                        This section gives clear steps to enhance your relationship.
-                        The advice is written in friendly, direct language so you can use it immediately in your daily life.
-                    </p>
-                    <p class="p3-text">
-                        The report concludes with a summary and additional resources.
-                        This final section ties together all the insights you have gained.
-                        It recaps key points and guides you on the next steps.
-                    </p>
-                    <p class="p2-text p3-end">
-                        By following this structured approach, you get a clear,
-                        actionable view of your relationship’s celestial blueprint.
-                        This Personalized Synastry Chart report is designed to empower you and your partner
-                        to grow together and build a lasting, meaningful bond.
-                    </p>
-                </div>
-                ${downElement(3)}
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 3 -- //
-        // -- Page 4 -- //
-        const page4 = `
-            <div class="p4 parent-container">
-                ${topElement("Methodology")}
-                <div class="p4-content content-container">
-                    <p class="p3-text">
-                        This report transforms your birth details into a clear, personalized astrological profile
-                        It provides insights to help you understand your relationship and make informed decisions.
-                    </p>
-                    <h2 class="p3-title">Data Sources</h2>
-                    <p class="p3-text">
-                        You provide your birth date, time, and place. 
-                        These details capture the unique snapshot of the sky at your birth.
-                        This input creates your natal chart—a blueprint of your core traits and energies.
-                        We use trusted astronomical sources to ensure accuracy, so your report truly reflects your cosmic imprint.
-                        <b>Ensure your birth details are spot-on—every correct detail unlocks uniquely tailored,
-                        precise insights that empower you to fully embrace your cosmic blueprint.</b>
-                    </p>
-                    <h2 class="p3-title">Astrological Analysis</h2>
-                    <p class="p3-text">
-                        Your personalized chart reveals essential aspects of your personality.
-                        We compare your chart with your partner’s to show how your energies interact.
-                    </p>
-                    <div class="text-block">
-                        <span class="text-block-title">
-                            You get a clear breakdown of key points, including:
-                        </span>
-                        <ul class="text-block-list">
-                            <li>${markerContent}<b>Core Personality: </b>You will learn about your Sun, Moon, and Ascendant signs. These elements will highlight your inherent traits and strengths.</li>
-                            <li>${markerContent}<b>Relationship Dynamics: </b>You will see how major planetary aspects like Sun-Moon and Venus-Mars will influence your connection. This analysis will reveal where you naturally click and where challenges may occur.</li>
-                            <li>${markerContent}<b>Actionable Insights: </b>You will receive straightforward advice. Each planetary aspect will be explained in plain language so you will know exactly how to nurture your strengths and address potential friction.</li>
-                        </ul>
-                    </div>
-                    <div class="text-block">
-                        <span class="text-block-title">
-                            Key benefits:
-                        </span>
-                        <ul class="text-block-list">
-                            <li>${markerContent}<b>Clarity: </b>Gain a clear view of your unique cosmic imprint.</li>
-                            <li>${markerContent}<b>Guidance: </b>Learn practical steps to enhance your relationship.</li>
-                            <li>${markerContent}<b>Empowerment: </b>Use actionable insights to make informed decisions.</li>
-                        </ul>
-                    </div>
-                    <div class="p4-end">
-                        <div class="p2-text">
-                            <h2 class="p3-title">Important Notes</h2>
-                            <p class="p3-text">
-                                Remember, astrology is a tool for self-reflection.
-                                The insights in your report guide you in understanding your relationship better.
-                                They are not absolute predictions but serve as a roadmap for growth.
-                                Knowing your cosmic blueprint helps you build a balanced and lasting bond.
-                            </p>
-                            <p class="p3-text">
-                                This methodology ensures you receive a practical, easy-to-understand analysis.
-                                Enjoy exploring your astrological profile and use these insights to enhance your relationship every day.
-                            </p>
-                        </div>
-                        <p class="p4-yellow">
-                            *Astrology is a tool, not a guarantee. Your free will and personal choices shape your path.
-                        </p>
-                    </div>
-                </div>
-                ${downElement(4)}
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 4 -- //
-        const rawInfoPath = path.join(__dirname, "../../../src/files/mocs/zodiac_signs.json");
-        const rawInfo = JSON.parse(fs.readFileSync(rawInfoPath, 'utf-8'));
-        const natal1 = this.createSvgNatal(body.natal1)
-        const natal2 = this.createSvgNatal(body.natal2)
-        const planetsList1 = this.getPlanets(body.natal1);
-        const planetsList2 = this.getPlanets(body.natal2);
-        const renderZodiacInfo = (birthDate: string) => {
-            const data = rawInfo;
-            const date = ZonedDateTime.parse(birthDate).withZoneSameInstant(ZoneId.of('UTC'));
-            const day = date.dayOfMonth();
-            const month = date.monthValue();
-
-            const element = data.find((item) => {
-                const range1 = item.date_range.range1;
-                const range2 = item.date_range.range2;
-              
-                const isAfterRange1 = (month > range1.month || (month === range1.month && day >= range1.day));
-                const isBeforeRange2 = (month < range2.month || (month === range2.month && day <= range2.day));
-              
-                return isAfterRange1 && isBeforeRange2;
-              });
-              const signContent = this.loadSignSvgByName(element.Sign);
-              const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-              const { date_range, Sign, ...otherData } = element; 
-              let form = "";
-              Object.entries(otherData).forEach(([key, value]) => {
-                const valueString = Array.isArray(value) ? value.join(', ') : value;
-                form += `
-                    <div class="p5-zodiac-info-item">
-                        <span class="p5-zodiac-info-item-title">${key}:</span>
-                        <span class="p5-zodiac-info-item-value">${valueString}</span>
-                    </div>
-                `;
-            });
-            return `
-                    <div class="p5-zodiac">
-                        <div class="p5-zodiac-img">
-                            ${signContent}
-                            <div class="p5-zodiac-date">
-                                <h3>${element.Sign}</h3>
-                                <span> 
-                                    ${monthNames[element.date_range.range1.month - 1]} ${element.date_range.range1.day}-${monthNames[element.date_range.range2.month - 1]} ${element.date_range.range2.day}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p5-zodiac-info">
-                            ${form}
-                        </div>
-                    </div>
-            `;
-        }
-        // -- Page 5 -- //
-        const page5 = `
-            <div class="p5 parent-container">
-                ${topElement("Individual Natal Charts")}
-                <div class="p5-content content-container">
-                    <p class="p3-text">
-                        This section focuses on your unique astrological blueprint.
-                        Each partner receives an individual natal chart.
-                        The chart is a snapshot of the sky at the exact moment of your birth.
-                        It shows the position of key planets. We focus on three core elements:
-                        the Sun, Moon, and Ascendant signs. These markers reveal essential aspects of your personality.
-                    </p>
-                    <div class="p5-natal">
-                        <div class="p5-section">
-                            <div class="p5-natal-chart">
-                                ${natal1}
-                            </div>
-                            <span class="p5-natal-title title-absolute">${body.name1}’s Chart</span>
-                        </div>
-                        <div class="p5-section">
-                            <span class="p5-natal-title">${body.name1}’s Planets</span>
-                            ${planetsList1}
-                        </div>
-                    </div>
-                    ${renderZodiacInfo(body.birthDate1)}
-                </div>
-                ${downElement(5)}
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 5 -- //
-        // -- Page 6 -- //
-        const page6 = `
-            <div class="p5 parent-container">
-                ${topElement("Individual Natal Charts")}
-                <div class="p5-content content-container">
-                    <div class="p5-natal">
-                        <div class="p6-section">
-                            <div class="p6-natal-chart">
-                                ${natal2}
-                            </div>
-                            <span class="p5-natal-title title-absolute">${body.name2}’s Chart</span>
-                        </div>
-                        <div class="p5-section">
-                            <span class="p5-natal-title">${body.name2}’s Planets</span>
-                            ${planetsList2}
-                        </div>
-                    </div>
-                    ${renderZodiacInfo(body.birthDate2)}
-                </div>
-                ${downElement(6)}
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 6 -- //
-        const renderPlanetListwithText = () => {
-            let list:string = "";
-            let list1:string = "";
-            let list2:string = "";
-            planetsDescription.slice(2).splice(7, 7).map((item, index)=>{
-                list1 += `
-                    <li>${planetsSvg[index]} <span class="p7-bl-text">${item}</span></li>
-                `;
-            })
-            planetsDescription.slice(2).splice(0, 7).map((item, index)=>{
-                list2 += `
-                    <li>${planetsSvg[index+6]} <span class="p7-bl-text">${item}</span></li>
-                `;
-            })
-            list = `
-                <ul class="p7-column">
-                    <li>${waterContent} <span class="p7-bl-text">${planetsDescription[0]}</span></li>
-                    ${list1}
-                </ul>
-                <ul class="p7-column">
-                    <li>${fireContent} <span class="p7-bl-text">${planetsDescription[1]}</span></li>
-                    ${list2}
-                </ul>
-            `;
-            return `${list}`;
-        }
-        // -- Page 7 -- //
-        const page7 = `
-            <div class="p7 parent-container">
-            ${topElement("Key Aspects Notes")}
-                <div class="p7-content content-container">
-                    <p class="p3-text">
-                        This section focuses on your unique astrological blueprint.
-                        Each partner receives an individual natal chart.
-                        The chart is a snapshot of the sky at the exact moment of your birth.
-                        It shows the position of key planets. We focus on three core elements:
-                        the Sun, Moon, and Ascendant signs. These markers reveal essential aspects of your personality.
-                    </p>
-                    <div class="p7-blocks">
-                        ${renderPlanetListwithText()}
-                    </div>
-                </div>
-                ${downElement(7)}
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 7 -- //
-        const socialSvg = this.loadSvg("social");
-        const renderSocial = () => {
-            let str:string = "";
+    async createPdfFile(body: PDFInfo, retries = 2, delayMs = 1000){
+        try{
+            console.log("Launching Puppeteer...");
+            const browser = await puppeteer.launch({
+                headless: true,
+                args: ["--no-sandbox", "--disable-setuid-sandbox"]
+            });        
             
-            socialSvg.map((svg)=>{
-                str += `<div>${svg}</div>`
-            })
+            const page = await browser.newPage();
+            const formatter = DateTimeFormatter.ofPattern("d MMM, yyyy 'at' hh:mm a").withLocale(Locale.ENGLISH);
+            
+            // -- Content -- //
+            const twinsPath = path.join(__dirname, "../../../src/files/twins.svg");
+            const twinsContent = fs.readFileSync(twinsPath, "utf-8");
 
-            return str;
-        }
-        // -- Page 8 -- //
-        const lang = body.lang;
-        const promptP8 = body.pages[0];
-        const page8 = `
-            <div class="p8">
-                ${topElement(`${getTitle[lang].tit[0]} ${body.name1} ${getTitle[lang].tit[1]} ${body.name2}`)}
-                    <div class="p8-content">
-                        <p class="p2-text">
-                            ${promptP8.intro}
+            const miniPath = path.join(__dirname, "../../../src/files/cover-picture.svg");
+            const miniContent = fs.readFileSync(miniPath, "utf-8");
+
+            const QRPath = path.join(__dirname, "../../../src/files/QR.svg");
+            const QRContent = fs.readFileSync(QRPath, "utf-8");
+
+            const telegramPath = path.join(__dirname, "../../../src/files/telegram.svg");
+            const telegramContent = fs.readFileSync(telegramPath, "utf-8");
+
+            const logoPath = path.join(__dirname, "../../../src/files/logo.svg");
+            const logoContent = fs.readFileSync(logoPath, "utf-8");
+
+            const starsPath = path.join(__dirname, "../../../src/files/stars.svg");
+            const starsContent = fs.readFileSync(starsPath, "utf-8");
+
+            const plusPath = path.join(__dirname, "../../../src/files/plus.svg");
+            const plusContent = fs.readFileSync(plusPath, "utf-8");
+
+            const markerPath = path.join(__dirname, "../../../src/files/marker.svg");
+            const markerContent = fs.readFileSync(markerPath, "utf-8");
+
+            const waterPath = path.join(__dirname, "../../../src/files/water.svg");
+            const waterContent = fs.readFileSync(waterPath, "utf-8");
+
+            const firePath = path.join(__dirname, "../../../src/files/fire.svg");
+            const fireContent = fs.readFileSync(firePath, "utf-8");
+
+            const ariesPath = path.join(__dirname, "../../../src/files/signs_big/Aries.svg");
+            const ariesContent = fs.readFileSync(ariesPath, "utf-8");
+
+            const moonPath = path.join(__dirname, "../../../src/files/explonation/Moon.svg");
+            const moonContent = fs.readFileSync(moonPath, "utf-8");
+
+            const saturnPath = path.join(__dirname, "../../../src/files/explonation/Saturn.svg");
+            const saturnContent = fs.readFileSync(saturnPath, "utf-8");
+
+            const venus_marsPath = path.join(__dirname, "../../../src/files/explonation/Venus_Mars.svg");
+            const venus_marsContent = fs.readFileSync(venus_marsPath, "utf-8");
+
+            const n1Path = path.join(__dirname, "../../../src/files/page8/1.svg");
+            const n1Content = fs.readFileSync(n1Path, "utf-8");
+
+            const n2Path = path.join(__dirname, "../../../src/files/page8/2.svg");
+            const n2Content = fs.readFileSync(n2Path, "utf-8");
+
+            const n3Path = path.join(__dirname, "../../../src/files/page8/3.svg");
+            const n3Content = fs.readFileSync(n3Path, "utf-8");
+
+            const n4Path = path.join(__dirname, "../../../src/files/page8/4.svg");
+            const n4Content = fs.readFileSync(n4Path, "utf-8");
+            // -- Content -- //
+
+            // -- Styles -- //
+            const styles = this.loadStyles();
+            // -- Styles -- //
+
+            // -- chart -- //
+            const chart1 = this.createSvg(body.synastry);
+            // -- chart -- //
+
+            // -- Top -- //
+            const topElement = (title: string)=>{
+                return `
+                <div class="top-element">
+                    <div class="sub">
+                        <div class="line"></div>
+                        <div class="star">${starsContent}</div>
+                    </div>
+                    <h2 class="page-title">${title}</h2>
+                    <div class="sub">
+                        <div class="star">${starsContent}</div>
+                        <div class="line"></div>
+                    </div>
+                </div>
+                `;
+            }
+            // -- Top -- //
+            // -- down -- //
+            const downElement = (number: number)=>{
+                return `
+                <div class="bottom-element">
+                    <div class="sub">
+                        <div class="line"></div>
+                    </div>
+                    <h2 class="page-title">${number}</h2>
+                    <div class="sub">
+                        <div class="line"></div>
+                    </div>
+                </div>
+                `;
+            }
+            // -- down -- //
+
+            // -- Page 1 -- //
+            const date = new Date();
+            const localDate = LocalDate.of(date.getFullYear(), date.getMonth() + 1, date.getDate());
+            const formatted = localDate.month().toString().charAt(0) + localDate.month().toString().slice(1).toLowerCase()
+            + ' ' + localDate.dayOfMonth() + ', ' + localDate.year();
+            const page1 = `
+            <div class="p1-content">
+                    <div class="logo">${logoContent}</div>
+                    <div class="p1-content-text">
+                        <h1 class="p1-content-title">Your Personalized Synastry Chart</h1>
+                        <h2 class="p1-content-subtitle">${formatted}</h2>
+                    </div>
+                    <div class="p1-twins">
+                        ${twinsContent}
+                    </div>
+                    <div class="p1-content-under">
+                        <h2 class="p1-content-under-text">This cosmic report is crafted exclusively for</h2>
+                        <div class="p1-content-names">
+                            <div class="p1-content-name">${body.name1}</div>
+                            <span>and</span>
+                            <div class="p1-content-name">${body.name2}</div>
+                        </div> 
+                    </div>
+                    <div class="p1-footer">
+                        <h1 class="p1-footer-text">
+                            In this report, you'll find a unique analysis of your relationship dynamics, 
+                            including your shared strengths and growth areas.
+                        </h1>
+                    </div>
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 1 -- //
+            const signsSvg = this.loadSvg("signs");
+            const planetsSvg = this.loadSvg("planets");
+            const signNames = ["aries", "taurus", "gemini", "cancer",
+                "leo", "virgo", "libra", "scorpio", "sagittarius", 
+                "carpicorn", "aquarius", "pisces"
+            ];
+            const planetNames = ["sun", "moon", "mercury", "venus", "mars", "jupiter",
+                "saturn", "uranus", "neptune", "pluto", "chiron", "ascendant", "mc", 
+                "north node"
+            ];
+            const renderSignList = () => {
+                let list:string = "";
+                let list1:string = "";
+                let list2:string = "";
+                signNames.splice(6, 6).map((item, index)=>{
+                    list1 += `
+                        <li class="text-right"><div class="text-right-svg">${signsSvg[index]}</div> <span>${item.toUpperCase()}</span></li>
+                    `;
+                })
+                signNames.splice(0, 6).map((item, index)=>{
+                    list2 += `
+                        <li class="text-right"><div class="text-right-svg">${signsSvg[index+5]}</div> <span>${item.toUpperCase()}</span></li>
+                    `;
+                })
+                list = `
+                    <ul>
+                        ${list1}
+                    </ul>
+                    <ul>
+                        ${list2}
+                    </ul>
+                `;
+                return `<div class="p2-symbols-list">${list}</div>`;
+            }
+            const renderPlanetList = () => {
+                let list:string = "";
+                let list1:string = "";
+                let list2:string = "";
+                planetNames.splice(7, 7).map((item, index)=>{
+                    list1 += `
+                        <li><span class="text-left">${item.toUpperCase()}</span> ${planetsSvg[index]}</li>
+                    `;
+                })
+                planetNames.splice(0, 7).map((item, index)=>{
+                    list2 += `
+                        <li><span class="text-left">${item.toUpperCase()}</span> ${planetsSvg[index+6]}</li>
+                    `;
+                })
+                list = `
+                    <ul>
+                        ${list1}
+                    </ul>
+                    <ul>
+                        ${list2}
+                    </ul>
+                `;
+                return `<div class="p2-symbols-list">${list}</div>`;
+            }
+            // -- Page 2 -- //
+            const page2 = `
+                <div class="p2 parent-container">
+                    ${topElement("Synastry Chart")}
+                    <div class="p2-content">
+                        <p class="p2-text p2-start">
+                            Synastry is a branch of astrology that compares the birth charts of two people.
+                            It examines how the planetary positions at the time of birth interact between partners.
+                            We overlay your charts to highlight key points such as the Sun, Moon, and Ascendant.
+                            These markers reveal core personality traits and relationship energies.
+                            Synastry transforms complex astrological data into clear insights you can use.
                         </p>
-                        <div class="p8-section">
-                            <div class="p8-chart">
-                                ${chart1}
-                            </div>
-                            <span class="p8-title">${promptP8.chartTitle}</span>
-                        </div>
-                        <div class="p8-info">
-                            <div class="p8-card">
-                                <h3 class="p8-card-title">${getTitle[lang].ks}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p8-card-el">
-                                    <div class="p8-card-el-img">${n1Content}</div>
-                                    <p>${promptP8.strengths[0]}</p>
+                        <div class="p2-chart">${chart1}</div>
+                        <div class="p2-userinfo">
+                            <div class="p2-users">
+                                <div class="p2-user">
+                                    <div class="p2-content-name">${body.name1}</div>
+                                    <span class="p2-user-text">${ZonedDateTime.parse(body.birthDate1).withZoneSameInstant(ZoneId.of('UTC')).format(formatter)}</span>
+                                    <span class="p2-user-text">${body.birthPlace1}</span>
                                 </div>
-                                <div class="p8-card-el">
-                                    <div class="p8-card-el-img">${n2Content}</div>
-                                    <p>${promptP8.strengths[1]}</p>
+                                <div class="p2-plus">
+                                    ${plusContent}
                                 </div>
-                                <p class="p2-text p8-text-desc">
-                                   ${promptP8.strengths[2]}
-                                </p>
-                            </div>
-                            <div class="p8-card">
-                                <h3 class="p8-card-title">${getTitle[lang].pc}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p8-card-el">
-                                    <div class="p8-card-el-img">${n3Content}</div>
-                                    <p>${promptP8.challenges[0]}</p>
-                                </div>
-                                <div class="p8-card-el">
-                                    <div class="p8-card-el-img">${n4Content}</div>
-                                    <p>${promptP8.challenges[1]}</p>
+                                <div class="p2-user">
+                                    <div class="p2-content-name">${body.name2}</div>
+                                    <span class="p2-user-text">${ZonedDateTime.parse(body.birthDate2).withZoneSameInstant(ZoneId.of('UTC')).format(formatter)}</span>
+                                    <span class="p2-user-text">${body.birthPlace2}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="p8-last">
-                            <h3 class="p8-last-title">${getTitle[lang].br}</h3>
-                            <div class="p8-line">
-                                <p class="p8-line-p">${promptP8.recommendations[0]}</p>
-                                <p class="p8-line-p">${promptP8.recommendations[1]}</p>
-                                <p class="p8-line-p">${promptP8.recommendations[2]}</p>
+                            <div class="p2-symbols">
+                                <div class="p2-symbols-signs">
+                                    <span class="p2-symbols-title">Zodiac Signs</span>
+                                        ${renderSignList()}
+                                </div>
+                                <div class="p2-symbols-planets">
+                                    <span class="p2-symbols-title">Planet Symbols</span>
+                                        ${renderPlanetList()}
+                                </div>
                             </div>
-                            <h4 class="p8-last-sub">${getTitle[lang].tk}</h4>
-                            <p class="p12-text p8-end">
-                                ${promptP8.takeaway}
+                            <p class="p12-text p2-down">
+                                Sun-Moon connections: potential for emotional synergy.
                             </p>
                         </div>
-                    </div>
-            </div>
-            <div class="page-break"></div>
-        `;
-       // -- Page 8 -- //
-        // -- Page 9 -- //
-        const promptP9 = body.pages[1];
-        const page9 = `
-            <div class="p9">
-                ${topElement(getTitle[lang].p9.title[0])}
-                    <div class="p9-content">
-                        <div class="p9-planets">
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP9.planets[0].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${moonContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP9.planets[0].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP9.planets[0].takeaway}
-                                </p>
-                            </div>
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP9.planets[1].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${moonContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP9.planets[1].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP9.planets[1].takeaway}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="p9-planets">
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP9.planets[2].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${venus_marsContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP9.planets[2].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP9.planets[2].takeaway}
-                                </p>
-                            </div>
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP9.planets[3].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${saturnContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP9.planets[3].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP9.planets[3].takeaway}
-                                </p>
-                            </div>
-                        </div>
-                        <p class="p2-text">
-                            ${promptP9.reflection}
+                        <p class="p2-text p2-end">
+                            The legend below decodes each sign and planet, helping you see where your energies align or clash.
                         </p>
                     </div>
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 9 -- //
-        // -- Page 10 -- //
-            const promptP10 = body.pages[2]; 
-            const page10 = `
-            <div class="p9">
-                ${topElement(getTitle[lang].p10.title[0])}
-                    <div class="p9-content">
-                        <div class="p9-planets">
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP10.planets[0].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${moonContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP10.planets[0].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP10.planets[0].takeaway}
-                                </p>
-                            </div>
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP10.planets[1].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${moonContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP10.planets[1].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP10.planets[1].takeaway}
-                                </p>
-                            </div>
-                        </div>
-                        <div class="p9-planets">
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP10.planets[2].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${venus_marsContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP10.planets[2].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP10.planets[2].takeaway}
-                                </p>
-                            </div>
-                            <div class="p9-planet">
-                                <h3 class="p9-planet-title">${promptP10.planets[3].title}</h3>
-                                <div class="p8-divider"></div>
-                                <div class="p9-planet-img">
-                                    ${saturnContent}
-                                </div>
-                                <p class="p9-planet-text">
-                                    ${promptP10.planets[3].text}
-                                </p>
-                                <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
-                                <p class="p12-text p9-mini">
-                                    ${promptP10.planets[3].takeaway}
-                                </p>
-                            </div>
-                        </div>
-                        <p class="p2-text">
-                            ${promptP10.reflection}
-                        </p>
-                    </div>
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 10-- //
-        // -- Page 11 -- //
-        const promptP11 = body.pages[3];
-        const page11 = `
-            <div class="p11">
-                ${topElement(getTitle[lang].p11.title[0])}
-                    <div class="p11-content">
+                    ${downElement(2)}
+                </div>
+            `;
+            // -- Page 2 -- //
+            // -- Page 3 -- //
+            const page3 = `
+                <div class="p3 parent-container">
+                    ${topElement("What is Synastry?")}
+                    <div class="p3-content content-container">
                         <p class="p3-text">
-                            ${promptP11.intro}
+                            Synastry is a branch of astrology that compares the birth charts of two people.
+                            It examines how the planetary positions at the time of birth interact between partners.
+                            We overlay your charts to highlight key points such as the Sun, Moon, and Ascendant.
+                            These markers reveal core personality traits and relationship energies.
+                            Synastry transforms complex astrological data into clear insights you can use.
                         </p>
-                        <div class="p11-block">
-                            <h3>${getTitle[lang].p11.overall}</h3>
-                            <p class="p12-text p9-mini">
-                                ${promptP11.planets[0].text}
+                        <div class="text-block">
+                            <span class="text-block-title">
+                                Key benefits of synastry:
+                            </span>
+                            <ul class="text-block-list">
+                                <li>${markerContent}<b>Clarity: </b>Understand how each partner’s energy influences the relationship.</li>
+                                <li>${markerContent}<b>Guidance: </b>Identify strengths and potential challenges.</li>
+                                <li>${markerContent}<b>Awareness: </b>Learn which traits blend well and which may clash.</li>
+                            </ul>
+                        </div>
+                        <p class="p3-text">
+                            Synastry does not predict fate. It uncovers the hidden layers of your relationship.
+                            It shows how you and your partner influence each other.
+                            You gain a clear picture of your communication style and emotional balance.
+                            Each planetary aspect comes with a brief explanation in plain language.
+                            This way, you know exactly what the energies mean for your connection.
+                        </p>
+                        <h2 class="p3-title">The Purpose of Your Report</h2>
+                        <p class="p3-text">
+                            The purpose of this report is to offer deep insight into your relationship and provide actionable guidance.
+                            Our goal is to simplify complex astrological data into practical advice you can apply every day.
+                        </p>
+                        <div class="text-block">
+                            <span class="text-block-title">
+                                This report does the following:
+                            </span>
+                            <ul class="text-block-list">
+                                <li>${markerContent}<b>Breaks Down Your Charts: </b>We analyze your individual natal charts and then compare them. You see how your energies interact.</li>
+                                <li>${markerContent}<b>Offers Detailed Analysis: </b>You learn why you click in some areas and face friction in others. We highlight key planetary aspects that influence your connection.</li>
+                                <li>${markerContent}<b>Provides Practical Guidance: </b>Clear tips help you use your strengths and manage potential conflicts. The advice is direct and ready to apply.</li>
+                                <li>${markerContent}<b>Promotes Personal Growth: </b>You discover how your relationship can help you grow. The report serves as a roadmap for building a balanced, harmonious bond.</li>
+                            </ul>
+                        </div>
+                        <div class="text-block">
+                            <span class="text-block-title">
+                                Inside this report, you will find:
+                            </span>
+                            <ul class="text-block-list">
+                                <li>${markerContent}<b>Individual Natal Charts: </b>Detailed breakdowns of your core traits, including your Sun, Moon, and Ascendant signs.</li>
+                                <li>${markerContent}<b>Synastry Analysis: </b>A comprehensive look at how your charts interact, with each aspect explained briefly.</li>
+                                <li>${markerContent}<b>Actionable Recommendations: </b>Clear steps to boost communication and manage emotional dynamics.</li>
+                            </ul>
+                        </div>
+                        <p class="p3-text">
+                            This report acts as your personal guide. It uses simple language without confusing astrological jargon.
+                            You gain a clear view of your relationship’s strengths and challenges.
+                            This clarity empowers you to nurture your connection confidently.
+                        </p>
+                        <h2 class="p3-title">How to Read This Report</h2>
+                        <p class="p3-text">
+                            This report is divided into clear, concise sections.
+                            Each section builds on the previous one, making it easy to follow.
+                        </p>
+                        <p class="p3-text">
+                            You will first read an introduction that explains what synastry is.
+                            Next, you review your individual natal charts.
+                            In this section, you see each partner’s core traits presented in simple graphics and bullet points.
+                        </p>
+                        <p class="p3-text">
+                            The following section focuses on the synastry analysis.
+                            Here, you find a breakdown of major planetary aspects between you and your partner.
+                            Each aspect comes with a short, direct explanation.
+                            We use tables and lists to make the information easy to scan.
+                        </p>
+                        <p class="p3-text">
+                            After the analysis, you receive practical recommendations.
+                            This section gives clear steps to enhance your relationship.
+                            The advice is written in friendly, direct language so you can use it immediately in your daily life.
+                        </p>
+                        <p class="p3-text">
+                            The report concludes with a summary and additional resources.
+                            This final section ties together all the insights you have gained.
+                            It recaps key points and guides you on the next steps.
+                        </p>
+                        <p class="p2-text p3-end">
+                            By following this structured approach, you get a clear,
+                            actionable view of your relationship’s celestial blueprint.
+                            This Personalized Synastry Chart report is designed to empower you and your partner
+                            to grow together and build a lasting, meaningful bond.
+                        </p>
+                    </div>
+                    ${downElement(3)}
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 3 -- //
+            // -- Page 4 -- //
+            const page4 = `
+                <div class="p4 parent-container">
+                    ${topElement("Methodology")}
+                    <div class="p4-content content-container">
+                        <p class="p3-text">
+                            This report transforms your birth details into a clear, personalized astrological profile
+                            It provides insights to help you understand your relationship and make informed decisions.
+                        </p>
+                        <h2 class="p3-title">Data Sources</h2>
+                        <p class="p3-text">
+                            You provide your birth date, time, and place. 
+                            These details capture the unique snapshot of the sky at your birth.
+                            This input creates your natal chart—a blueprint of your core traits and energies.
+                            We use trusted astronomical sources to ensure accuracy, so your report truly reflects your cosmic imprint.
+                            <b>Ensure your birth details are spot-on—every correct detail unlocks uniquely tailored,
+                            precise insights that empower you to fully embrace your cosmic blueprint.</b>
+                        </p>
+                        <h2 class="p3-title">Astrological Analysis</h2>
+                        <p class="p3-text">
+                            Your personalized chart reveals essential aspects of your personality.
+                            We compare your chart with your partner’s to show how your energies interact.
+                        </p>
+                        <div class="text-block">
+                            <span class="text-block-title">
+                                You get a clear breakdown of key points, including:
+                            </span>
+                            <ul class="text-block-list">
+                                <li>${markerContent}<b>Core Personality: </b>You will learn about your Sun, Moon, and Ascendant signs. These elements will highlight your inherent traits and strengths.</li>
+                                <li>${markerContent}<b>Relationship Dynamics: </b>You will see how major planetary aspects like Sun-Moon and Venus-Mars will influence your connection. This analysis will reveal where you naturally click and where challenges may occur.</li>
+                                <li>${markerContent}<b>Actionable Insights: </b>You will receive straightforward advice. Each planetary aspect will be explained in plain language so you will know exactly how to nurture your strengths and address potential friction.</li>
+                            </ul>
+                        </div>
+                        <div class="text-block">
+                            <span class="text-block-title">
+                                Key benefits:
+                            </span>
+                            <ul class="text-block-list">
+                                <li>${markerContent}<b>Clarity: </b>Gain a clear view of your unique cosmic imprint.</li>
+                                <li>${markerContent}<b>Guidance: </b>Learn practical steps to enhance your relationship.</li>
+                                <li>${markerContent}<b>Empowerment: </b>Use actionable insights to make informed decisions.</li>
+                            </ul>
+                        </div>
+                        <div class="p4-end">
+                            <div class="p2-text">
+                                <h2 class="p3-title">Important Notes</h2>
+                                <p class="p3-text">
+                                    Remember, astrology is a tool for self-reflection.
+                                    The insights in your report guide you in understanding your relationship better.
+                                    They are not absolute predictions but serve as a roadmap for growth.
+                                    Knowing your cosmic blueprint helps you build a balanced and lasting bond.
+                                </p>
+                                <p class="p3-text">
+                                    This methodology ensures you receive a practical, easy-to-understand analysis.
+                                    Enjoy exploring your astrological profile and use these insights to enhance your relationship every day.
+                                </p>
+                            </div>
+                            <p class="p4-yellow">
+                                *Astrology is a tool, not a guarantee. Your free will and personal choices shape your path.
                             </p>
                         </div>
-                        <h3 class="p11-title">${getTitle[lang].p11.bond}</h3>
-                        <div class="p11-arcadeons">
-                            <div class="p11-arcadeon">
-                                <div class="p11-arcadeon-text">
-                                    <h3>1</h3>
-                                    <span>${promptP11.planets[1].title.replaceAll(" ", "</br>")}:</span>
-                                </div>
-                                <div class="p11-arcadeon-info">
-                                    <ul>
-                                        <li>${markerContent}${promptP11.planets[1].steps[0]}</li>
-                                        <li>${markerContent}${promptP11.planets[1].steps[1]}</li>
-                                    </ul>
+                    </div>
+                    ${downElement(4)}
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 4 -- //
+            const rawInfoPath = path.join(__dirname, "../../../src/files/mocs/zodiac_signs.json");
+            const rawInfo = JSON.parse(fs.readFileSync(rawInfoPath, 'utf-8'));
+            const natal1 = this.createSvgNatal(body.natal1)
+            const natal2 = this.createSvgNatal(body.natal2)
+            const planetsList1 = this.getPlanets(body.natal1);
+            const planetsList2 = this.getPlanets(body.natal2);
+            const renderZodiacInfo = (birthDate: string) => {
+                const data = rawInfo;
+                const date = ZonedDateTime.parse(birthDate).withZoneSameInstant(ZoneId.of('UTC'));
+                const day = date.dayOfMonth();
+                const month = date.monthValue();
+
+                const element = data.find((item) => {
+                    const range1 = item.date_range.range1;
+                    const range2 = item.date_range.range2;
+                
+                    const isAfterRange1 = (month > range1.month || (month === range1.month && day >= range1.day));
+                    const isBeforeRange2 = (month < range2.month || (month === range2.month && day <= range2.day));
+                
+                    return isAfterRange1 && isBeforeRange2;
+                });
+                const signContent = this.loadSignSvgByName(element.Sign);
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const { date_range, Sign, ...otherData } = element; 
+                let form = "";
+                Object.entries(otherData).forEach(([key, value]) => {
+                    const valueString = Array.isArray(value) ? value.join(', ') : value;
+                    form += `
+                        <div class="p5-zodiac-info-item">
+                            <span class="p5-zodiac-info-item-title">${key}:</span>
+                            <span class="p5-zodiac-info-item-value">${valueString}</span>
+                        </div>
+                    `;
+                });
+                return `
+                        <div class="p5-zodiac">
+                            <div class="p5-zodiac-img">
+                                ${signContent}
+                                <div class="p5-zodiac-date">
+                                    <h3>${element.Sign}</h3>
+                                    <span> 
+                                        ${monthNames[element.date_range.range1.month - 1]} ${element.date_range.range1.day}-${monthNames[element.date_range.range2.month - 1]} ${element.date_range.range2.day}
+                                    </span>
                                 </div>
                             </div>
-                            <div class="p11-arcadeon">
-                                <div class="p11-arcadeon-text">
-                                    <h3>2</h3>
-                                    <span>${promptP11.planets[2].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[2].title.split(' ').slice(2).join(' ')}:</span>
-                                </div>
-                                <div class="p11-arcadeon-info">
-                                    <ul>
-                                        <li>${markerContent}${promptP11.planets[2].steps[0]}</li>
-                                        <li>${markerContent}${promptP11.planets[2].steps[1]}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="p11-arcadeon">
-                                <div class="p11-arcadeon-text">
-                                    <h3>3</h3>
-                                    <span>${promptP11.planets[3].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[3].title.split(' ').slice(2).join(' ')}:</span>
-                                </div>
-                                <div class="p11-arcadeon-info">
-                                    <ul>
-                                        <li>${markerContent}${promptP11.planets[3].steps[0]}</li>
-                                        <li>${markerContent}${promptP11.planets[3].steps[1]}</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="p11-arcadeon">
-                                <div class="p11-arcadeon-text">
-                                    <h3>4</h3>
-                                    <span>${promptP11.planets[4].title}:</span>
-                                </div>
-                                <div class="p11-arcadeon-info">
-                                    <ul>
-                                        <li>${markerContent}${promptP11.planets[4].steps[0]}</li>
-                                        <li>${markerContent}${promptP11.planets[4].steps[1]}</li>
-                                    </ul>
-                                </div>
+                            <div class="p5-zodiac-info">
+                                ${form}
                             </div>
                         </div>
-                        <h3 class="p11-title">${getTitle[lang].tk}</h3>
-                        ${promptP11.planets[5].text}
-                    </div>
-            </div>
-            <div class="page-break"></div>
-        `;
-        // -- Page 11 -- //
-        // -- Page 12 -- //
-        const page12 = `
-            <div class="p1-content p12-content">
-                <div class="p12-top">
-                    <div class="p12-picture">
-                        ${miniContent}
-                    </div>
-                    <div class="p12-textblock">
-                        <p class="p12-text p12-textblock-text">
-                            Thank you for exploring your cosmic synergy with us.
-                             Use code STARS10 for 10% off your next reading!
+                `;
+            }
+            // -- Page 5 -- //
+            const page5 = `
+                <div class="p5 parent-container">
+                    ${topElement("Individual Natal Charts")}
+                    <div class="p5-content content-container">
+                        <p class="p3-text">
+                            This section focuses on your unique astrological blueprint.
+                            Each partner receives an individual natal chart.
+                            The chart is a snapshot of the sky at the exact moment of your birth.
+                            It shows the position of key planets. We focus on three core elements:
+                            the Sun, Moon, and Ascendant signs. These markers reveal essential aspects of your personality.
                         </p>
-                        <p class="p12-text p12-textblock-text">
-                            Remember, astrology provides insights, but the journey is yours to shape.
-                            We wish you both a harmonious path forward!
+                        <div class="p5-natal">
+                            <div class="p5-section">
+                                <div class="p5-natal-chart">
+                                    ${natal1}
+                                </div>
+                                <span class="p5-natal-title title-absolute">${body.name1}’s Chart</span>
+                            </div>
+                            <div class="p5-section">
+                                <span class="p5-natal-title">${body.name1}’s Planets</span>
+                                ${planetsList1}
+                            </div>
+                        </div>
+                        ${renderZodiacInfo(body.birthDate1)}
+                    </div>
+                    ${downElement(5)}
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 5 -- //
+            // -- Page 6 -- //
+            const page6 = `
+                <div class="p5 parent-container">
+                    ${topElement("Individual Natal Charts")}
+                    <div class="p5-content content-container">
+                        <div class="p5-natal">
+                            <div class="p6-section">
+                                <div class="p6-natal-chart">
+                                    ${natal2}
+                                </div>
+                                <span class="p5-natal-title title-absolute">${body.name2}’s Chart</span>
+                            </div>
+                            <div class="p5-section">
+                                <span class="p5-natal-title">${body.name2}’s Planets</span>
+                                ${planetsList2}
+                            </div>
+                        </div>
+                        ${renderZodiacInfo(body.birthDate2)}
+                    </div>
+                    ${downElement(6)}
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 6 -- //
+            const renderPlanetListwithText = () => {
+                let list:string = "";
+                let list1:string = "";
+                let list2:string = "";
+                planetsDescription.slice(2).splice(7, 7).map((item, index)=>{
+                    list1 += `
+                        <li>${planetsSvg[index]} <span class="p7-bl-text">${item}</span></li>
+                    `;
+                })
+                planetsDescription.slice(2).splice(0, 7).map((item, index)=>{
+                    list2 += `
+                        <li>${planetsSvg[index+6]} <span class="p7-bl-text">${item}</span></li>
+                    `;
+                })
+                list = `
+                    <ul class="p7-column">
+                        <li>${waterContent} <span class="p7-bl-text">${planetsDescription[0]}</span></li>
+                        ${list1}
+                    </ul>
+                    <ul class="p7-column">
+                        <li>${fireContent} <span class="p7-bl-text">${planetsDescription[1]}</span></li>
+                        ${list2}
+                    </ul>
+                `;
+                return `${list}`;
+            }
+            // -- Page 7 -- //
+            const page7 = `
+                <div class="p7 parent-container">
+                ${topElement("Key Aspects Notes")}
+                    <div class="p7-content content-container">
+                        <p class="p3-text">
+                            This section focuses on your unique astrological blueprint.
+                            Each partner receives an individual natal chart.
+                            The chart is a snapshot of the sky at the exact moment of your birth.
+                            It shows the position of key planets. We focus on three core elements:
+                            the Sun, Moon, and Ascendant signs. These markers reveal essential aspects of your personality.
+                        </p>
+                        <div class="p7-blocks">
+                            ${renderPlanetListwithText()}
+                        </div>
+                    </div>
+                    ${downElement(7)}
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 7 -- //
+            const socialSvg = this.loadSvg("social");
+            const renderSocial = () => {
+                let str:string = "";
+                
+                socialSvg.map((svg)=>{
+                    str += `<div>${svg}</div>`
+                })
+
+                return str;
+            }
+            // -- Page 8 -- //
+            const lang = body.lang;
+            const promptP8 = body.pages[0];
+            const page8 = `
+                <div class="p8">
+                    ${topElement(`${getTitle[lang].tit[0]} ${body.name1} ${getTitle[lang].tit[1]} ${body.name2}`)}
+                        <div class="p8-content">
+                            <p class="p2-text">
+                                ${promptP8.intro}
+                            </p>
+                            <div class="p8-section">
+                                <div class="p8-chart">
+                                    ${chart1}
+                                </div>
+                                <span class="p8-title">${promptP8.chartTitle}</span>
+                            </div>
+                            <div class="p8-info">
+                                <div class="p8-card">
+                                    <h3 class="p8-card-title">${getTitle[lang].ks}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p8-card-el">
+                                        <div class="p8-card-el-img">${n1Content}</div>
+                                        <p>${promptP8.strengths[0]}</p>
+                                    </div>
+                                    <div class="p8-card-el">
+                                        <div class="p8-card-el-img">${n2Content}</div>
+                                        <p>${promptP8.strengths[1]}</p>
+                                    </div>
+                                    <p class="p2-text p8-text-desc">
+                                    ${promptP8.strengths[2]}
+                                    </p>
+                                </div>
+                                <div class="p8-card">
+                                    <h3 class="p8-card-title">${getTitle[lang].pc}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p8-card-el">
+                                        <div class="p8-card-el-img">${n3Content}</div>
+                                        <p>${promptP8.challenges[0]}</p>
+                                    </div>
+                                    <div class="p8-card-el">
+                                        <div class="p8-card-el-img">${n4Content}</div>
+                                        <p>${promptP8.challenges[1]}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p8-last">
+                                <h3 class="p8-last-title">${getTitle[lang].br}</h3>
+                                <div class="p8-line">
+                                    <p class="p8-line-p">${promptP8.recommendations[0]}</p>
+                                    <p class="p8-line-p">${promptP8.recommendations[1]}</p>
+                                    <p class="p8-line-p">${promptP8.recommendations[2]}</p>
+                                </div>
+                                <h4 class="p8-last-sub">${getTitle[lang].tk}</h4>
+                                <p class="p12-text p8-end">
+                                    ${promptP8.takeaway}
+                                </p>
+                            </div>
+                        </div>
+                </div>
+                <div class="page-break"></div>
+            `;
+        // -- Page 8 -- //
+            // -- Page 9 -- //
+            const promptP9 = body.pages[1];
+            const page9 = `
+                <div class="p9">
+                    ${topElement(getTitle[lang].p9.title[0])}
+                        <div class="p9-content">
+                            <div class="p9-planets">
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP9.planets[0].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${moonContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP9.planets[0].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP9.planets[0].takeaway}
+                                    </p>
+                                </div>
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP9.planets[1].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${moonContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP9.planets[1].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP9.planets[1].takeaway}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="p9-planets">
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP9.planets[2].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${venus_marsContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP9.planets[2].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP9.planets[2].takeaway}
+                                    </p>
+                                </div>
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP9.planets[3].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${saturnContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP9.planets[3].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP9.planets[3].takeaway}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="p2-text">
+                                ${promptP9.reflection}
+                            </p>
+                        </div>
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 9 -- //
+            // -- Page 10 -- //
+                const promptP10 = body.pages[2]; 
+                const page10 = `
+                <div class="p9">
+                    ${topElement(getTitle[lang].p10.title[0])}
+                        <div class="p9-content">
+                            <div class="p9-planets">
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP10.planets[0].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${moonContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP10.planets[0].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP10.planets[0].takeaway}
+                                    </p>
+                                </div>
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP10.planets[1].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${moonContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP10.planets[1].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP10.planets[1].takeaway}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="p9-planets">
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP10.planets[2].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${venus_marsContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP10.planets[2].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP10.planets[2].takeaway}
+                                    </p>
+                                </div>
+                                <div class="p9-planet">
+                                    <h3 class="p9-planet-title">${promptP10.planets[3].title}</h3>
+                                    <div class="p8-divider"></div>
+                                    <div class="p9-planet-img">
+                                        ${saturnContent}
+                                    </div>
+                                    <p class="p9-planet-text">
+                                        ${promptP10.planets[3].text}
+                                    </p>
+                                    <h4 class="p9-planet-sub">${getTitle[lang].tk}</h4>
+                                    <p class="p12-text p9-mini">
+                                        ${promptP10.planets[3].takeaway}
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="p2-text">
+                                ${promptP10.reflection}
+                            </p>
+                        </div>
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 10-- //
+            // -- Page 11 -- //
+            const promptP11 = body.pages[3];
+            const page11 = `
+                <div class="p11">
+                    ${topElement(getTitle[lang].p11.title[0])}
+                        <div class="p11-content">
+                            <p class="p3-text">
+                                ${promptP11.intro}
+                            </p>
+                            <div class="p11-block">
+                                <h3>${getTitle[lang].p11.overall}</h3>
+                                <p class="p12-text p9-mini">
+                                    ${promptP11.planets[0].text}
+                                </p>
+                            </div>
+                            <h3 class="p11-title">${getTitle[lang].p11.bond}</h3>
+                            <div class="p11-arcadeons">
+                                <div class="p11-arcadeon">
+                                    <div class="p11-arcadeon-text">
+                                        <h3>1</h3>
+                                        <span>${promptP11.planets[1].title.replaceAll(" ", "</br>")}:</span>
+                                    </div>
+                                    <div class="p11-arcadeon-info">
+                                        <ul>
+                                            <li>${markerContent}${promptP11.planets[1].steps[0]}</li>
+                                            <li>${markerContent}${promptP11.planets[1].steps[1]}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="p11-arcadeon">
+                                    <div class="p11-arcadeon-text">
+                                        <h3>2</h3>
+                                        <span>${promptP11.planets[2].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[2].title.split(' ').slice(2).join(' ')}:</span>
+                                    </div>
+                                    <div class="p11-arcadeon-info">
+                                        <ul>
+                                            <li>${markerContent}${promptP11.planets[2].steps[0]}</li>
+                                            <li>${markerContent}${promptP11.planets[2].steps[1]}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="p11-arcadeon">
+                                    <div class="p11-arcadeon-text">
+                                        <h3>3</h3>
+                                        <span>${promptP11.planets[3].title.split(' ').slice(0, 2).join(' ')}<br> ${promptP11.planets[3].title.split(' ').slice(2).join(' ')}:</span>
+                                    </div>
+                                    <div class="p11-arcadeon-info">
+                                        <ul>
+                                            <li>${markerContent}${promptP11.planets[3].steps[0]}</li>
+                                            <li>${markerContent}${promptP11.planets[3].steps[1]}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="p11-arcadeon">
+                                    <div class="p11-arcadeon-text">
+                                        <h3>4</h3>
+                                        <span>${promptP11.planets[4].title}:</span>
+                                    </div>
+                                    <div class="p11-arcadeon-info">
+                                        <ul>
+                                            <li>${markerContent}${promptP11.planets[4].steps[0]}</li>
+                                            <li>${markerContent}${promptP11.planets[4].steps[1]}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 class="p11-title">${getTitle[lang].tk}</h3>
+                            ${promptP11.planets[5].text}
+                        </div>
+                </div>
+                <div class="page-break"></div>
+            `;
+            // -- Page 11 -- //
+            // -- Page 12 -- //
+            const page12 = `
+                <div class="p1-content p12-content">
+                    <div class="p12-top">
+                        <div class="p12-picture">
+                            ${miniContent}
+                        </div>
+                        <div class="p12-textblock">
+                            <p class="p12-text p12-textblock-text">
+                                Thank you for exploring your cosmic synergy with us.
+                                Use code STARS10 for 10% off your next reading!
+                            </p>
+                            <p class="p12-text p12-textblock-text">
+                                Remember, astrology provides insights, but the journey is yours to shape.
+                                We wish you both a harmonious path forward!
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p12-questions">
+                        <span class="p5-natal-title p12-title">Have questions?</span>
+                        <div class="p12-qr">
+                            ${QRContent}
+                        </div>
+                        <p>
+                            Lorem ipsum dolor sit amet consectetur. Id ultrices mi non a.
+                            Dignissim pellentesque mattis duis venenatis sed eu scelerisque.
+                            Varius nulla suscipit ornare tincidunt lorem.
+                            Semper blandit fusce euismod scelerisque turpis congue at neque id.
                         </p>
                     </div>
+                    <div class="p12-social">
+                        <h3>Channels</h3>
+                        <div class="p12-tg">${telegramContent}</div>
+                        <h3>We are on social media</h3>
+                        <div class="p12-social-svg">
+                            ${renderSocial()}
+                        </div>
+                    </div>  
+                    <div class="logo p12-logo">${logoContent}</div>
                 </div>
-                <div class="p12-questions">
-                    <span class="p5-natal-title p12-title">Have questions?</span>
-                    <div class="p12-qr">
-                        ${QRContent}
-                    </div>
-                    <p>
-                        Lorem ipsum dolor sit amet consectetur. Id ultrices mi non a.
-                        Dignissim pellentesque mattis duis venenatis sed eu scelerisque.
-                        Varius nulla suscipit ornare tincidunt lorem.
-                        Semper blandit fusce euismod scelerisque turpis congue at neque id.
-                    </p>
-                </div>
-                <div class="p12-social">
-                    <h3>Channels</h3>
-                    <div class="p12-tg">${telegramContent}</div>
-                    <h3>We are on social media</h3>
-                    <div class="p12-social-svg">
-                        ${renderSocial()}
-                    </div>
-                </div>  
-                <div class="logo p12-logo">${logoContent}</div>
-            </div>
-        `;
-        // -- Page 12 -- //
-        const htmlContent = `
-        <html>
-        <head>
-            ${styles}
-        </head>
-        <body>
-            ${page1}
-            ${page2}
-            ${page3}
-            ${page4}
-            ${page5}
-            ${page6}
-            ${page7}
-            ${page8}
-            ${page9}
-            ${page10}
-            ${page11}
-            ${page12}
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #f9f9f9; z-index: -1;"></div>
-        </body>
-        </html>
-        `;
+            `;
+            // -- Page 12 -- //
+            const htmlContent = `
+            <html>
+            <head>
+                ${styles}
+            </head>
+            <body>
+                ${page1}
+                ${page2}
+                ${page3}
+                ${page4}
+                ${page5}
+                ${page6}
+                ${page7}
+                ${page8}
+                ${page9}
+                ${page10}
+                ${page11}
+                ${page12}
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #f9f9f9; z-index: -1;"></div>
+            </body>
+            </html>
+            `;
 
-        console.log("Setting page content...");
-        await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+            console.log("Setting page content...");
+            await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-        console.log("Generating PDF...");
-        const pdfBuffer = await page.pdf({
-            format: "A4",
-            printBackground: true,
-        });
-        
-        const scale = await page.evaluate(() => window.devicePixelRatio);
-        console.log("Device Pixel Ratio:", scale);
-        await browser.close();
-        console.log("PDF generated successfully.");
-        const buffer = Buffer.from(pdfBuffer);
-        return buffer;
+            console.log("Generating PDF...");
+            const pdfBuffer = await page.pdf({
+                format: "A4",
+                printBackground: true,
+            });
+            
+            const scale = await page.evaluate(() => window.devicePixelRatio);
+            console.log("Device Pixel Ratio:", scale);
+            await browser.close();
+            console.log("PDF generated successfully.");
+            const buffer = Buffer.from(pdfBuffer);
+            return buffer;
+        }catch (e){
+            console.error('Error generating PDF:', e);
+
+            if (retries > 0) {
+              console.log(`Retrying... attempts left: ${retries}`);
+              await new Promise(resolve => setTimeout(resolve, delayMs)); 
+              return this.createPdfFile(body, retries - 1, delayMs);
+            } else {
+              console.error('All retries failed.');
+            }
+        }
     }
 }
