@@ -8,14 +8,21 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('create-payment-intent')
-  async createPaymentIntent() {
-    return this.paymentService.createPaymentIntent();
+  async createPaymentIntent(@Body() body?:{promo:string}) {
+    return this.paymentService.createPaymentIntent(body);
   }
-  @Post('capture-order/:id')
-  async captureOrder(
-    @Param('id') id: string,
+  @Post('capture-order')
+  async captureOrderWithoutId(
     @Body() body: SynastryDto,
   ) {
-    return this.paymentService.captureOrder(id, body);
+    return this.paymentService.captureOrder(body);
+  }
+
+  @Post('capture-order/:id')
+  async captureOrder(
+    @Param('id') id: string ,
+    @Body() body: SynastryDto,
+  ) {
+    return this.paymentService.captureOrder(body, id);
   }
 }

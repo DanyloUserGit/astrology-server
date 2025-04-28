@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsDateString, ValidateNested, IsEmail } from "class-validator";
+import { IsNumber, IsString, IsDateString, ValidateNested, IsEmail, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 
 export class Partner {
@@ -39,4 +39,8 @@ export class SynastryDto {
 
     @IsString()
     lang:string;
+
+    @IsString()
+    @IsOptional()
+    token:string;
 }

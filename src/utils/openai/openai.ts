@@ -46,23 +46,6 @@ export class OpenAIService implements OpenAIIntr{
           sign: p.sign
         };
       }
-      // formatAspectInfo(p1: any, p2: any, aspect: PlanetAspect): string {
-      //   const p1Deg = this.findPlanetDegree(p1, aspect.p1_name);
-      //   const p2Deg = this.findPlanetDegree(p2, aspect.p2_name);
-      //   if (!p1Deg || !p2Deg) return '';
-    
-      //   const orb = Math.abs(aspect.orbit).toFixed(2);
-      //   return `Person1’s ${aspect.p1_name.replace(/_/g, ' ')} (${p1Deg.deg} ${p1Deg.sign}) ${aspect.aspect}s Person2’s ${aspect.p2_name.replace(/_/g, ' ')} (${p2Deg.deg} ${p2Deg.sign}), orb ≈ ${orb}°.`;
-      // }
-    
-      // getAspectBetween(p1: any, p2: any, aspects: PlanetAspect[], p1Name: string, p2Name: string): string | null {
-      //   const match = aspects.find(
-      //     (a) =>
-      //       (a.p1_name.toLowerCase() === p1Name.toLowerCase() && a.p2_name.toLowerCase() === p2Name.toLowerCase()) ||
-      //       (a.p2_name.toLowerCase() === p1Name.toLowerCase() && a.p1_name.toLowerCase() === p2Name.toLowerCase())
-      //   );
-      //   return match ? this.formatAspectInfo(p1, p2, match) : null;
-      // }
       buildReadableAspects(data: any): string[] {
         const aspects = data.aspects as PlanetAspect[];
         const p1 = data.data.first_subject;

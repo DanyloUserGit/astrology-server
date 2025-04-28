@@ -43,7 +43,7 @@ export class PromptService {
                 ${readableAspects.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
                 Base all interpretations on tropical astrology. Keep the tone warm, clear, and human.
-                Language: ${lang}
+                Language: ${lang} (Also translate Name1 and Name2 and names of planets. DO NOT translate any JSON keys)
 
                 Begin when ready.
             `;
