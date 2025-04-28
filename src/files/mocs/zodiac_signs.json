@@ -1,0 +1,640 @@
+[
+    {
+        "Sign": "Aries",
+        "date_range": {
+            "range1": {
+                "month": 3,
+                "day": 21
+            },
+            "range2": {
+                "month": 4,
+                "day": 19
+            }
+        },
+        "Element": "Fire",
+        "Quality": "Cardinal",
+        "Symbol": "Ram",
+        "Lucky Colour(s)": [
+            "Red",
+            "Mustard Yellow"
+        ],
+        "Lucky Number(s)": [
+            1, 6, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Mars"
+        ],
+        "Lucky Gemstone(s)": [
+            "Ruby"
+        ],
+        "Lucky Metal(s)": [
+            "Iron"
+        ],
+        "Lucky Day(s)": [
+            "Tuesday"
+        ],
+        "Lucky Flower(s)": [
+            "Honeysuckle"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Cancer",
+            "Capricorn",
+            "Pisces"
+        ],
+        "Strengths": [
+            "Bold",
+            "Ambitious",
+            "Energetic"
+        ],
+        "Weaknesses": [
+            "Impulsive",
+            "Impatient",
+            "Aggressive"
+        ]
+    },
+    {
+        "Sign": "Taurus",
+        "date_range": {
+            "range1": {
+                "month": 4,
+                "day": 20
+            },
+            "range2": {
+                "month": 5,
+                "day": 20
+            }
+        },
+        "Element": "Earth",
+        "Quality": "Fixed",
+        "Symbol": "Bull",
+        "Lucky Colour(s)": [
+            "Pink",
+            "Pale Blue"
+        ],
+        "Lucky Number(s)": [
+            2, 6, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Venus"
+        ],
+        "Lucky Gemstone(s)": [
+            "Diamond"
+        ],
+        "Lucky Metal(s)": [
+            "Copper"
+        ],
+        "Lucky Day(s)": [
+            "Friday"
+        ],
+        "Lucky Flower(s)": [
+            "Rose"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Virgo",
+            "Capricorn",
+            "Cancer"
+        ],
+        "Strengths": [
+            "Patient",
+            "Reliable",
+            "Devoted"
+        ],
+        "Weaknesses": [
+            "Stubborn",
+            "Possessive",
+            "Unyielding"
+        ]
+    },
+    {
+        "Sign": "Gemini",
+        "date_range": {
+            "range1": {
+                "month": 5,
+                "day": 21
+            },
+            "range2": {
+                "month": 6,
+                "day": 20
+            }
+        },
+        "Element": "Air",
+        "Quality": "Mutable",
+        "Symbol": "Twins",
+        "Lucky Colour(s)": [
+            "Yellow",
+            "Green"
+        ],
+        "Lucky Number(s)": [
+            3, 5, 2007
+        ],
+        "Ruling Planet(s)": [
+            "Mercury"
+        ],
+        "Lucky Gemstone(s)": [
+            "Agate"
+        ],
+        "Lucky Metal(s)": [
+            "Mercury (Quicksilver)"
+        ],
+        "Lucky Day(s)": [
+            "Wednesday"
+        ],
+        "Lucky Flower(s)": [
+            "Lavender"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Libra",
+            "Aquarius",
+            "Aries"
+        ],
+        "Strengths": [
+            "Adaptable",
+            "Communicative",
+            "Curious"
+        ],
+        "Weaknesses": [
+            "Inconsistent",
+            "Indecisive",
+            "Restless"
+        ]
+    },
+    {
+        "Sign": "Cancer",
+        "date_range": {
+            "range1": {
+                "month": 6,
+                "day": 21
+            },
+            "range2": {
+                "month": 7,
+                "day": 22
+            }
+        },
+        "Element": "Water",
+        "Quality": "Cardinal",
+        "Symbol": "Crab",
+        "Lucky Colour(s)": [
+            "White",
+            "Silver"
+        ],
+        "Lucky Number(s)": [
+            2, 7, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Moon"
+        ],
+        "Lucky Gemstone(s)": [
+            "Pearl"
+        ],
+        "Lucky Metal(s)": [
+            "Silver"
+        ],
+        "Lucky Day(s)": [
+            "Monday"
+        ],
+        "Lucky Flower(s)": [
+            "White Rose"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Taurus",
+            "Virgo",
+            "Pisces"
+        ],
+        "Strengths": [
+            "Compassionate",
+            "Intuitive",
+            "Loyal"
+        ],
+        "Weaknesses": [
+            "Moody",
+            "Overly Sensitive",
+            "Clingy"
+        ]
+    },
+    {
+        "Sign": "Leo",
+        "date_range": {
+            "range1": {
+                "month": 7,
+                "day": 23
+            },
+            "range2": {
+                "month": 8,
+                "day": 22
+            }
+        },
+        "Element": "Fire",
+        "Quality": "Fixed",
+        "Symbol": "Lion",
+        "Lucky Colour(s)": [
+            "Gold",
+            "Orange"
+        ],
+        "Lucky Number(s)": [
+            1, 5, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Sun"
+        ],
+        "Lucky Gemstone(s)": [
+            "Ruby"
+        ],
+        "Lucky Metal(s)": [
+            "Gold"
+        ],
+        "Lucky Day(s)": [
+            "Sunday"
+        ],
+        "Lucky Flower(s)": [
+            "Sunflower"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Aries",
+            "Gemini",
+            "Sagittarius"
+        ],
+        "Strengths": [
+            "Confident",
+            "Generous",
+            "Creative"
+        ],
+        "Weaknesses": [
+            "Arrogant",
+            "Dominating",
+            "Self-centered"
+        ]
+    },
+    {
+        "Sign": "Virgo",
+        "date_range": {
+            "range1": {
+                "month": 8,
+                "day": 23
+            },
+            "range2": {
+                "month": 9,
+                "day": 22
+            }
+        },
+        "Element": "Earth",
+        "Quality": "Mutable",
+        "Symbol": "Maiden",
+        "Lucky Colour(s)": [
+            "Green",
+            "Brown"
+        ],
+        "Lucky Number(s)": [
+            3, 5, 2006
+        ],
+        "Ruling Planet(s)": [
+            "Mercury"
+        ],
+        "Lucky Gemstone(s)": [
+            "Peridot"
+        ],
+        "Lucky Metal(s)": [
+            "Mercury (Quicksilver)"
+        ],
+        "Lucky Day(s)": [
+            "Wednesday"
+        ],
+        "Lucky Flower(s)": [
+            "Buttercup"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Taurus",
+            "Capricorn",
+            "Cancer"
+        ],
+        "Strengths": [
+            "Analytical",
+            "Practical",
+            "Loyal"
+        ],
+        "Weaknesses": [
+            "Overcritical",
+            "Perfectionist",
+            "Worrier"
+        ]
+    },
+    {
+        "Sign": "Libra",
+        "date_range": {
+            "range1": {
+                "month": 9,
+                "day": 23
+            },
+            "range2": {
+                "month": 10,
+                "day": 22
+            }
+        },
+        "Element": "Air",
+        "Quality": "Cardinal",
+        "Symbol": "Scales",
+        "Lucky Colour(s)": [
+            "Pink",
+            "Light Blue"
+        ],
+        "Lucky Number(s)": [
+            4, 6, 13
+        ],
+        "Ruling Planet(s)": [
+            "Venus"
+        ],
+        "Lucky Gemstone(s)": [
+            "Opal"
+        ],
+        "Lucky Metal(s)": [
+            "Copper"
+        ],
+        "Lucky Day(s)": [
+            "Friday"
+        ],
+        "Lucky Flower(s)": [
+            "Rose"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Gemini",
+            "Aquarius",
+            "Taurus"
+        ],
+        "Strengths": [
+            "Diplomatic",
+            "Fair-minded",
+            "Sociable"
+        ],
+        "Weaknesses": [
+            "Indecisive",
+            "Avoids Confrontation",
+            "Gullible"
+        ]
+    },
+    {
+        "Sign": "Scorpio",
+        "date_range": {
+            "range1": {
+                "month": 10,
+                "day": 23
+            },
+            "range2": {
+                "month": 11,
+                "day": 21
+            }
+        },
+        "Element": "Water",
+        "Quality": "Fixed",
+        "Symbol": "Scorpion",
+        "Lucky Colour(s)": [
+            "Scarlet",
+            "Black"
+        ],
+        "Lucky Number(s)": [
+            2, 4, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Pluto",
+            "Mars"
+        ],
+        "Lucky Gemstone(s)": [
+            "Topaz"
+        ],
+        "Lucky Metal(s)": [
+            "Iron"
+        ],
+        "Lucky Day(s)": [
+            "Tuesday"
+        ],
+        "Lucky Flower(s)": [
+            "Chrysanthemum"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Cancer",
+            "Virgo",
+            "Pisces"
+        ],
+        "Strengths": [
+            "Passionate",
+            "Resourceful",
+            "Brave"
+        ],
+        "Weaknesses": [
+            "Jealous",
+            "Secretive",
+            "Resentful"
+        ]
+    },
+    {
+        "Sign": "Sagittarius",
+        "date_range": {
+            "range1": {
+                "month": 11,
+                "day": 22
+            },
+            "range2": {
+                "month": 12,
+                "day": 21
+            }
+        },
+        "Element": "Fire",
+        "Quality": "Mutable",
+        "Symbol": "Archer",
+        "Lucky Colour(s)": [
+            "Purple",
+            "Maroon"
+        ],
+        "Lucky Number(s)": [
+            3, 7, 2009
+        ],
+        "Ruling Planet(s)": [
+            "Jupiter"
+        ],
+        "Lucky Gemstone(s)": [
+            "Turquoise"
+        ],
+        "Lucky Metal(s)": [
+            "Tin"
+        ],
+        "Lucky Day(s)": [
+            "Thursday"
+        ],
+        "Lucky Flower(s)": [
+            "Carnation"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Aries",
+            "Leo",
+            "Libra"
+        ],
+        "Strengths": [
+            "Adventurous",
+            "Independent",
+            "Honest"
+        ],
+        "Weaknesses": [
+            "Impatient",
+            "Blunt",
+            "Overconfident"
+        ]
+    },
+    {
+        "Sign": "Capricorn",
+        "date_range": {
+            "range1": {
+                "month": 12,
+                "day": 22
+            },
+            "range2": {
+                "month": 1,
+                "day": 19
+            }
+        },
+        "Element": "Earth",
+        "Quality": "Cardinal",
+        "Symbol": "Goat",
+        "Lucky Colour(s)": [
+            "Dark Green",
+            "Brown"
+        ],
+        "Lucky Number(s)": [
+            4, 8, 10
+        ],
+        "Ruling Planet(s)": [
+            "Saturn"
+        ],
+        "Lucky Gemstone(s)": [
+            "Onyx"
+        ],
+        "Lucky Metal(s)": [
+            "Lead"
+        ],
+        "Lucky Day(s)": [
+            "Saturday"
+        ],
+        "Lucky Flower(s)": [
+            "Pansy"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Taurus",
+            "Virgo",
+            "Scorpio"
+        ],
+        "Strengths": [
+            "Disciplined",
+            "Ambitious",
+            "Patient"
+        ],
+        "Weaknesses": [
+            "Pessimistic",
+            "Stubborn",
+            "Reserved"
+        ]
+    },
+    {
+        "Sign": "Aquarius",
+        "date_range": {
+            "range1": {
+                "month": 1,
+                "day": 20
+            },
+            "range2": {
+                "month": 2,
+                "day": 18
+            }
+        },
+        "Element": "Air",
+        "Quality": "Fixed",
+        "Symbol": "Water Bearer",
+        "Lucky Colour(s)": [
+            "Electric Blue",
+            "Grey"
+        ],
+        "Lucky Number(s)": [
+            1, 7, 11
+        ],
+        "Ruling Planet(s)": [
+            "Uranus"
+        ],
+        "Lucky Gemstone(s)": [
+            "Amethyst"
+        ],
+        "Lucky Metal(s)": [
+            "Uranium (symbolically)"
+        ],
+        "Lucky Day(s)": [
+            "Saturday"
+        ],
+        "Lucky Flower(s)": [
+            "Orchid"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Gemini",
+            "Libra",
+            "Sagittarius"
+        ],
+        "Strengths": [
+            "Progressive",
+            "Original",
+            "Humanitarian"
+        ],
+        "Weaknesses": [
+            "Aloof",
+            "Unpredictable",
+            "Stubborn"
+        ]
+    },
+    {
+        "Sign": "Pisces",
+        "date_range": {
+            "range1": {
+                "month": 2,
+                "day": 19
+            },
+            "range2": {
+                "month": 3,
+                "day": 20
+            }
+        },
+        "Element": "Water",
+        "Quality": "Mutable",
+        "Symbol": "Fish",
+        "Lucky Colour(s)": [
+            "Sea Green",
+            "Lavender"
+        ],
+        "Lucky Number(s)": [
+            3, 7, 12
+        ],
+        "Ruling Planet(s)": [
+            "Neptune",
+            "Jupiter"
+        ],
+        "Lucky Gemstone(s)": [
+            "Aquamarine"
+        ],
+        "Lucky Metal(s)": [
+            "Tin"
+        ],
+        "Lucky Day(s)": [
+            "Thursday"
+        ],
+        "Lucky Flower(s)": [
+            "Water Lily"
+        ],
+        "Compatible Zodiac Sign(s)": [
+            "Cancer",
+            "Scorpio",
+            "Capricorn"
+        ],
+        "Strengths": [
+            "Empathetic",
+            "Creative",
+            "Gentle"
+        ],
+        "Weaknesses": [
+            "Escapist",
+            "Overly Trusting",
+            "Vague"
+        ]
+    }
+]

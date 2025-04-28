@@ -17,7 +17,6 @@ lerna-debug.log*
 
 # credentials
 /credentials
-/src/files/mocs/
 
 # Tests
 /coverage

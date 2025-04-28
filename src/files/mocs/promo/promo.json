@@ -1,0 +1,12 @@
+[
+    {
+        "promo":"dimafree",
+        "title":"Unlimited Pdf Generation",
+        "discount":100
+    },
+    {
+        "promo":"spring30",
+        "title":"Spring 30% discount",
+        "discount":30
+    }
+]
