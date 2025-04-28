@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { StripeTokensService } from './stripe-tokens.service';
 import { Injectable } from '@nestjs/common';
 import { PromoService } from 'src/promo/promo.service';
@@ -58,7 +59,10 @@ export class PaymentService {
       if(!body.token) return new Error("Token was not presented");
       const status = await this.stripeTokensService.verifyAndConsumeToken(body.token);
       if(status){
-        return await this.synastryService.generatePdf(body)
+        this.synastryService.generatePdf(body).catch((error)=>{
+          console.log(error)
+        })
+        return { success: true, message: "Generation started successfully" };
       }else{
         return {
           status,
@@ -68,7 +72,10 @@ export class PaymentService {
     }
     const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
     if(paymentIntent.status==="succeeded"){
-      return await this.synastryService.generatePdf(body)
+      this.synastryService.generatePdf(body).catch((error)=>{
+        console.log(error);
+      })
+      return { success: true, message: "Generation started successfully" };
     }else{
       return {
         status: paymentIntent.status,
