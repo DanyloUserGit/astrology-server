@@ -13,9 +13,9 @@ export class PromptService {
         @InjectModel(Prompt.name, 'synastryConnection') private promptModel: Model<Prompt>,
       ) {
         this.openAiService = new OpenAIService();
-      }
+    }
       
-      buildPrompt(data:NatalChart, lang: string, prompt:string, instruction: string): string {
+    buildPrompt(data:NatalChart, lang: string, prompt:string, instruction: string): string {
         try {
             const p1 = data.data.first_subject;
             const p2 = data.data.second_subject;

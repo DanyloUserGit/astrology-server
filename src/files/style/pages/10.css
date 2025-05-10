@@ -1,0 +1,72 @@
+.p10-text{
+    width: 100%;
+    text-align: center;
+    font-size: 8px;
+    font-weight: 200;
+}
+.p10-cards{
+    margin: 12px 0 0 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.p10-cards-card{
+    flex: 0 0 calc(50% - 4px);
+    padding: 12px;
+    border: 1px solid #FAE4C8;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.p10-cards-card svg{
+    margin: 0 auto;
+}
+.p10-cards-card span{
+    text-align: center;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 500;
+}
+.p10-cards-card-text{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.p10-cards-card-text p{
+    text-align: left;
+    font-size: 8px;
+    font-weight: 200;
+    color: #000000;
+}
+.p10-card-last{
+    margin: 8px 0 0 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background-color: #FAE4C8;
+    border-radius: 12px;
+    padding: 12px;
+}
+.p10-card-last-text{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.p10-card-last-text span{
+    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+    color: #000000;
+}
+.p10-card-last-text-long{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.p10-card-last-text-long p{
+    text-align: left;
+    font-size: 8px;
+    font-weight: 200;
+    color: #000000;
+}

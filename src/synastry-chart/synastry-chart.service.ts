@@ -7,12 +7,16 @@ import { Partner, SynastryDto } from "./synastry-chart.dto";
 import { PromptService } from "src/prompts/prompt.service";
 import { ProcessTimer } from "src/utils/process-timer";
 import { ProcessTimerImpl } from "src/utils/process-timer/impl";
+import { ZodiacSignsService } from "src/zodiac_signs/zodiac_signs.service";
 
 @Injectable()
 export class SynastryService {
     uiGenerator: UIGenerator;
     processTimer: ProcessTimer;
-    constructor(private readonly promptService:PromptService) {
+    constructor(
+        private readonly promptService:PromptService,
+        private readonly zodiacSignsService:ZodiacSignsService
+    ) {
         this.uiGenerator = new UIGeneratorService();
         this.processTimer = new ProcessTimerImpl();
     }
@@ -29,7 +33,7 @@ export class SynastryService {
         };
     }
     
-    async generatePdf(body: SynastryDto) {
+    async generatePdf(body: SynastryDto, tries=0) {
         try {
             console.log("Generating PDF for:", body);
             this.processTimer.start();
@@ -108,6 +112,8 @@ export class SynastryService {
                 const page = await this.promptService.generateSummary(resSynastry.data, body.lang, i);
                 if(page) pages.push(page);
             }
+            const zodiac_signs = await this.zodiacSignsService.getFile();
+            if(!zodiac_signs) throw new Error("Couldn't download file zodiac_signs.json from DB");
             const pdf = await this.uiGenerator.createPdfFile({
                 name1: first_subject.name,
                 name2: second_subject.name,
@@ -119,17 +125,22 @@ export class SynastryService {
                 natal2: resNatalSecond.data,
                 synastry: resSynastry.data,
                 pages,
-                lang:body.lang
+                zodiac_signs,
+                lang:body.lang,
             });
-
+            if(!pdf) return new Error("Error in generating after 2 tries");
             console.log("Sending email...");
-            // await this.googleSheetsService.appendRow(body.email);
             const status = await this.sendMail(body.email, pdf, {name1:body.first_subject.name, name2:body.second_subject.name});
 
             return status;
         } catch (error) {
-            console.error("Error in generatePdf():", error);
-            throw new Error("Failed to generate and send PDF");
+            console.error("Error in generatePdf(), retrying", error);
+            if(tries<=3){
+                tries++;
+                this.generatePdf(body, tries);
+            }else{
+                throw new Error("Generation failed after 3 tries");
+            }
         }
     }
 

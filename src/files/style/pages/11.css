@@ -1,0 +1,137 @@
+.p11-arcadeons{
+    margin-top:10px;
+    width:100%;
+}
+.p11-arcadeon{
+    margin: 10px 0;
+    padding:8px;
+    display:flex;
+    justify-content:space-between;
+    width:100%;
+    border-radius:8px;
+    border: 1px solid #FAE4C8;
+}
+.p11-arcadeon-text{
+    display:flex;
+    gap:4px;
+}
+.p11-arcadeon-text h3{
+    font-size: 16px;
+    font-weight:400;
+    color: #CB8020;
+    margin:auto 0;
+    max-width:30%;
+}
+.p11-arcadeon-text span{
+    font-size: 10px;
+    font-weight:400;
+    color: #CB8020;
+    margin:auto 0;
+    max-width:30%;
+}
+.p11-block{
+    padding:8px;
+    border-radius:8px;
+    border: 1px solid #FAE4C8;
+}
+.p11-block h3{
+    text-align:center;
+    color: #CB8020;
+    font-size:10px;
+    font-weight:400;
+}
+.p11-title{
+    color: #000000;
+    font-size:10px;
+    font-weight:400;
+    text-align:left;
+}
+.p11-arcadeon-info ul{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    list-style:none;
+    text-align:left;
+}
+.p11-arcadeon-info ul li{
+    font-size: 8px;
+    font-weight:200;
+}
+.p11-text{
+    width: 100%;
+    background-color: #FAE4C8;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+.p11-text p{    
+    color: #161616;
+    font-size: 8px;
+    font-weight: 400;
+    line-height: 125%;
+}
+.p11-cards{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+.p11-cards-card{
+    border-radius: 12px;
+    border: 1px solid #FAE4C8;
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.p11-cards-card-top{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}   
+.p11-cards-card-top span{
+    color: #595965;
+    font-size: 10px;
+    font-weight: 500;
+}
+.p11-cards-card-text{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.p11-cards-card-text span{
+    text-align: left;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 500;
+}
+.p11-cards-card-text p{
+    text-align: left;
+    color: #000000;
+    font-size: 8px;
+    font-weight: 200;
+}
+.p11-end{
+    background-color: #CB8020;
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-radius: 8px;
+    margin: 12px 0 0 0;
+}
+.p11-end span{
+    color: #FFF9F1;
+    font-size: 10px;
+    font-weight: 500;
+}
+.p11-stars svg{
+    width: 17px;
+    height: 17px;
+}

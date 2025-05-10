@@ -1,0 +1,20 @@
+[
+  {
+    "prompt": "Write an interpretation of the aspect Moon Trine Venus in a synastry chart for a couple.",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string, // Name of the aspect (e.g. \"Moon Trine Venus\")\n //Description (140-180 characters) \"description\": [string, string, string],\n // Three insight-focused paragraphs (1 sentence each)\n  \"daily_signal\": string,              // Daily subtle signal this aspect creates\n  \"micro_booster\": string,             // Small daily practice to amplify this energy\n  \"strength_line\": string              // Long-term strength or foundation this aspect offers\n}",
+    "page": 8,
+    "isPlanet":true
+  },
+  {
+    "prompt": "Write an interpretation of the aspect Sun Conjunct Mars in a synastry chart for a couple.",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n //Description (140-180 characters) \"description\": [string, string, string],\n// Three insight-focused paragraphs (1 sentence each)  \"daily_signal\": string,\n  \"micro_booster\": string,\n  \"strength_line\": string\n}",
+    "page": 8,
+    "isPlanet":true
+  },
+  {
+    "prompt": "Write an interpretation of the aspect Mercury Sextile Jupiter in a synastry chart for a couple.",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n //Description (140-180 characters) \"description\": [string, string, string],\n// Three insight-focused paragraphs (1 sentence each)  \"daily_signal\": string,\n  \"micro_booster\": string,\n  \"strength_line\": string\n}",
+    "page": 8,
+    "isPlanet":true
+  }
+]

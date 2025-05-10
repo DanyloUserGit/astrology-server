@@ -21,7 +21,6 @@ export class ZodiacSignsService {
             const {sign} = body;
 
             const element = await this.zodiacModel.findOne({Sign:sign}).lean();
-              console.log(element)
               if (element){
                 const signContent = this.loadSignSvgByName(element.Sign);
 
@@ -30,6 +29,15 @@ export class ZodiacSignsService {
                   svgImage: signContent
                 }
               }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async getFile(){
+        try {
+            const file = await this.zodiacModel.find({}, {_id:0}).lean();
+            return file;
         } catch (error) {
             console.log(error);
         }

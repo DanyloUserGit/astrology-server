@@ -1,0 +1,7 @@
+[
+    {
+      "prompt": "Write a relationship-focused forecast for the coming year based on the provided synastry chart.",
+      "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"overview\": [string, string], // Two emotional insight paragraphs (1–2 sentences each) about the tone of the year for the couple\n  \"periods\": [                  // 3 key time periods with unique emotional themes\n    {\n      \"range\": string,         // Time period (e.g. \"April–May\")\n      \"label\": string,         // Title for the period (e.g. \"Clarity & Connection\")\n      \"description\": string    // 2–3 sentence description of what the couple might experience during this time\n    },\n    ...\n  ],\n  \"final_message\": string       // Supportive, warm conclusion (1–2 sentences) about growth and connection\n}",
+      "page": 11
+    }
+]

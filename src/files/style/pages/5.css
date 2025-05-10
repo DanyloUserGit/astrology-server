@@ -1,0 +1,65 @@
+.p5-natal{
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #FAE4C8;
+    display: flex;
+    gap:68px;
+    justify-content:center;
+}
+.p5-natal-title{
+    color: #CB8020;
+    font-size: 12px;
+    font-weight: 400;
+    width: auto;
+}
+.p5-zodiac{
+    margin:10px 0;
+    padding: 16px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-radius:16px;
+    border: 1px solid #FAE4C8;
+}
+.p5-zodiac-date{
+    margin-top: 12px;
+}
+.p5-zodiac-date h3{
+    color: #CB8020;
+    font-size: 10px;
+    font-weight: 400;
+}
+.p5-zodiac-date span{
+    color: #716E68;
+    font-size: 8px;
+    font-weight: 400;
+}
+.p5-zodiac-info{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+}
+.p5-zodiac-info-item{
+    display:flex;
+    flex-direction:column;
+    gap: 4px;
+    border-radius:8px;
+    border: 1px solid #FAE4C8;
+    padding: 4px 8px;
+    text-align:left;
+}
+.p5-zodiac-info-item-title{
+    color: #494B50;
+    font-size: 8px;
+    font-weight: 400;
+}
+.p5-zodiac-info-item-value{
+    color: #CB8020;
+    font-size: 8px;
+    font-weight: 400;
+}
+.p5-text{
+    margin: 8px 0 8px 0;
+}

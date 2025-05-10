@@ -1,0 +1,122 @@
+.p7-text{
+    color: #000000;
+    text-align:left;
+    margin: 8px 0;
+}
+.p7-blocks{
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 8px;
+    margin-left:0;
+    margin: 12px 0 0 0;
+}
+.p7-column{
+    list-style:none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.p7-column li{
+    padding:8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-radius:8px;
+    border: 1px solid #FAE4C8;
+}
+.p7-bl-top{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.p7-column li svg{
+    width: 20px;
+    height: 20px;
+}
+.p7-bl-text{
+    color: #000000;
+    font-weight: 500;
+    font-size: 9px;
+    text-align:left;
+    display: flex;
+    flex-direction: column;
+    text-transform: capitalize;
+}
+.p7-bl-text p{
+    margin-top: 4px;
+}
+.p7-column li p{
+    font-size: 7px;
+    font-weight: 200;
+    text-align: left;
+}
+.p7-textblock{
+    display: flex;
+    gap: 12px;
+    margin: 0 !important;
+}
+.p7-block{
+    display: flex;
+    flex-direction: column;
+    gap:12px;
+}
+.p7-block span{
+
+}
+.p7-block p{
+    font-weight: 200;
+    font-size: 8px;
+}
+.p7-cards{
+    display: flex;
+    flex-direction: column;
+    gap:8px;
+}
+.p7-cards-line{
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+.p7-cards-card{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap:4px;
+}
+.p7-cards-card span{
+    font-weight: 500;
+    font-size: 8px;
+}
+.p7-cards-card p{
+    font-weight: 200;
+    font-size: 8px;
+}
+.p7-end{
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin: 8px 0 0 0;
+}
+.p7-end-pink{
+    background-color: #FAE4C8;
+    text-align: center;
+    padding: 8px;
+    flex: 1;
+    border-radius:8px;
+    font-weight:300;
+    font-size:8px;
+    color:#161616;
+}
+.p7-end-orange{
+    background-color: #CB8020;
+    text-align: center;
+    padding: 8px;
+    flex: 1;
+    border-radius:8px;
+    font-weight:300;
+    font-size:8px;
+    color: #FFF9F1;
+}

@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { ElementType, PlanetAspect } from "src/types";
+import { ElementType, Aspect } from "src/types";
 import { OpenAIIntr } from ".";
 
 
@@ -47,7 +47,7 @@ export class OpenAIService implements OpenAIIntr{
         };
       }
       buildReadableAspects(data: any): string[] {
-        const aspects = data.aspects as PlanetAspect[];
+        const aspects = data.aspects as Aspect[];
         const p1 = data.data.first_subject;
         const p2 = data.data.second_subject;
       
@@ -76,7 +76,7 @@ export class OpenAIService implements OpenAIIntr{
     async generateSummary(prompt:string): Promise<any> {
         try {
             const completion = await this.openai.chat.completions.create({
-              model: 'gpt-4',
+              model: 'gpt-4o',
               messages: [{ role: 'user', content: prompt }],
               temperature: 0.8
             });

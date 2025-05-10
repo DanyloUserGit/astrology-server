@@ -1,0 +1,191 @@
+.p2-text{
+    width: 100%;
+    text-align: left;
+    color: #000000;
+    font-size: 8px;
+    font-weight: 300;
+    background-color: #FAE4C8;
+    padding: 8px;
+    border-radius: 8px;
+}
+.p2-start {
+    flex: 0 0 auto;
+    max-width: fit-content;
+    height: auto;
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    font-weight: 400 !important;
+}
+
+.p2-chart-img {
+    flex: 1;
+    max-width: calc(100% - 174px - 24px); 
+}
+
+.p2-chart {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    flex-wrap: nowrap; 
+}
+
+.p2-chart-img svg{
+    max-width: 100%;
+}
+.p2-plus{
+    width: 24px;
+    height: 24px;
+}
+.p2-content-name{
+    text-align: center;
+    padding-top: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 4px;
+    font-size: 18px;
+    color: #FFF9F1;
+    background-color: #CB8020;
+    border-radius: 4px;
+    max-width: fit-content;
+}
+.p2-userinfo{
+    width: 100%;
+    margin: 24px 0 12px 0;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #FAE4C8;
+}
+.p2-end{
+    display: flex;
+    align-items: center; 
+    gap: 12px;
+    width: 100%;
+    text-align: center !important;
+    margin: 0 0 12px 0;
+    font-weight: 400;
+}
+.p2-users{
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.p2-user{
+    width: 230px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+.p2-user-text{
+    color:#595965;
+    font-size: 8px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 125%;
+}
+.p2-symbols{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+}
+.p2-symbols-signs, .p2-symbols-planets{
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-items: left;
+    gap: 12px;
+}
+.p2-symbols-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+}
+.p2-symbols-list li {
+    display: flex;
+    align-items: center; 
+    gap: 6px; 
+    margin-left: 16px;
+}
+.signs > li:nth-child(8) {
+    margin-left: 0; 
+}
+.signs > li:nth-child(7) {
+    margin-right: 24px; 
+}
+.signs > li:nth-child(1) {
+    margin-left: 0; 
+}
+.planets > li:nth-child(1) {
+    margin-left: 0; 
+} 
+.planets > li:nth-child(8) {
+    margin-left: 0; 
+} 
+.planets > li:nth-child(13) {
+    margin-right: 24px; 
+} 
+.planets > li:nth-child(14) {
+    margin-left: 0; 
+} 
+.p2-symbols-title{
+    text-align: left;
+    color:#CB8020;
+    font-size: 12px;
+    font-weight: 400;
+}
+.p2-legend{
+    width: 100%;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #FFF9F1;
+    border: 1px solid #FAE4C8;
+}
+.p2-userinfo-content{
+    margin: 12px 0 0 0;
+}
+.p2-userinfo-content-text{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    margin: 0 0 12px 0;
+    text-align: center;
+}
+.p2-userinfo-content-text span{
+    color: #CB8020;
+    font-size: 14px;
+    font-weight: 500;
+}
+.p2-userinfo-content-text p{
+    color: #000000;
+    font-weight: 200;
+    font-size: 8px;
+}
+.p2-userinfo-content-text p b{
+    font-weight: 400;
+}
+.p2-userinfo-content-line{
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+.p2-userinfo-content-line-el{
+    flex: 1 !important;
+}

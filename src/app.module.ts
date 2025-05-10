@@ -33,7 +33,7 @@ import * as redisStore from 'cache-manager-redis-store';
         const uri = configService.get('MONGO_LINK');
         return {
           uri,
-          dbName: "synastry"
+          dbName: "prompts"
         };
       },
     }),
