@@ -19,7 +19,7 @@
             "Mustard Yellow"
         ],
         "Lucky Number(s)": [
-            1, 6, 2009
+            1, 6, 2, 0, 9
         ],
         "Ruling Planet(s)": [
             "Mars"
@@ -72,7 +72,7 @@
             "Pale Blue"
         ],
         "Lucky Number(s)": [
-            2, 6, 2009
+            2, 6, 0, 9
         ],
         "Ruling Planet(s)": [
             "Venus"
@@ -125,7 +125,7 @@
             "Green"
         ],
         "Lucky Number(s)": [
-            3, 5, 2007
+            3, 5, 2, 0, 7
         ],
         "Ruling Planet(s)": [
             "Mercury"
@@ -178,7 +178,7 @@
             "Silver"
         ],
         "Lucky Number(s)": [
-            2, 7, 2009
+            2, 7, 0, 9
         ],
         "Ruling Planet(s)": [
             "Moon"
@@ -231,7 +231,7 @@
             "Orange"
         ],
         "Lucky Number(s)": [
-            1, 5, 2009
+            1, 5, 2, 0, 9
         ],
         "Ruling Planet(s)": [
             "Sun"
@@ -284,7 +284,7 @@
             "Brown"
         ],
         "Lucky Number(s)": [
-            3, 5, 2006
+            3, 5, 2, 0, 6
         ],
         "Ruling Planet(s)": [
             "Mercury"
@@ -337,7 +337,7 @@
             "Light Blue"
         ],
         "Lucky Number(s)": [
-            4, 6, 13
+            4, 6, 1, 3
         ],
         "Ruling Planet(s)": [
             "Venus"
@@ -390,7 +390,7 @@
             "Black"
         ],
         "Lucky Number(s)": [
-            2, 4, 2009
+            2, 4, 0, 9
         ],
         "Ruling Planet(s)": [
             "Pluto",
@@ -444,7 +444,7 @@
             "Maroon"
         ],
         "Lucky Number(s)": [
-            3, 7, 2009
+            3, 7, 2, 0, 9
         ],
         "Ruling Planet(s)": [
             "Jupiter"
@@ -497,7 +497,7 @@
             "Brown"
         ],
         "Lucky Number(s)": [
-            4, 8, 10
+            4, 8, 1, 0
         ],
         "Ruling Planet(s)": [
             "Saturn"
@@ -550,7 +550,7 @@
             "Grey"
         ],
         "Lucky Number(s)": [
-            1, 7, 11
+            1, 7
         ],
         "Ruling Planet(s)": [
             "Uranus"
@@ -603,7 +603,7 @@
             "Lavender"
         ],
         "Lucky Number(s)": [
-            3, 7, 12
+            3, 7, 1, 2
         ],
         "Ruling Planet(s)": [
             "Neptune",

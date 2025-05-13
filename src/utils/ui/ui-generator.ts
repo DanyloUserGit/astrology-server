@@ -48,12 +48,16 @@ export class UIGeneratorService implements UIGenerator{
         const formatDegrees = (degrees: number): string => {
             return `${Math.floor(degrees)}°`;
         };
-    
+        const changeName = {
+            "Medium_Coeli":"MC",
+            "True_Node":"North Node",
+            "Ascendant":"Ascendant"
+        }
         const allPlanets = Object.entries(data.data)
-            .filter(([_, obj]: [string, any]) => obj && obj.point_type === "Planet")
+            .filter(([_, obj]: [string, any]) => obj && (obj.point_type === "Planet" || changeName[obj.name]))
             .map(([_, obj]) => obj)
             .filter((planet: any) => 
-                fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))
+                fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${changeName[planet.name] ? changeName[planet.name].replaceAll(" ", "_").toLowerCase() : planet.name.toLowerCase()}.svg`))
             );
     
         const midpoint = Math.ceil(allPlanets.length / 2);
@@ -62,170 +66,179 @@ export class UIGeneratorService implements UIGenerator{
     
         const renderList = (planets: any[]) => {
             return `<ul class="planet-list">` + planets.map((planet: any) => {
-                const icon = this.loadPlanetSvgByName(planet.name.toLowerCase());
-                return `<li><div class="planet-icon">${icon}</div> ${planet.name} in <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
+                const icon = this.loadPlanetSvgByName(!changeName[planet.name] ? planet.name.toLowerCase() : changeName[planet.name].replaceAll(" ", "_").toLowerCase());
+                return `<li><div class="planet-icon">${icon}</div> <span>${changeName[planet.name] ? changeName[planet.name] : planet.name} in</span> <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
             }).join('') + `</ul>`;
         };
     
         return renderList(firstHalf) + renderList(secondHalf);
     }    
     
-    createSvg(rawData: NatalChart) {
-        try {
-            const natalData = rawData.data;
-            const aspects = rawData.aspects;
-            const width = 280;
-            const height = 280;
-            const radius = 140;
-            const center = { x: width / 2, y: height / 2 };
-    
-            let svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
-            // Фон
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
-            
-        // Радіус центрального кола
+createSvg(rawData: NatalChart) {
+    try {
+        const natalData = rawData.data;
+        const aspects = rawData.aspects;
+        const width = 280;
+        const height = 280;
+        const radius = 140;
+        const center = { x: width / 2, y: height / 2 };
         const centralRadius = 27.456;
+        const textRadius = radius - 10.56;
+        const innerRadius = radius - 36.96;
+        const outerRadius = radius - 13.2;
 
-        // Лінії поділу на 12 частин
+        const zodiacSigns = [
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+        ];
+
+        const exceptions = ["Mean_Node", "Medium_Coeli"];
+        const normal = ["north_node", "mc"];
+        const exceptionsMap: Record<string, string> = Object.fromEntries(
+            exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
+        );
+
+        const allowed_planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", 
+            "Uranus", "Neptune", "Pluto", "Chiron", "Ascendant", "Medium_Coeli", "Mean_Node"
+        ];
+
+        let svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+        // Background
+        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
+
+        // 12 outer division lines
         for (let i = 0; i < 12; i++) {
             const angle = (i * 30) * (Math.PI / 180);
-            
-            // Обчислення кінцевих точок для лінії (між центром і центральним колом)
-            const x1 = Math.cos(angle) * (radius-13.2) + center.x;
-            const y1 = Math.sin(angle) * (radius-13.2) + center.y;
-
-            // Обчислення координат для кінця лінії на зовнішньому радіусі
+            const x1 = Math.cos(angle) * (radius - 13.2) + center.x;
+            const y1 = Math.sin(angle) * (radius - 13.2) + center.y;
             const x2 = Math.cos(angle) * radius + center.x;
             const y2 = Math.sin(angle) * radius + center.y;
-
-            // Додаємо лінію від центра до краю центрального кола
             svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FAE4C8" stroke-width="2"/>`;
         }
 
+        // Concentric circles
+        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 13.2}" fill="#FFFFFF" stroke="none"/>`;
+        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 26.4}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1"/>`;
+        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${centralRadius}" fill="#FFFFFF" stroke="none"/>`;
 
-        // Малюємо центральне коло
-        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius-13.2}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
-        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius-26.4}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1"/>`;
-        svgString += `<circle cx="${center.x}" cy="${center.y}" r="${centralRadius}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
-        // Лінії поділу на 12 частин (Довгі)
+        // 12 inner division lines
         for (let i = 0; i < 12; i++) {
             const angle = (i * 30) * (Math.PI / 180);
-            
-            // Обчислення кінцевих точок для лінії (між центром і центральним колом)
             const x1 = Math.cos(angle) * centralRadius + center.x;
             const y1 = Math.sin(angle) * centralRadius + center.y;
-
-            // Обчислення координат для кінця лінії на зовнішньому радіусі
-            const x2 = Math.cos(angle) * (radius-13.2) + center.x;
-            const y2 = Math.sin(angle) * (radius-13.2) + center.y;
-
-            // Додаємо лінію від центра до краю центрального кола
+            const x2 = Math.cos(angle) * (radius - 13.2) + center.x;
+            const y2 = Math.sin(angle) * (radius - 13.2) + center.y;
             svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E4B77C" stroke-width="1"/>`;
         }
-            // Знаки зодіаку та їхні сузір'я
-            const zodiacSigns = [
-                { name: "Virgo", emoji: "♈" }, { name: "Leo", emoji: "♉" },
-                { name: "Cancer", emoji: "♊" }, { name: "Gemini", emoji: "♋" },
-                { name: "Taurus", emoji: "♌" }, { name: "Aries", emoji: "♍" },
-                { name: "Pisces", emoji: "♎" }, { name: "Aquarius", emoji: "♏" },
-                { name: "Capricorn", emoji: "♐" }, { name: "Sagittarius", emoji: "♑" },
-                { name: "Scorpio", emoji: "♒" }, { name: "Libra", emoji: "♓" }
-            ];
 
-            const textRadius = radius-10.56; 
-
-            zodiacSigns.forEach((sign, i) => {
-                const sectorAngle = 30; 
-                const baseAngle = i * sectorAngle; 
-                const centerAngle = baseAngle + sectorAngle / 2; 
-                
-                const angleRad = ((centerAngle - 90) * Math.PI) / 180; // Переведення в радіани
-                const textX = Math.cos(angleRad) * textRadius + center.x;
-                const textY = Math.sin(angleRad) * textRadius + center.y;
-                
-                const rotation = centerAngle; // Поворот тексту у межах секції
-            
-                svgString += `
-                    <text x="${textX}" y="${textY}" font-size="10.56" fill="#FFF9F1" text-anchor="middle"
-                          transform="rotate(${rotation}, ${textX}, ${textY})">
-                        ${sign.name}
-                    </text>
-                `;
-            });
-            const innerRadius = radius - 36.96;
-        const outerRadius = radius - 13.2;
-        const exceptions = ["Mean_Node"];
-        const normal = ["north_node"];
-        const exceptionsMap: Record<string, string> = Object.fromEntries(
-            exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
-          );
-        let planetPositions = {};
-        Object.values(natalData.first_subject || {}).forEach((planet: CelestialBody) => {
-            if (planet && typeof planet === "object" && planet.abs_pos !== undefined && fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))) {
-                const angleRad = ((planet.abs_pos - 90) * Math.PI) / 180;
-                const x = Math.cos(angleRad) * innerRadius + center.x;
-                const y = Math.sin(angleRad) * innerRadius + center.y;
-                
-                const planetName = planet.name ? planet.name.toLowerCase() : "unknown";
-                const planetSvg = this.loadPlanetSvgByName(planetName) || "";
-                
-                svgString += `<g transform="translate(${x}, ${y}) scale(0.58)">${planetSvg}</g>`;
-                planetPositions[planet.name] = { x, y };
-            }else if(planet && typeof planet === "object" && planet.abs_pos !== undefined && exceptions.includes(planet.name)){
-                const angleRad = ((planet.abs_pos - 90) * Math.PI) / 180;
-                const x = Math.cos(angleRad) * innerRadius + center.x;
-                const y = Math.sin(angleRad) * innerRadius + center.y;
-                
-                const planetName = planet.name ? planet.name.toLowerCase() : "unknown";
-                const planetSvg = this.loadPlanetSvgByName(exceptionsMap[planetName]) || "";
-                
-              
-                svgString += `<g transform="translate(${x}, ${y}) scale(0.58)">${planetSvg}</g>`;         
-                planetPositions[planet.name] = { x, y };
-            }
+        // Zodiac arcs
+        zodiacSigns.forEach((_, i) => {
+            const startAngle = (i * 30 - 90) * (Math.PI / 180);
+            const endAngle = ((i + 1) * 30 - 90) * (Math.PI / 180);
+            const x1 = center.x + Math.cos(startAngle) * textRadius;
+            const y1 = center.y + Math.sin(startAngle) * textRadius;
+            const x2 = center.x + Math.cos(endAngle) * textRadius;
+            const y2 = center.y + Math.sin(endAngle) * textRadius;
+            const largeArc = 0;
+            const pathId = `zodiacArc${i}`;
+            svgString += `<path id="${pathId}" fill="none" d="M ${x1} ${y1} A ${textRadius} ${textRadius} 0 ${largeArc} 1 ${x2} ${y2}" />`;
         });
 
-        if (!aspects || !Array.isArray(aspects)) {
-            console.error("Error: Aspects data is missing or invalid");
-        } else {
+        // Zodiac labels
+        zodiacSigns.forEach((sign, i) => {
+            svgString += `
+                <text font-size="10.56" fill="#FFF9F1">
+                    <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">
+                        ${sign}
+                    </textPath>
+                </text>
+            `;
+        });
+
+        // Helper
+        function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
+            const rad = (angleDeg) * (Math.PI / 180);
+            return {
+                x: cx + r * Math.cos(rad),
+                y: cy + r * Math.sin(rad)
+            };
+        }
+
+        let planetPositions: Record<string, { x: number, y: number }> = {};
+
+const drawSubjectPlanets = (
+    subjectData: Record<string, CelestialBody>,
+    label: string,
+    placement: "inner" | "ring"
+) => {
+    Object.values(subjectData || {}).forEach((planet: CelestialBody) => {
+        if (!planet || typeof planet !== "object" || planet.abs_pos === undefined) return;
+        if (!allowed_planets.includes(planet.name)) return;
+
+        const rawName = planet.name?.toLowerCase();
+        const actualName = exceptions.includes(planet.name) ? exceptionsMap[rawName] : rawName;
+
+        const angleRad = ((planet.abs_pos - 90) * Math.PI) / 180;
+
+        const baseRadius = (radius - 16.2 + radius - 24.2) / 2;
+        const planetRadius = placement === "ring" ? baseRadius : baseRadius - (7.92*2.5);
+
+        const x = Math.cos(angleRad) * planetRadius + center.x;
+        const y = Math.sin(angleRad) * planetRadius + center.y;
+
+        const planetSvg = this.loadPlanetSvgByName(actualName) || "";
+
+        svgString += `
+        <g transform="translate(${x}, ${y}) scale(0.58)">
+            <g transform="translate(-7, -7)">
+            ${planetSvg}
+            </g>
+        </g>
+        `;
+
+
+        planetPositions[`${planet.name}_${label}`] = { x, y };
+    });
+};
+
+
+        // Draw planets for both subjects
+        drawSubjectPlanets(natalData.first_subject, "1", "ring");
+        drawSubjectPlanets(natalData.second_subject, "2", "inner");
+
+        // Aspects
+        if (Array.isArray(aspects)) {
             aspects.forEach(({ p1_name, p2_name, aspect }) => {
-                if (planetPositions[p1_name] && planetPositions[p2_name]) {
-                    const { x: x1, y: y1 } = planetPositions[p1_name];
-                    const { x: x2, y: y2 } = planetPositions[p2_name];
-                    let x1f, x2f, y1f, y2f;
-                    if(y1 > 0 || y2 > 0){
-                        y1f = y1+7.92;
-                        y2f = y2+7.92;
-                    }else{
-                        y1f = y1-7.92;
-                        y2f = y2-7.92;
-                    }
-                    if(x1 > 0 || x2 > 0){
-                        x1f = x1+7.92;
-                        x2f = x2+7.92;
-                    }else{
-                        x1f = x1-7.92;
-                        x2f = x2-7.92;
-                    }
-                    let color;
+                const p1 = planetPositions[`${p1_name}_1`] || planetPositions[`${p1_name}_2`];
+                const p2 = planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
+                if (p1 && p2) {
+                    const offset = 7.92;
+                    const x1f = p1.x + (p1.x > center.x ? -offset : offset);
+                    const y1f = p1.y + (p1.y > center.y ? -offset : offset);
+                    const x2f = p2.x + (p2.x > center.x ? -offset : offset);
+                    const y2f = p2.y + (p2.y > center.y ? -offset : offset);
+
+                    let color, stroke;
                     switch (aspect) {
-                        case "trine": color = "#7CE483"; break;
-                        case "square": color = "#EF3C25"; break;
-                        case "opposition": color = "#E4B77C"; break;
-                        default: color = "#E4B77C";
+                        case "trine": color = "#7CE483"; stroke = 2; break;
+                        case "square": color = "#EF3C25"; stroke = 2; break;
+                        case "opposition": color = "#E4B77C"; stroke = 1; break;
+                        default: color = "#E4B77C"; stroke = 1;
                     }
-                    
-                    svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="${color}" stroke-width="1"/>`;
+
+                    svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="${color}" stroke-width="${stroke}"/>`;
                 }
             });
         }
-            svgString += `</svg>`;
-            return svgString;
-        } catch (error) {
-            console.error(error);
-            throw error;  
-        }
+
+        svgString += `</svg>`;
+        return svgString;
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
+}
     createSvgNatal(rawData: NatalChart) {
         try {
             const natalData = rawData.data;
@@ -309,7 +322,7 @@ export class UIGeneratorService implements UIGenerator{
                     </text>
                 `;
             });
-            const innerRadius = radius - 50;
+            const innerRadius = radius - 40;
         const exceptions = ["Mean_Node"];
         const normal = ["north_node"];
         const exceptionsMap: Record<string, string> = Object.fromEntries(
@@ -319,23 +332,35 @@ export class UIGeneratorService implements UIGenerator{
         Object.values(natalData).forEach((planet: CelestialBody) => {
             if (planet && typeof planet === "object" && planet.abs_pos !== undefined && fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))) {
                 const angleRad = ((planet.abs_pos - 90) * Math.PI) / 180;
-                const x = Math.cos(angleRad) * innerRadius + center.x;
-                const y = Math.sin(angleRad) * innerRadius + center.y;
+                const baseRadius = (radius - 40 + radius - 50) / 2;
+                const x = Math.cos(angleRad) * baseRadius + center.x;
+                const y = Math.sin(angleRad) * baseRadius + center.y;
                 
                 const planetName = planet.name ? planet.name.toLowerCase() : "unknown";
                 const planetSvg = this.loadPlanetSvgByName(planetName) || "";
                 
-                svgString += `<g transform="translate(${x}, ${y}) scale(1.5)">${planetSvg}</g>`;
+                svgString += `                
+                <g transform="translate(${x}, ${y}) scale(1.5)">
+                    <g transform="translate(-7, -7)">
+                    ${planetSvg}
+                    </g>
+                </g>`;
                 planetPositions[planet.name] = { x, y };
             }else if(planet && typeof planet === "object" && planet.abs_pos !== undefined && exceptions.includes(planet.name)){
                 const angleRad = ((planet.abs_pos - 90) * Math.PI) / 180;
-                const x = Math.cos(angleRad) * innerRadius + center.x;
-                const y = Math.sin(angleRad) * innerRadius + center.y;
+                const baseRadius = (radius - 40 + radius - 50) / 2;
+                const x = Math.cos(angleRad) * baseRadius + center.x;
+                const y = Math.sin(angleRad) * baseRadius + center.y;
                 
                 const planetName = planet.name ? planet.name.toLowerCase() : "unknown";
                 const planetSvg = this.loadPlanetSvgByName(exceptionsMap[planetName]) || "";
                 
-                svgString += `<g transform="translate(${x}, ${y})">${planetSvg}</g>`;
+                svgString += `                
+                <g transform="translate(${x}, ${y}) scale(1.5)">
+                    <g transform="translate(-7, -7)">
+                    ${planetSvg}
+                    </g>
+                </g>`;
                 planetPositions[planet.name] = { x, y };
             }
         });
@@ -347,21 +372,12 @@ export class UIGeneratorService implements UIGenerator{
                 if (planetPositions[p1_name] && planetPositions[p2_name]) {
                     const { x: x1, y: y1 } = planetPositions[p1_name];
                     const { x: x2, y: y2 } = planetPositions[p2_name];
-                    let x1f, x2f, y1f, y2f;
-                    if(y1 > 0 || y2 > 0){
-                        y1f = y1+5;
-                        y2f = y2+5;
-                    }else{
-                        y1f = y1-32;
-                        y2f = y2-32;
-                    }
-                    if(x1 > 0 || x2 > 0){
-                        x1f = x1+5;
-                        x2f = x2+5;
-                    }else{
-                        x1f = x1-32;
-                        x2f = x2-32;
-                    }
+                    const offset = 7.92 * 2;
+                    const x1f = x1 + (x1 > center.x ? -offset : offset);
+                    const y1f = y1 + (y1 > center.y ? -offset : offset);
+                    const x2f = x2 + (x2 > center.x ? -offset : offset);
+                    const y2f = y2 + (y2 > center.y ? -offset : offset);
+                    
                     let color = "#E4B77C";
                     
                     svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="${color}" stroke-width="1"/>`;
@@ -605,7 +621,7 @@ export class UIGeneratorService implements UIGenerator{
                 planetNames.map((item, index)=>{
                     const svg = this.loadSingleSvg(`planets/${item.replaceAll(" ", "_")}`)
                     list1 += `
-                        <li><span class="text-left">${item.toUpperCase()}</span> ${svg}</li>
+                        <li>${svg} <span class="text-left">${item.toUpperCase()}</span></li>
                     `;
                 })
                 list = `
@@ -1147,6 +1163,16 @@ export class UIGeneratorService implements UIGenerator{
                 <div class="p5 parent-container">
                     ${topElement("Individual Natal Charts")}
                     <div class="p5-content content-container">
+                        <p class="p3-text">
+                            This section focuses on your <b>unique</b> astrological blueprint.
+                            Each partner receives an <b>individual natal chart.</b> The chart
+                            is a<br /> snapshot of the sky at the exact moment of your birth. 
+                        </p>
+                        <p class="p3-text p5-text">
+                            It shows the position of key planets. We focus
+                            on three core elements: the Sun, Moon, and Ascendant signs.
+                            <b>These markers<br /> reveal essential aspects of your personality.</b>
+                        </p>
                         <div class="p5-natal">
                             <div class="p5-section">
                                 <div class="p5-natal-chart">
@@ -1211,7 +1237,7 @@ export class UIGeneratorService implements UIGenerator{
             // -- Page 7 -- //
             const page7 = `
                 <div class="p7 parent-container">
-                ${topElement("Key Aspects Notes")}
+                ${topElement("How to Read Your Synastry Chart")}
                     <div class="p7-content content-container">
                         <p class="p3-text">
                             Your synastry chart compares how the planets in your chart
@@ -1221,13 +1247,6 @@ export class UIGeneratorService implements UIGenerator{
                         <p class="p3-text p5-text">
                             Below is a quick guide to what each planet symbolizes in relationship astrology.
                             This will <b>help you better understand</b> the<br /> meanings behind the interactions described in your report.
-                        </p>
-                        <p class="p3-text">
-                            This section focuses on your unique astrological blueprint.
-                            Each partner receives an individual natal chart.
-                            The chart is a snapshot of the sky at the exact moment of your birth.
-                            It shows the position of key planets. We focus on three core elements:
-                            the Sun, Moon, and Ascendant signs. These markers reveal essential aspects of your personality.
                         </p>
                         <div class="p7-blocks">
                             ${renderPlanetListwithText()}
@@ -1247,37 +1266,36 @@ export class UIGeneratorService implements UIGenerator{
                                 <div class="p7-cards-line">
                                     <div class="p7-cards-card">
                                         <span>Conjunction (0°)</span>
-                                        <p>Strong alignment, shared energy</p>
+                                        <p>Strong alignment, shared<br /> energy</p>
                                     </div>
                                     <div class="p7-cards-card">
                                         <span>Trine (120°)</span>
-                                        <p>Harmonious flow, easy compatibility</p>
+                                        <p>Harmonious flow,<br /> easy compatibility</p>
                                     </div>
                                     <div class="p7-cards-card">
                                         <span>Square (90°)</span>
-                                        <p>Tension, challenge, growth potential</p>
+                                        <p>Tension, challenge, growth<br /> potential</p>
                                     </div>
                                 </div>
                                 <div class="p7-cards-line">
                                     <div class="p7-cards-card">
                                         <span>Opposition (180°)</span>
-                                        <p>Complementary or conflicting forces</p>
+                                        <p>Complementary or<br /> conflicting forces</p>
                                     </div>
                                     <div class="p7-cards-card">
                                         <span>Quintile / Sextile (72° / 60°)</span>
-                                        <p>Creative synergy or support</p>
+                                        <p>Creative synergy or<br /> support</p>
                                     </div>
                                     <div class="p7-cards-card">
                                         <span>Wide Orb (>8°)</span>
-                                        <p>Influence exists but may be subtle</p>
+                                        <p>Influence exists but may<br /> be subtle</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="p7-end">
-                            <div class="p7-end-pink">Every planetary aspect adds a brushstroke to your shared portrait. Some create instant harmony. Others invite growth through contrast.</div>
-                            <div class="p7-end-orange">Together, they form a complete picture of how your souls interact across time and space.
-                            Let’s explore it.</div>
+                            <div class="p7-end-pink">Every planetary aspect adds a brushstroke to your<br /> shared portrait. Some create instant harmony. Others<br /> invite growth through contrast.</div>
+                            <div class="p7-end-orange">Together, they form a complete picture of how your<br /> souls interact across time and space.<br /> Let’s explore it.</div>
                         </div>
                     </div>
                     ${downElement(7)}
@@ -1322,9 +1340,9 @@ export class UIGeneratorService implements UIGenerator{
                                 </div>
                                 <div class="p8-cards-card-content">
                                     <div class="p8-cards-card-content-text">
-                                        <p>${promptP8.planets[0].description[0]}</p>
-                                        <p>${promptP8.planets[0].description[1]}</p>
-                                        <p>${promptP8.planets[0].description[2]}</p>
+                                        <p>${promptP8.planets[0].description[0] ? promptP8.planets[0].description[0] : ""}</p>
+                                        <p>${promptP8.planets[0].description[1] ? promptP8.planets[0].description[1] : ""}</p>
+                                        <p>${promptP8.planets[0].description[2] ? promptP8.planets[0].description[2] : ""}</p>
                                     </div>
                                     <div class="p8-cards-card-content-info">
                                         <div class="p8-cards-card-content-info-el">
@@ -1332,11 +1350,11 @@ export class UIGeneratorService implements UIGenerator{
                                             <p>${promptP8.planets[0].daily_signal}</p>
                                         </div>
                                         <div class="p8-cards-card-content-info-el">
-                                            <div class="p8-cards-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[1]}</span></div>
+                                            <div class="p8-cards-card-content-info-el-title">${thunderContent} <span>${getTitle[lang].p8.info_labels[1]}</span></div>
                                             <p>${promptP8.planets[0].micro_booster}</p>
                                         </div>
                                         <div class="p8-cards-card-content-info-el">
-                                            <div class="p8-cards-card-content-info-el-title">${calenderContent} <span>${getTitle[lang].p8.info_labels[2]}</span></div>
+                                            <div class="p8-cards-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[2]}</span></div>
                                             <p>${promptP8.planets[0].strength_line}</p>
                                         </div>
                                     </div>
@@ -1344,13 +1362,13 @@ export class UIGeneratorService implements UIGenerator{
                             </div>
                             <div class="p8-cards-card">
                                 <div class="p8-cards-card-top">
-                                    <span>${promptP8.planets[0].label}</span>
+                                    <span>${promptP8.planets[1].label}</span>
                                 </div>
                                 <div class="p8-cards-card-content">
                                     <div class="p8-cards-card-content-text">
-                                        <p>${promptP8.planets[1].description[0]}</p>
-                                        <p>${promptP8.planets[1].description[1]}</p>
-                                        <p>${promptP8.planets[1].description[2]}</p>
+                                        <p>${promptP8.planets[1].description[0] ? promptP8.planets[1].description[0] : ""}</p>
+                                        <p>${promptP8.planets[1].description[1] ? promptP8.planets[1].description[1] : ""}</p>
+                                        <p>${promptP8.planets[1].description[2] ? promptP8.planets[1].description[2] : ""}</p>
                                     </div>
                                     <div class="p8-cards-card-content-info">
                                         <div class="p8-cards-card-content-info-el">
@@ -1358,11 +1376,11 @@ export class UIGeneratorService implements UIGenerator{
                                             <p>${promptP8.planets[1].daily_signal}</p>
                                         </div>
                                         <div class="p8-cards-card-content-info-el">
-                                            <div class="p8-cards-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[1]}</span></div>
+                                            <div class="p8-cards-card-content-info-el-title">${thunderContent} <span>${getTitle[lang].p8.info_labels[1]}</span></div>
                                             <p>${promptP8.planets[1].micro_booster}</p>
                                         </div>
                                         <div class="p8-cards-card-content-info-el">
-                                            <div class="p8-cards-card-content-info-el-title">${calenderContent} <span>${getTitle[lang].p8.info_labels[2]}</span></div>
+                                            <div class="p8-cards-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[2]}</span></div>
                                             <p>${promptP8.planets[1].strength_line}</p>
                                         </div>
                                     </div>
@@ -1375,21 +1393,21 @@ export class UIGeneratorService implements UIGenerator{
                             </div>
                             <div class="p8-last-card-content">
                                 <div class="p8-last-card-content-text">
-                                    <p>${promptP8.planets[2].description[0]}</p>
-                                    <p>${promptP8.planets[2].description[1]}</p>
-                                    <p>${promptP8.planets[2].description[2]}</p>
+                                    <p>${promptP8.planets[2].description[0] ? promptP8.planets[2].description[0] : ""}</p>
+                                    <p>${promptP8.planets[2].description[1] ? promptP8.planets[2].description[1] : ""}</p>
+                                    <p>${promptP8.planets[2].description[2] ? promptP8.planets[2].description[2] : ""}</p>
                                 </div>
                                 <div class="p8-last-card-content-info">
                                     <div class="p8-last-card-content-info-el">
-                                        <div class="p8-last-card-content-info-el-title">${calenderContent} <span>${getTitle[lang].p8.info_labels[0]}</span></div>
+                                        <div class="p8-last-card-content-info-el-title">${calenderContent} <span>${getTitle[lang].p8.info_labels[0].replaceAll(" ", "<br />")}</span></div>
                                         <p>${promptP8.planets[2].daily_signal}</p>
                                     </div>
                                     <div class="p8-last-card-content-info-el">
-                                        <div class="p8-last-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[1]}</span></div>
+                                        <div class="p8-last-card-content-info-el-title">${thunderContent} <span>${getTitle[lang].p8.info_labels[1].replaceAll(" ", "<br />")}</span></div>
                                         <p>${promptP8.planets[2].micro_booster}</p>
                                     </div>
                                     <div class="p8-last-card-content-info-el">
-                                        <div class="p8-last-card-content-info-el-title">${calenderContent} <span>${getTitle[lang].p8.info_labels[2]}</span></div>
+                                        <div class="p8-last-card-content-info-el-title">${chartIncreaseContent} <span>${getTitle[lang].p8.info_labels[2].replaceAll(" ", "<br />")}</span></div>
                                         <p>${promptP8.planets[2].strength_line}</p>
                                     </div>
                                 </div>
@@ -1583,6 +1601,16 @@ export class UIGeneratorService implements UIGenerator{
                                         <p>${promptP11.periods[2].description}</p>
                                     </div>
                                 </div>
+                                <div class="p11-cards-card">
+                                    <div class="p11-cards-card-top">
+                                        ${iconCalender}
+                                        <span>${promptP11.periods[3].range}</span>
+                                    </div>
+                                    <div class="p11-cards-card-text">
+                                        <span>${promptP11.periods[3].label}</span>
+                                        <p>${promptP11.periods[3].description}</p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="p11-end">
                                 <div class="stars-flex p11-stars">
@@ -1622,18 +1650,6 @@ export class UIGeneratorService implements UIGenerator{
                             The stars guide, but you set the course.<br />Wishing you clear skies on every step together!
                         </div>
                     </div>
-                    <div class="p12-social">
-                        <div class="p12-social-element">
-                            <h3>We are on social media</h3>
-                            <div class="p12-social-svg">
-                                ${renderSocial()}
-                            </div>
-                        </div>
-                        <div class="p12-social-element">
-                            <h3>Channels</h3>
-                            <div class="p12-tg">${telegramContent}</div>
-                        </div>
-                    </div>  
                     <div class="p12-rate">
                         <div class="p12-rate-text">
                             <span>Scan to rate</span>

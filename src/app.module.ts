@@ -39,7 +39,7 @@ import * as redisStore from 'cache-manager-redis-store';
     }),
     CacheModule.register({
       isGlobal: true,
-      ttl: 30 * 1000
+      ttl: 2 * 60 * 1000
     }),
     SynastryModule,
     PaypalModule,

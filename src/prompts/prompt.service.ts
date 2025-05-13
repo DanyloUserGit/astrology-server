@@ -25,7 +25,12 @@ export class PromptService {
             const elementBreakdown1 = this.openAiService.getElementBreakdown(p1);
             const elementBreakdown2 = this.openAiService.getElementBreakdown(p2);
             const readableAspects = this.openAiService.buildReadableAspects(data);
-            
+            const today = new Date();
+            const dateStr = today.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+            });
             return `
                 ${prompt}
 
@@ -42,8 +47,10 @@ export class PromptService {
                 ## Synastry Aspects:
                 ${readableAspects.map((a, i) => `${i + 1}. ${a}`).join('\n')}
 
+                Do NOT use emojis, symbols, colour icons, or bullet marks. 
                 Base all interpretations on tropical astrology. Keep the tone warm, clear, and human.
                 Language: ${lang} (Also translate Name1 and Name2 and names of planets. DO NOT translate any JSON keys)
+                DateString: ${dateStr}
 
                 Begin when ready.
             `;

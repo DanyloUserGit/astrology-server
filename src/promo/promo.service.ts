@@ -10,7 +10,7 @@ export class PromoService {
 
     async validatePromo(dto: ValidatePromoDto){
         try {
-            const promo = await this.promoModel.findOne({promo:dto.promo});
+            const promo = await this.promoModel.findOne({promo:dto.promo.replaceAll(" ", "")});
             if(!promo) throw new Error("Promo was not found");
             const discountNumber = (promo.discount / 100) * parseFloat(process.env.PDF_PRICE || '9.99');
             const priceAfterDiscount = parseFloat(process.env.PDF_PRICE || '9.99') - discountNumber;

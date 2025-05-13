@@ -143,7 +143,6 @@ export class SynastryService {
             }
         }
     }
-
     async sendMail(email: string, pdf: Buffer, names:{name1:string, name2:string}) {
         try {
             console.log("Sending email to:", email);

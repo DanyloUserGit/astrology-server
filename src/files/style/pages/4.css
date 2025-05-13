@@ -24,13 +24,15 @@
     display: flex;
     gap: 4px;
     font-size: 8px;
-    font-weight: 200;
     color: #000000;
     text-align: left;
     margin: 8px 0 0 0;
 }
-.p4-bordertext-info b{
-    font-weight: 400;
+.p4-bordertext-info span{
+    font-size: 8px;
+    font-weight: 200;
+    color: #000000;
+    text-align: left;
 }
 .p4-bordertext-info svg{
     width: 10px;
@@ -47,9 +49,6 @@
     background-color: #FAE4C8;
     color: #161616;
     margin: 8px 0 0 0;
-}
-.p4-info b{
-    font-weight: 400;
 }
 .p4-info svg{
     width: 16px;
@@ -95,9 +94,6 @@
     height: 1em;
     margin: 0 2px; 
 }
-.p4-card p b{
-    font-weight: 400;
-}
 .p4-card p svg{
     width: 10px;
     height: 10px;
@@ -111,9 +107,6 @@
     border-radius: 8px;
     border: 1px solid #FAE4C8;
     flex: 1 !important;
-}
-.p4-card b{
-    font-weight: 400;
 }
 .p4-cards{
     width: 100%;
@@ -149,9 +142,6 @@
     font-size: 8px;
     font-weight: 200;
 }
-.p4-list li b{
-    font-weight: 400;
-}
 .p4-list li::before {
     content: '•';
     position: absolute;
@@ -169,9 +159,6 @@
     text-align: center;
     padding: 8px;
     border-radius: 8px;
-}
-.p4-end b{
-    font-weight: 400;
 }
 .p4-end-block{
     margin: 12px 0 0 0;

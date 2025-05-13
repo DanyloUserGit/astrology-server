@@ -8,5 +8,10 @@
         "promo":"spring30",
         "title":"Spring 30% discount",
         "discount":30
+    },
+    {
+        "promo":"STARS10",
+        "title":"Stars 10% discount",
+        "discount":10
     }
 ]

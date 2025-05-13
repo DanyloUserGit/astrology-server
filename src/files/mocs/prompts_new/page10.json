@@ -1,43 +1,43 @@
 [
   {
     "prompt": "Write a Day 1 relationship exercise focused on emotional communication for a couple.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string, // Title of the day’s practice (e.g. 'Emotional Check-In')\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string, // Title of the day’s practice (e.g. 'Emotional Check-In')\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 2 relationship exercise centered on gratitude and appreciation.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 3 relationship exercise designed to handle conflict more mindfully.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 4 relationship exercise that helps couples align their vision for the future.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 5 relationship exercise that focuses on physical intimacy and daily rituals.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 6 relationship exercise encouraging curiosity and open-ended questions.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   },
   {
     "prompt": "Write a Day 7 relationship exercise that invites a couple to celebrate a shared memory.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph should be between 124–241 characters.\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string] // Two paragraphs explaining what to do and why it matters. Each paragraph in the \"description\" array must be between **124 and 141 characters** (not words). Do not exceed 141 characters per paragraph.\n}",
     "page": 10,
     "isPlanet": true
   }

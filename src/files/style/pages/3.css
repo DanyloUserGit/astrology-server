@@ -5,9 +5,6 @@
     color: #000000;
     text-align:left;
 }
-.p3-text b{
-    font-weight: 400;
-}
 .p3-subtext{
     margin: 10px 0;
 }
@@ -30,9 +27,6 @@
     padding: 8px;
     border-radius: 8px;
     border: 1px solid #FAE4C8;
-}
-.p3-bordertext b{
-    font-weight: 400;
 }
 .p3-bordertext-title{
     max-width: fit-content;
@@ -151,28 +145,25 @@
     font-size: 8px;
     font-weight: 200;
 }
-.p3-arcadeon b{
-    font-weight: 500;
-}
 .p3-list-flex li > .p3-arcadeon:first-of-type{
     margin: 0 0 8px 0;
 }
 .p3-list-flex {
-    display: flex;              /* ❗ li в один ряд */
+    display: flex;            
     gap: 8px;
     justify-content: space-between;
   }
   
 .p3-list-flex li {
   display: flex;
-  flex-direction: column;     /* ❗ .p3-arcadeon всередині стають стовпчиком */
-  width: calc(50% - 4px);     /* або 33% для трьох в ряд */
+  flex-direction: column;     
+  width: calc(50% - 4px);    
   box-sizing: border-box;
   gap: 8px;
 }
 
 .p3-arcadeon {
-  width: 100%;                /* ❗ займає всю ширину li */
+  width: 100%;       
 }
 .p3-end{
     display: flex;
