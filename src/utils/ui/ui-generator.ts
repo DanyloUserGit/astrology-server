@@ -1189,51 +1189,27 @@ const drawSubjectPlanets = (
                 <div class="page-break"></div>
             `;
             // -- Page 6 -- //
-            const renderPlanetListwithText = () => {
-                let list:string = "";
-                let list1:string = "";
-                let list2:string = "";
-                let list3:string = "";
-                planetsDescription.slice(0, 5).map((item)=>{
-                    const svg = this.loadSingleSvg(`planets/${item.planet.replaceAll(" ", "_").replaceAll("midheaven", "mc")}`)
-                    list1 += `
-                        <li>
-                            <div class="p7-bl-top">${svg} <span class="p7-bl-text">${item.planet} <p>${item.title}</p></span></div>
-                            <p>${item.description}</p>
-                        </li>
-                    `;
-                })
-                planetsDescription.slice(5, 10).map((item)=>{
-                    const svg = this.loadSingleSvg(`planets/${item.planet.replaceAll(" ", "_").replaceAll("midheaven", "mc")}`)
-                    list2 += `
-                        <li>
-                            <div class="p7-bl-top">${svg} <span class="p7-bl-text">${item.planet} <p>${item.title}</p></span></div>
-                            <p>${item.description}</p>
-                        </li>
-                    `;
-                })
-                planetsDescription.slice(10, 15).map((item)=>{
-                    const svg = this.loadSingleSvg(`planets/${item.planet.replaceAll(" ", "_").replaceAll("midheaven", "mc")}`)
-                    list3 += `
-                        <li>
-                            <div class="p7-bl-top">${svg} <span class="p7-bl-text">${item.planet} <p>${item.title}</p></span></div>
-                            <p>${item.description}</p>
-                        </li>
-                    `;
-                })
-                list = `
-                    <ul class="p7-column">
-                        ${list1}
-                    </ul>
-                    <ul class="p7-column">
-                        ${list2}
-                    </ul>
-                    <ul class="p7-column">
-                        ${list3}
-                    </ul>
-                `;
-                return `${list}`;
-            }
+    const renderPlanetListwithText = () => {
+    let listItems = planetsDescription.map((item) => {
+        const svg = this.loadSingleSvg(
+            `planets/${item.planet.replaceAll(" ", "_").replaceAll("midheaven", "mc")}`
+        );
+        return `
+            <li class="p7-card">
+                <div class="p7-bl-top">
+                    ${svg} 
+                    <span class="p7-bl-text">${item.planet} 
+                        <p>${item.title}</p>
+                    </span>
+                </div>
+                <p>${item.description}</p>
+            </li>
+        `;
+    }).join("");
+
+    return `<ul class="p7-grid">${listItems}</ul>`;
+};
+
             // -- Page 7 -- //
             const page7 = `
                 <div class="p7 parent-container">
