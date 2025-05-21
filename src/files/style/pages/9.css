@@ -91,6 +91,7 @@
     display: flex;
     flex-direction: column;
     gap: 28px;
+    position: relative;
 }
 .p9-cards-card-content-text{
     display: flex;
@@ -186,6 +187,6 @@
     font-size: 10px;
     font-weight: 500;
     position: absolute;
-    top: 78px;
-    left: 129px;
+    top: 75px;
+    left: 39.5px;
 }

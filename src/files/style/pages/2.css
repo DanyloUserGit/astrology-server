@@ -17,9 +17,10 @@
     flex-direction: column;
     gap: 10px;
     text-align: left;
-    font-weight: 400 !important;
 }
-
+.p2-start p{
+    font-weight: 300 !important;
+}
 .p2-chart-img {
     flex: 1;
     max-width: calc(100% - 174px - 24px); 
@@ -109,19 +110,29 @@
 }
 .p2-symbols-list {
     display: flex;
-    flex-wrap: wrap;
     list-style: none;
     margin: 0;
     padding: 0;
+    gap: 24px;
+}
+.signs-pair{
+    display: flex;
+    flex-direction: column;
     gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.signs-pair li svg{
+    width: 12px;
+    height: 12px;
 }
 .p2-symbols-list li {
     display: flex;
     align-items: center; 
     gap: 6px; 
-    margin-left: 16px;
 }
-.signs > li:nth-child(8) {
+/* .signs > li:nth-child(8) {
     margin-left: 0; 
 }
 .signs > li:nth-child(7) {
@@ -141,7 +152,7 @@
 } 
 .planets > li:nth-child(14) {
     margin-left: 0; 
-} 
+}  */
 .p2-symbols-title{
     text-align: left;
     color:#CB8020;

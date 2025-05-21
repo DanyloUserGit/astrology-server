@@ -175,10 +175,11 @@ export class SynastryService {
                 ]
               };
               
-
             const info = await transporter.sendMail(mailOptions);
             this.processTimer.end();
-            return { success: true, message: "Email sent successfully" };
+
+            const base64Pdf = pdf.toString("base64");
+            return { success: true, message: "Email sent successfully", pdf:`data:application/pdf;base64,${base64Pdf}` };
         } catch (error) {
             console.error("Email sending failed:", error);
             throw new Error("Failed to send email");

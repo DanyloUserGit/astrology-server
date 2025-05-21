@@ -1,19 +1,19 @@
 [
   {
     "prompt": "Write an interpretation of the aspect Mercury Square Mars in a synastry chart for a couple.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string, // Name of the aspect (e.g. \"Mercury Square Mars\")\n  \"description\": [string, string, string], // Three insight-focused paragraphs (each between 90–150 characters)\n  \"final_note\": string // Closing encouragement or wisdom (between 60–70 characters)\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string, // Name of the aspect (e.g. \"Mercury Square Mars\")\n  \"description\": [string, string, string], // Three insight-focused paragraphs (each between 120–172 characters)\n  \"final_note\": string // Closing encouragement or wisdom (between 60–70 characters)\n}",
     "page": 9,
     "isPlanet": true
   },
   {
     "prompt": "Write an interpretation of the aspect Moon Opposite Saturn in a synastry chart for a couple.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string, string], // Each description paragraph should be between 90–150 characters\n  \"final_note\": string // The final note should be between 60–70 characters\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string, string], // Each description paragraph should be between 120–172 characters\n  \"final_note\": string // The final note should be between 60–70 characters\n}",
     "page": 9,
     "isPlanet": true
   },
   {
     "prompt": "Write an interpretation of the aspect Venus Square Uranus in a synastry chart for a couple.",
-    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string, string], // Each description paragraph should be between 90–150 characters\n  \"final_note\": string // The final note should be between 60–70 characters\n}",
+    "instruction": "Return your response strictly in the following JSON format:\n\n{\n  \"label\": string,\n  \"description\": [string, string, string], // Each description paragraph should be between 120–172 characters\n  \"final_note\": string // The final note should be between 60–70 characters\n}",
     "page": 9,
     "isPlanet": true
   }

@@ -108,6 +108,7 @@
     flex-direction: column;
     gap: 28px;
     padding: 8px;
+    position: relative;
 }
 .p8-cards-card-content-text{
     display: flex;
@@ -143,6 +144,8 @@
     font-weight:200 !important;
 }
 .p8-cards-card-content-info-el-title{
+    min-width: 90px;
+    flex-shrink: 0;
     text-align: left;
     display: flex;
     align-items: center;
@@ -199,6 +202,7 @@
 .p8-last-card-content-info-el{
     flex: 1;
     display: flex;
+    flex-direction: column;
     gap: 10px;
     text-align: left;
     border-radius: 8px;
@@ -214,14 +218,14 @@
 .p8-last-card-content-info-el-title{
     text-align: left;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 4px;
     color:#000000;
     font-size:8px;
 }
 .p8-last-card-content-info-el-title span{
     font-weight:500 !important;
-    margin: 0 auto;
+    margin: 0;
 }
 .p8-last-card-content-info-el-title svg{
     width: 16px;

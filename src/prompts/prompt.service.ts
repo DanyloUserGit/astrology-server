@@ -49,7 +49,7 @@ export class PromptService {
 
                 Do NOT use emojis, symbols, colour icons, or bullet marks. 
                 Base all interpretations on tropical astrology. Keep the tone warm, clear, and human.
-                Language: ${lang} (Also translate Name1 and Name2 and names of planets. DO NOT translate any JSON keys)
+                Language: ${lang} (Also translate Person 1 and Person 2 and names of planets. DO NOT translate any JSON keys)
                 DateString: ${dateStr}
 
                 Begin when ready.

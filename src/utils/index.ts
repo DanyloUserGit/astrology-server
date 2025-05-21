@@ -21,7 +21,8 @@ export const getTitle = {
                 "Mercury Square Mars",
                 "Moon Opposite Saturn",
                 "Venus Square Uranus"
-            ]
+            ],
+            match:"Friction factor:",
         },
         p10: {
             title:["7-Day Action Plan"],
@@ -52,7 +53,8 @@ export const getTitle = {
                 "Меркурій у квадраті до Марса",
                 "Місяць в опозиції до Сатурна",
                 "Венера у квадраті до Урана"
-            ]
+            ],
+            match: "Коефіцієнт тертя:"
         },
         p10: {
             title: ["7-денний план дій"],

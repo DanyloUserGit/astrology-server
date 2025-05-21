@@ -59,7 +59,7 @@
 }
 .p4-card-top{
     background-color: #FAE4C8;
-    border-radius: 8px 8px 0 0;
+    border-radius: 7px 7px 0 0;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -86,17 +86,19 @@
     font-size: 8px;
     font-weight: 200;
     padding: 8px;
+    white-space: nowrap;
 }
 .p4-card p svg{
     display: inline-block;
     vertical-align: middle;
-    width: 1em;
-    height: 1em;
-    margin: 0 2px; 
+    margin: 0 0 2px 2px; 
+}
+.p4-card-top-text-title{
+    white-space: nowrap;
 }
 .p4-card p svg{
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
 }
 .p4-card{
     font-size: 8px;
@@ -136,19 +138,19 @@
     font-weight: 200;
     padding: 8px;
 }
-.p4-list li{
-    position: relative;
-    padding-left: 8px;
+.p4-list{
+    list-style: disc !important;
+    padding: 0 12px;
+}
+.p4-list-last{
+    margin: 4px 0 0 0;
+}
+.p4-list li {
+    text-align: left !important;
     font-size: 8px;
     font-weight: 200;
-}
-.p4-list li::before {
-    content: '•';
-    position: absolute;
-    left: 0;
-    top: -0.25em;
-    font-size: 2em;
-    color: black;
+    line-height: 1.25;
+    color: #000000;
 }
 .p4-end{
     flex: 1;

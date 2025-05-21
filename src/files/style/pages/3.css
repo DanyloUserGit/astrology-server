@@ -20,13 +20,13 @@
 }
 .p3-bordertext{
     font-size: 8px;
-    line-height: 125%;
     font-weight: 200;
     color: #000000;
     text-align:left;
     padding: 8px;
     border-radius: 8px;
     border: 1px solid #FAE4C8;
+    white-space: nowrap;
 }
 .p3-bordertext-title{
     max-width: fit-content;
@@ -50,7 +50,7 @@
 }
 .text-block-list-planets svg{
     width: 14px;
-    height: 14px;
+    height: auto;
 }
 .p3-bordertext-width{
     width: 209px !important;
@@ -66,6 +66,10 @@
 }
 .p3-arrow{
     margin-left: 5px;
+}
+.p3-arrow svg{
+    width: 20px;
+    height: auto;
 }
 .p3-list-row {
     display: flex;
@@ -119,16 +123,20 @@
 }
 .p3-list-flex-top{
     display: flex;
+    align-items: center;
     gap: 4px;
     text-align: center;
     color: #000000;
     font-size: 8px;
     font-weight: 400;
 }
-.p3-list-flex-top svg{
-    width: 20px;
-    height: 20px;
+.p3-list-flex-top svg {
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0;
+    display: block;
 }
+
 .p3-list-flex-text{
     color: #000000;
     font-size: 8px;
@@ -176,6 +184,8 @@
     font-size: 8px;
 }
 .p3-end-text{
+    word-wrap: normal;
+    overflow-wrap: normal;
     color: #000000;
     font-weight: 200;
     font-size: 8px;
@@ -209,11 +219,12 @@
     gap: 8px;
     width: 100%;
     flex-wrap: wrap; 
+    margin: 12px 0 0 0;
 }
-.p3-end-list li {
+/* .p3-end-list li {
     flex: 1;
     min-width: 0;
-}
+} */
 .p3-end-block {
     flex: 1; 
 }

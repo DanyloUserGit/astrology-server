@@ -60,8 +60,9 @@ html {
 
 body {
   min-height: 100vh;
-  line-height: 1;
+  line-height: 1.25;
   text-rendering: optimizeSpeed;
+  /* line-height: 125% !important; */
 }
 
 img,
