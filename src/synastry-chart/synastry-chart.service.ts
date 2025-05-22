@@ -112,6 +112,7 @@ export class SynastryService {
                 const page = await this.promptService.generateSummary(resSynastry.data, body.lang, i);
                 if(page) pages.push(page);
             }
+            const match = await this.promptService.generateSummary(resSynastry.data, body.lang, 1);
             const zodiac_signs = await this.zodiacSignsService.getFile();
             if(!zodiac_signs) throw new Error("Couldn't download file zodiac_signs.json from DB");
             const pdf = await this.uiGenerator.createPdfFile({
@@ -127,6 +128,7 @@ export class SynastryService {
                 pages,
                 zodiac_signs,
                 lang:body.lang,
+                match
             });
             if(!pdf) return new Error("Error in generating after 2 tries");
             console.log("Sending email...");
@@ -154,8 +156,8 @@ export class SynastryService {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
                 },
-                logger: true,
-                debug: true,  
+                // logger: true,
+                // debug: true,  
             });
 
             const mailOptions = {

@@ -19,7 +19,7 @@
 .p7-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 8px;
     padding: 8px;
     border-radius: 8px;
     border: 1px solid #FAE4C8;
@@ -45,11 +45,15 @@
 }
 .p7-bl-text p{
     margin-top: 4px;
+    font-size: 8px;
+    font-weight: 400;
+    color: #000000;
 }
 .p7-card p{
     font-size: 7px;
     font-weight: 200;
     text-align: left;
+    color: #000000;
 }
 .p7-textblock{
     display: flex;

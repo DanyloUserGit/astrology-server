@@ -1,0 +1,7 @@
+[
+    {
+    "prompt": "You are an astrological compatibility calculator. Based on the provided list of aspects between two people's planets, compute a compatibility score. The result must always be the same for identical input. Return a JSON object with a single integer field called \"match\", where the value ranges from 55 to 100. Consider: (1) the type of aspect (e.g., conjunction, trine, square), (2) the orb precision (the smaller the orb, the stronger the aspect), and (3) the importance of the planets involved (e.g., Sun and Moon are more significant than Pluto or Chiron). Harmonious and precise aspects between important planets should increase the score. Conflicting or wide aspects should reduce it, but the result should never be lower than 55. Be deterministic and consistent. \n \"temperature\": 0",
+    "instruction": "Given an identical input, always return the same result. Output a JSON object with a single field: \"match\" (an integer from 55 to 100) based on aspect type, orb tightness, and planet significance. \n \"temperature\": 0",
+    "page": 1
+    }
+]

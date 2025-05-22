@@ -13,6 +13,7 @@ export interface PDFInfo {
     pages: any;
     lang:string;
     zodiac_signs:ZodiacSignInfo[];
+    match:{match:number};
 }
 
 export interface UIGenerator {

@@ -43,4 +43,8 @@ export class SynastryDto {
     @IsString()
     @IsOptional()
     token:string;
+
+    // @IsString()
+    // @IsOptional()
+    // webhookUrl: string;
 }

@@ -1,24 +1,16 @@
 import { DateTimeFormatter, LocalDate, ZonedDateTime, ZoneId } from "@js-joda/core";
 import { Locale } from "@js-joda/locale_en";
+import '@js-joda/timezone';
 import * as fs from "fs";
 import * as path from "path";
 import puppeteer from "puppeteer";
 import { CelestialBody, NatalChart } from "src/types";
 import { PDFInfo, planetsDescription, UIGenerator } from ".";
 import { getTitle } from "..";
-import { Calculator } from "../calculate-compatibility";
-import { CalculatorService } from "../calculate-compatibility/calculator";
 import { OpenAIIntr } from "../openai";
 import { OpenAIService } from "../openai/openai";
-import '@js-joda/timezone';
 
 export class UIGeneratorService implements UIGenerator{
-    private promptGenerator: OpenAIIntr;
-    private calculatorService: Calculator;
-    constructor () {
-        this.promptGenerator = new OpenAIService();
-        this.calculatorService = new CalculatorService();
-    }
     loadPlanetSvgByName(dir:string){
         const directoryPath = path.resolve(__dirname, `../../../src/files/planets/${dir}.svg`);
         return fs.readFileSync(directoryPath, 'utf-8')
@@ -555,7 +547,7 @@ Object.values(natalData).forEach((planet: CelestialBody) => {
                  `;
              }
              // -- down -- //
-             const match = this.calculatorService.calculateCompatibility(body.synastry.aspects);
+             const match = body.match.match;
             // -- Page 1 -- //
             const date = new Date();
             const localDate = LocalDate.of(date.getFullYear(), date.getMonth() + 1, date.getDate());
@@ -1331,7 +1323,7 @@ Object.values(natalData).forEach((planet: CelestialBody) => {
             // -- Page 8 -- //
             const lang = body.lang;
             const circumference = 2 * Math.PI * 71;
-            const percentDisMatchp8 = circumference - ((100 - match) / 100) * circumference;
+            const percentDisMatchp8 = circumference - ((match) / 100) * circumference;
             const p8Ring = `
                 <svg width="168" height="168" viewBox="0 0 168 168">
                     <!-- Фонове коло -->
