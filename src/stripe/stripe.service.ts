@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PromoService } from 'src/promo/promo.service';
 import { SynastryDto } from 'src/synastry-chart/synastry-chart.dto';
 import { SynastryService } from 'src/synastry-chart/synastry-chart.service';
+import { v4 as uuid } from 'uuid';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -55,14 +56,15 @@ export class PaymentService {
     }
   }
   async captureOrder(body: SynastryDto, paymentIntentId?: string | null, ) {
+    const fileToken = uuid();
     if(!paymentIntentId){
       if(!body.token) return new Error("Token was not presented");
       const status = await this.stripeTokensService.verifyAndConsumeToken(body.token);
       if(status){
-        this.synastryService.generatePdf(body).catch((error)=>{
+        this.synastryService.generatePdf(body, fileToken).catch((error)=>{
           console.log(error)
         })
-        return { success: true, message: "Generation started successfully" };
+        return { success: true, message: "Generation started successfully", fileToken };
       }else{
         return {
           status,
@@ -72,10 +74,10 @@ export class PaymentService {
     }
     const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
     if(paymentIntent.status==="succeeded"){
-      this.synastryService.generatePdf(body).catch((error)=>{
+      this.synastryService.generatePdf(body, fileToken).catch((error)=>{
         console.log(error);
       })
-      return { success: true, message: "Generation started successfully" };
+      return { success: true, message: "Generation started successfully", fileToken};
     }else{
       return {
         status: paymentIntent.status,

@@ -8,6 +8,7 @@ import { PromptService } from "src/prompts/prompt.service";
 import { ProcessTimer } from "src/utils/process-timer";
 import { ProcessTimerImpl } from "src/utils/process-timer/impl";
 import { ZodiacSignsService } from "src/zodiac_signs/zodiac_signs.service";
+import { StripeTokensService } from "src/stripe/stripe-tokens.service";
 
 @Injectable()
 export class SynastryService {
@@ -15,7 +16,8 @@ export class SynastryService {
     processTimer: ProcessTimer;
     constructor(
         private readonly promptService:PromptService,
-        private readonly zodiacSignsService:ZodiacSignsService
+        private readonly zodiacSignsService:ZodiacSignsService,
+        private readonly stripeTokensService:StripeTokensService
     ) {
         this.uiGenerator = new UIGeneratorService();
         this.processTimer = new ProcessTimerImpl();
@@ -33,7 +35,7 @@ export class SynastryService {
         };
     }
     
-    async generatePdf(body: SynastryDto, tries=0) {
+    async generatePdf(body: SynastryDto,fileToken?:string | null, tries=0) {
         try {
             console.log("Generating PDF for:", body);
             this.processTimer.start();
@@ -134,17 +136,31 @@ export class SynastryService {
             console.log("Sending email...");
             const status = await this.sendMail(body.email, pdf, {name1:body.first_subject.name, name2:body.second_subject.name});
 
+            if(fileToken) await this.stripeTokensService.createTokenFile(fileToken, status);
+
             return status;
         } catch (error) {
             console.error("Error in generatePdf(), retrying", error);
             if(tries<=3){
                 tries++;
-                this.generatePdf(body, tries);
+                this.generatePdf(body, fileToken || null, tries);
             }else{
                 throw new Error("Generation failed after 3 tries");
             }
         }
     }
+
+    async getFile(token:string){
+        try {
+            const data = await this.stripeTokensService.verifyAndGetFile(token);
+            if(!data) return {success: false, message:"The file is still being generated."};
+
+            return data;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     async sendMail(email: string, pdf: Buffer, names:{name1:string, name2:string}) {
         try {
             console.log("Sending email to:", email);

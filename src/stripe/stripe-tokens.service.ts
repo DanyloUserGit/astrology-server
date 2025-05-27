@@ -14,6 +14,21 @@ export class StripeTokensService {
     return token;
   }
 
+  async createTokenFile(token: string, res:{success:boolean, message:string, pdf:string}): Promise<string> {
+    const id = uuid();
+    await this.cacheManager.set(`file${token}`, res);
+    return id;
+  }
+
+  async verifyAndGetFile(token: string): Promise<any> {
+    const data = await this.cacheManager.get(`file${token}`);
+    if (data) {
+      await this.cacheManager.del(`file${token}`);
+      return data;
+    }
+    return null;
+  }
+
   async verifyAndConsumeToken(token: string): Promise<boolean> {
     const key = `free_order`;
     const exists = await this.cacheManager.get(key);

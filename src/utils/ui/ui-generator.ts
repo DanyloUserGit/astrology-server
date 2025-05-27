@@ -7,8 +7,6 @@ import puppeteer from "puppeteer";
 import { CelestialBody, NatalChart } from "src/types";
 import { PDFInfo, planetsDescription, UIGenerator } from ".";
 import { getTitle } from "..";
-import { OpenAIIntr } from "../openai";
-import { OpenAIService } from "../openai/openai";
 
 export class UIGeneratorService implements UIGenerator{
     loadPlanetSvgByName(dir:string){
@@ -66,87 +64,96 @@ export class UIGeneratorService implements UIGenerator{
         return renderList(firstHalf) + renderList(secondHalf);
     }    
     
-    createSvg(rawData: NatalChart) {
-        try {
-            const natalData = rawData.data;
-            const aspects = rawData.aspects;
-            const width = 265;
-            const height = 265;
-            const radius = width / 2;
-            const center = { x: width / 2, y: height / 2 };
+createSvg(rawData: NatalChart) {
+    try {
+        const { data: natalData, aspects } = rawData;
+        const width = 265;
+        const height = 265;
+        const radius = width / 2;
+        const center = { x: radius, y: radius };
 
-            const textRadius = radius - 13.56;
-            const outerRingRadius = radius - 21;
-            const innerRingRadius = radius - 42;
+        const textRadius = radius - 13.56;
+        const outerRingRadius = radius - 21;
+        const innerRingRadius = radius - 42;
 
-            const zodiacSigns = [
-                "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-                "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-            ];
+        const zodiacSigns = [
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+        ];
 
-            const exceptions = ["Mean_Node", "Medium_Coeli"];
-            const normal = ["north_node", "mc"];
-            const exceptionsMap: Record<string, string> = Object.fromEntries(
-                exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
-            );
+        const exceptions = ["Mean_Node", "Medium_Coeli"];
+        const normal = ["north_node", "mc"];
+        const exceptionsMap: Record<string, string> = Object.fromEntries(
+            exceptions.map((e, i) => [e.toLowerCase(), normal[i]])
+        );
 
-            const allowed_planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", 
-                "Uranus", "Neptune", "Pluto", "Chiron", "Ascendant", "Medium_Coeli", "Mean_Node"
-            ];
+        const allowed_planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", 
+            "Uranus", "Neptune", "Pluto", "Chiron", "Ascendant", "Medium_Coeli", "Mean_Node"
+        ];
 
-            let svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
-            // Фон
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
+        svg += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020"/>`;
 
-            // Зовнішні лінії
-            for (let i = 0; i < 12; i++) {
-                const angle = (i * 30) * (Math.PI / 180);
-                const x1 = Math.cos(angle) * outerRingRadius + center.x;
-                const y1 = Math.sin(angle) * outerRingRadius + center.y;
-                const x2 = Math.cos(angle) * radius + center.x;
-                const y2 = Math.sin(angle) * radius + center.y;
-                svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FAE4C8" stroke-width="1"/>`;
-            }
+        svg += `<circle cx="${center.x}" cy="${center.y}" r="${outerRingRadius}" fill="#FFFFFF"/>`;
+        svg += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
-            // Кольорові кільця
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${outerRingRadius}" fill="#FFFFFF" stroke="none"/>`;
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1"
-            stroke-dasharray="3,2"/>`;
+        svg += `
+        <foreignObject x="0" y="0" width="${width}" height="${height}">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+            ${[...Array(12).keys()].map(i => {
+                const angle = i * 30;
+                
+                const isRightSide = Boolean(angle>=30 && angle!=90 && angle<=150);
+                const adjustedHeight = isRightSide ? radius - 1 : radius;
 
-            // Внутрішні лінії
-            for (let i = 0; i < 12; i++) {
-                const angle = (i * 30) * (Math.PI / 180);
-                const x2 = Math.cos(angle) * outerRingRadius + center.x;
-                const y2 = Math.sin(angle) * outerRingRadius + center.y;
-                svgString += `<line x1="${center.x}" y1="${center.y}" x2="${x2}" y2="${y2}" stroke="#edc795" stroke-width="0.5" 
-                stroke-dasharray="4,4"/>`;
-            }
+                return `<div style="
+                position: absolute;
+                left: ${center.x}px;
+                top: ${center.y - adjustedHeight}px;
+                width: 0;
+                height: ${adjustedHeight}px;
+                border-left: 1px dashed #edc795;
+                opacity: 0.8;
+                transform: rotate(${angle}deg);
+                transform-origin: bottom center;
+                "></div>`;
+            }).join('')}
+            </div>
+        </foreignObject>
+        `;
 
-            // Дуги для зодіакальних знаків
-            zodiacSigns.forEach((_, i) => {
-                const startAngle = (i * 30 - 90) * (Math.PI / 180);
-                const endAngle = ((i + 1) * 30 - 90) * (Math.PI / 180);
-                const x1 = center.x + Math.cos(startAngle) * textRadius;
-                const y1 = center.y + Math.sin(startAngle) * textRadius;
-                const x2 = center.x + Math.cos(endAngle) * textRadius;
-                const y2 = center.y + Math.sin(endAngle) * textRadius;
-                const pathId = `zodiacArc${i}`;
-                svgString += `<path id="${pathId}" fill="none" d="M ${x1} ${y1} A ${textRadius} ${textRadius} 0 0 1 ${x2} ${y2}" />`;
-            });
+        svg += `<circle cx="${center.x}" cy="${center.y}" r="5" fill="#FFF7ED"/>`;
 
-            // Тексти зодіаків
-            zodiacSigns.forEach((sign, i) => {
-                svgString += `
-                    <text font-size="9.56" fill="#FFF9F1">
-                        <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">
-                            ${sign}
-                        </textPath>
-                    </text>
-                `;
-            });
+        zodiacSigns.forEach((_, i) => {
+            const angleFix = (i === 11) ? 1.5 : 0; 
+            const startAngle = (i * 30 - 90) * (Math.PI / 180);
+            const endAngle = ((i + 1) * 30 - 90 + angleFix) * (Math.PI / 180);
 
-            let planetPositions: Record<string, { x: number, y: number }> = {};
+            const x1 = center.x + Math.cos(startAngle) * textRadius;
+            const y1 = center.y + Math.sin(startAngle) * textRadius;
+            const x2 = center.x + Math.cos(endAngle) * textRadius;
+            const y2 = center.y + Math.sin(endAngle) * textRadius;
+
+            const largeArcFlag = 0;
+            const sweepFlag = 1;
+
+            const pathId = `zodiacArc${i}`;
+            const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 ${largeArcFlag} ${sweepFlag} ${x2} ${y2}`;
+
+            svg += `<path id="${pathId}" fill="none" stroke="none" d="${pathD}" />`;
+        });
+
+        zodiacSigns.forEach((sign, i) => {
+        svg += `
+            <text font-size="9.56" fill="#FFF9F1">
+            <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">${sign}</textPath>
+            </text>
+        `;
+        });
+
+        // --- Планети
+        const planetPositions: Record<string, { x: number, y: number }> = {};
 
 const drawSubjectPlanets = (
     subjectData: Record<string, CelestialBody>,
@@ -165,37 +172,46 @@ const drawSubjectPlanets = (
         const angleDeg = planet.abs_pos;
         const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
+        // Знаходимо скільки планет близько по куту (±6 градусів)
         const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-        const shiftIndex = nearby.length;
+        const shiftIndex = nearby.length; // індекс для зсуву по радіусу
         usedAngles.push(angleDeg);
 
-        const baseRadius = (radius - 21.2 + radius - 45) / 2;
-        const base = placement === "ring" ? baseRadius : baseRadius - (15.92 * 2.5);
-        const planetRadius = base - shiftIndex * 20; // кожен зсув на 10px глибше
+        const baseRadius = (radius - 19.7 + radius - 43.5) / 2; // базовий радіус для ring
+        const baseRadiusInner = baseRadius - (15.92 * 2.5); 
+        let planetRadius = baseRadius;
+
+        if (placement === "ring") {
+            // Зсув по радіусу, щоб не накладатись
+            // Кожен наступний "близький" по куту зсувається на +15px назовні
+            planetRadius = baseRadius + shiftIndex * 15;
+        } else {
+            // Для inner просто фіксований радіус (можна кастомізувати)
+            planetRadius = baseRadiusInner - shiftIndex * 15;
+        }
 
         const x = Math.cos(angleRad) * planetRadius + center.x;
         const y = Math.sin(angleRad) * planetRadius + center.y;
 
         const planetSvg = this.loadPlanetSvgByName(actualName) || "";
 
-        svgString += `
+        svg += `
             <g transform="translate(${x}, ${y}) scale(0.58)">
                 <g transform="translate(-7, -7)">
-                    <g transform="translate(6, 0)"> 
-                        ${planetSvg}
-                    </g>
+                    ${planetSvg}
                 </g>
             </g>
         `;
+
         planetPositions[`${planet.name}_${label}`] = { x, y };
     });
 };
 
 
-            drawSubjectPlanets(natalData.first_subject, "1", "ring");
-            drawSubjectPlanets(natalData.second_subject, "2", "inner");
+        drawSubjectPlanets(natalData.first_subject, "1", "ring");
+        drawSubjectPlanets(natalData.second_subject, "2", "inner");
 
-            // Аспекти
+  // Аспекти
             if (Array.isArray(aspects)) {
                 const lines: { x1: number; y1: number; x2: number; y2: number; color: string; stroke: number; zIndex: number }[] = [];
 
@@ -203,11 +219,17 @@ const drawSubjectPlanets = (
                     const p1 = planetPositions[`${p1_name}_1`] || planetPositions[`${p1_name}_2`];
                     const p2 = planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
                     if (p1 && p2) {
-                        const offset = 15.92 + 2;
-                        const x1f = p1.x + (p1.x > center.x ? -offset : offset);
-                        const y1f = p1.y + (p1.y > center.y ? -offset : offset);
-                        const x2f = p2.x + (p2.x > center.x ? -offset : offset);
-                        const y2f = p2.y + (p2.y > center.y ? -offset : offset);
+                        // Менший offset (наприклад, 10) зсуває ближче до центру
+                        const offset = 20;
+                        const angle1 = Math.atan2(p1.y - center.y, p1.x - center.x);
+                        const angle2 = Math.atan2(p2.y - center.y, p2.x - center.x);
+
+                        // Зміщення координат вздовж напрямку до центру
+                        const x1f = p1.x - Math.cos(angle1) * offset;
+                        const y1f = p1.y - Math.sin(angle1) * offset;
+                        const x2f = p2.x - Math.cos(angle2) * offset;
+                        const y2f = p2.y - Math.sin(angle2) * offset;
+
 
                         let color = "#E4B77C", stroke = 1, zIndex = 0;
                         switch (aspect) {
@@ -224,24 +246,27 @@ const drawSubjectPlanets = (
                 lines.sort((a, b) => a.zIndex - b.zIndex);
 
                 lines.forEach(({ x1, y1, x2, y2, color, stroke }) => {
-                    svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${stroke}"/>`;
+                    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-linecap="round" stroke-width="${stroke}"/>`;
                 });
             }
 
-            svgString += `</svg>`;
-            return svgString;
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
+        svg += `</svg>`;
+        return svg;
+    } catch (e) {
+        console.error(e);
+        throw e;
     }
+}
+
+
+
     createSvgNatal(rawData: NatalChart) {
         try {
             const natalData = rawData.data;
             const aspects = rawData.aspects;
             const width = 950;
             const height = 950;
-            const radius = (width-50)/2;
+            const radius = width/2;
             const center = { x: width / 2, y: height / 2 };
 
             let svgString = `<svg width="226" height="226" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
@@ -254,30 +279,31 @@ const drawSubjectPlanets = (
             const whiteRingDiff = radius - baseWhiteRing;
             const adjustedWhiteRing = radius - whiteRingDiff * 1.2;
 
-            // Лінії поділу на 12 частин
-            for (let i = 0; i < 12; i++) {
-                const angle = (i * 30) * (Math.PI / 180);
-                const x1 = Math.cos(angle) * adjustedWhiteRing + center.x;
-                const y1 = Math.sin(angle) * adjustedWhiteRing + center.y;
-                const x2 = Math.cos(angle) * radius + center.x;
-                const y2 = Math.sin(angle) * radius + center.y;
-                svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FAE4C8" stroke-width="2"/>`;
-            }
-
             // Малюємо кільця
             svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
+
+            svgString += `
+            <foreignObject x="0" y="0" width="${width}" height="${height}">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+                ${Array.from({ length: 12 }, (_, i) => {
+                const angle = i * 30;
+                return `<div style="
+                    position: absolute;
+                    left: ${center.x}px;
+                    top: ${center.y}px;
+                    width: 0;
+                    height: ${radius}px;
+                    border-left: 1px solid #edc795;
+                    opacity: 0.8;
+                    transform: rotate(${angle}deg);
+                    transform-origin: top center;
+                "></div>`;
+                }).join('')}
+            </div>
+            </foreignObject>
+            `;
             svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" 
             stroke-dasharray="3,2"/>`;
-
-            // Лінії по другому білому кільцю
-            for (let i = 0; i < 12; i++) {
-                const angle = (i * 30) * (Math.PI / 180);
-                const x1 = Math.cos(angle) * (radius - 121) + center.x;
-                const y1 = Math.sin(angle) * (radius - 121) + center.y;
-                const x2 = Math.cos(angle) * radius + center.x;
-                const y2 = Math.sin(angle) * radius + center.y;
-                svgString += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E4B77C" stroke-width="1"/>`;
-            }
 
             const zodiacSigns = [
                 { name: "Virgo", emoji: "♈" }, { name: "Leo", emoji: "♉" },
@@ -288,102 +314,121 @@ const drawSubjectPlanets = (
                 { name: "Scorpio", emoji: "♒" }, { name: "Libra", emoji: "♓" }
             ];
 
-            // Радіус для тексту (було radius - 20)
-            const baseTextRadius = radius - 32.26;
-            const textDiff = radius - baseTextRadius;
-            const adjustedTextRadius = radius - textDiff * 1.5;
+            svgString += `
+            <foreignObject x="0" y="0" width="${width}" height="${height}">
+            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+                ${Array.from({ length: 12 }, (_, i) => {
+                const angle = i * 30 - 45;
+                const rad = angle * (Math.PI / 180);
+                const labelRadius = radius - 35;
 
-            zodiacSigns.forEach((sign, i) => {
-                const centerAngle = i * 30 + 15;
-                const angleRad = ((centerAngle - 90) * Math.PI) / 180;
-                const textX = Math.cos(angleRad) * adjustedTextRadius + center.x;
-                const textY = Math.sin(angleRad) * adjustedTextRadius + center.y;
-                const rotation = centerAngle;
+                const x = center.x + Math.cos(rad) * labelRadius;
+                const y = center.y + Math.sin(rad) * labelRadius;
 
-                svgString += `
-                    <text x="${textX}" y="${textY}" font-size="35" fill="#FFF9F1" text-anchor="middle"
-                        transform="rotate(${rotation}, ${textX}, ${textY})">
-                        ${sign.name}
-                    </text>
+                return `
+                    <div style="
+                    position: absolute;
+                    left: ${x}px;
+                    top: ${y}px;
+                    transform: translate(-50%, -50%) rotate(${angle + 90}deg);
+                    transform-origin: center;
+                    color: #FFF9F1;
+                    font-size: 35px;
+                    font-family: sans-serif;
+                    white-space: nowrap;
+                    ">
+                    ${zodiacSigns[i].name}
+                    </div>
                 `;
+                }).join('')}
+            </div>
+            </foreignObject>
+            `;
+
+
+        // console.log({ radius, center, svgString });
+
+            // Планети
+            const exceptions = ["Mean_Node"];
+            const normal = ["north_node"];
+            const exceptionsMap: Record<string, string> = Object.fromEntries(
+                exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
+            );
+
+            let planetPositions = {};
+            const usedAngles: number[] = [];
+
+            Object.values(natalData).forEach((planet: CelestialBody) => {
+                if (
+                    planet &&
+                    typeof planet === "object" &&
+                    planet.abs_pos !== undefined &&
+                    fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))
+                ) {
+                    const angleDeg = planet.abs_pos;
+                    const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+
+                    const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
+                    const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+                    usedAngles.push(angleDeg);
+
+                    const baseRadius = (radius - 75 + radius - 125) / 2;
+                    let planetRadius = baseRadius;
+                    planetRadius = baseRadius + shiftIndex * 2.5;
+
+                    const x = Math.cos(angleRad) * planetRadius + center.x;
+                    const y = Math.sin(angleRad) * planetRadius + center.y;
+                    const planetSvg = this.loadPlanetSvgByName(planet.name.toLowerCase()) || "";
+
+                    svgString += `
+                        <g transform="translate(${x}, ${y}) scale(1.5)">
+                            <g transform="translate(-7, -7)">
+                                ${planetSvg}
+                            </g>
+                        </g>
+                    `;
+
+                    planetPositions[planet.name] = { x, y };
+
+                } else if (
+                    planet &&
+                    typeof planet === "object" &&
+                    planet.abs_pos !== undefined &&
+                    exceptions.includes(planet.name)
+                ) {
+                    const angleDeg = planet.abs_pos;
+                    const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+
+                    const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
+                    const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+                    usedAngles.push(angleDeg);
+
+                    const baseRadius = (radius - 75 + radius - 125) / 2;
+                    let planetRadius = baseRadius;
+                    planetRadius = baseRadius + shiftIndex * 2.5;
+
+                    const x = Math.cos(angleRad) * planetRadius + center.x;
+                    const y = Math.sin(angleRad) * planetRadius + center.y;
+                    const planetSvg = this.loadPlanetSvgByName(exceptionsMap[planet.name.toLowerCase()]) || "";
+
+                    svgString += `
+                        <g transform="translate(${x}, ${y}) scale(1.5)">
+                            <g transform="translate(-7, -7)">
+                                ${planetSvg}
+                            </g>
+                        </g>
+                    `;
+
+                    planetPositions[planet.name] = { x, y };
+                }
             });
-
-// Планети
-const exceptions = ["Mean_Node"];
-const normal = ["north_node"];
-const exceptionsMap: Record<string, string> = Object.fromEntries(
-    exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
-);
-
-let planetPositions = {};
-const usedAngles: number[] = [];
-
-Object.values(natalData).forEach((planet: CelestialBody) => {
-    if (
-        planet &&
-        typeof planet === "object" &&
-        planet.abs_pos !== undefined &&
-        fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))
-    ) {
-        const angleDeg = planet.abs_pos;
-        const angleRad = ((angleDeg - 90) * Math.PI) / 180;
-
-        // Пошук сусідніх планет у межах 6 градусів
-        const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-        const shiftIndex = nearby.length;
-        usedAngles.push(angleDeg);
-
-        const baseRadius = (radius - 65 + radius - 115) / 2;
-        const dynamicRadius = baseRadius - shiftIndex * 18; // 12px зміщення
-
-        const x = Math.cos(angleRad) * dynamicRadius + center.x;
-        const y = Math.sin(angleRad) * dynamicRadius + center.y;
-        const planetSvg = this.loadPlanetSvgByName(planet.name.toLowerCase()) || "";
-
-        svgString += `<g transform="translate(${x}, ${y}) scale(1.5)">
-            <g transform="translate(-7, -7)">
-                ${planetSvg}
-            </g>
-        </g>`;
-
-        planetPositions[planet.name] = { x, y };
-
-    } else if (
-        planet &&
-        typeof planet === "object" &&
-        planet.abs_pos !== undefined &&
-        exceptions.includes(planet.name)
-    ) {
-        const angleDeg = planet.abs_pos;
-        const angleRad = ((angleDeg - 90) * Math.PI) / 180;
-
-        const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-        const shiftIndex = nearby.length;
-        usedAngles.push(angleDeg);
-
-        const baseRadius = (radius - 65 + radius - 115) / 2;
-        const dynamicRadius = baseRadius - shiftIndex * 18;
-
-        const x = Math.cos(angleRad) * dynamicRadius + center.x;
-        const y = Math.sin(angleRad) * dynamicRadius + center.y;
-        const planetSvg = this.loadPlanetSvgByName(exceptionsMap[planet.name.toLowerCase()]) || "";
-
-        svgString += `<g transform="translate(${x}, ${y}) scale(1.5)">
-            <g transform="translate(-7, -7)">
-                ${planetSvg}
-            </g>
-        </g>`;
-
-        planetPositions[planet.name] = { x, y };
-    }
-});
 
             if (aspects && Array.isArray(aspects)) {
                 aspects.forEach(({ p1_name, p2_name }) => {
                     if (planetPositions[p1_name] && planetPositions[p2_name]) {
                         const { x: x1, y: y1 } = planetPositions[p1_name];
                         const { x: x2, y: y2 } = planetPositions[p2_name];
-                        const offset = 12 * 2;
+                        const offset = 12 * 2.1;
                         const x1f = x1 + (x1 > center.x ? -offset : offset);
                         const y1f = y1 + (y1 > center.y ? -offset : offset);
                         const x2f = x2 + (x2 > center.x ? -offset : offset);
