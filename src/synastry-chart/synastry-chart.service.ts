@@ -167,7 +167,7 @@ export class SynastryService {
             const transporter = nodemailer.createTransport({
                 host: "mail.adm.tools",
                 port: 2525,
-                secure: true,
+                secure: false,
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS,
