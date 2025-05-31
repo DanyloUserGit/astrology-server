@@ -138,7 +138,7 @@ export class SynastryService {
 
             if(fileToken) await this.stripeTokensService.createTokenFile(fileToken, status);
 
-            return {...status, fileName:`Synastry Chart for ${first_subject.name} and ${second_subject.name}`};
+            return {fileName:`Synastry Chart for ${first_subject.name} and ${second_subject.name}`, ...status};
         } catch (error) {
             console.error("Error in generatePdf(), retrying", error);
             if(tries<=3){
