@@ -136,7 +136,7 @@ export class SynastryService {
             console.log("Sending email...");
             const status = await this.sendMail(body.email, pdf, {name1:body.first_subject.name, name2:body.second_subject.name});
 
-            if(fileToken) await this.stripeTokensService.createTokenFile(fileToken, status);
+            if(fileToken) await this.stripeTokensService.createTokenFile(fileToken, {fileName:`Synastry Chart for ${first_subject.name} and ${second_subject.name}`, ...status});
 
             return {fileName:`Synastry Chart for ${first_subject.name} and ${second_subject.name}`, ...status};
         } catch (error) {

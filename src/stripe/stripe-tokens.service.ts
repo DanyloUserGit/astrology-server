@@ -14,7 +14,7 @@ export class StripeTokensService {
     return token;
   }
 
-  async createTokenFile(token: string, res:{success:boolean, message:string, pdf:string}): Promise<string> {
+  async createTokenFile(token: string, res:{fileName:string, success:boolean, message:string, pdf:string}): Promise<string> {
     const id = uuid();
     await this.cacheManager.set(`file${token}`, res);
     return id;
