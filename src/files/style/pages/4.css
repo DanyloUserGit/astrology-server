@@ -1,168 +1,170 @@
-.p4-yellow{
-    color:#CB8020;
-    font-size:12px;
-    text-align:left;
+.p4-yellow {
+  color: #cb8020;
+  font-size: 12px;
+  text-align: left;
 }
-.p4-title{
-    margin-top: 10px;
+.p4-title {
+  margin-top: 10px;
 }
-.p4-bordertext{
-    margin-top: 8px;
+.p4-bordertext {
+  margin-top: 8px;
 }
-.p4-bordertext span{
-    font-size: 8px;
-    font-weight: 500;
-    color: #000000;
-    margin: 0 0 4px 0;
+.p4-bordertext span {
+  font-size: 8px;
+  font-weight: 500;
+  color: #000000;
+  margin: 0 0 4px 0;
 }
-.p4-bordertext p{
-    font-size: 8px;
-    font-weight: 200;
-    color: #000000;
+.p4-bordertext p {
+  font-size: 8px;
+  font-weight: 200;
+  color: #000000;
 }
-.p4-bordertext-info{
-    display: flex;
-    gap: 4px;
-    font-size: 8px;
-    color: #000000;
-    text-align: left;
-    margin: 8px 0 0 0;
+.p4-bordertext-info {
+  display: flex;
+  gap: 4px;
+  font-size: 8px;
+  color: #000000;
+  text-align: left;
+  margin: 8px 0 0 0;
 }
-.p4-bordertext-info span{
-    font-size: 8px;
-    font-weight: 200;
-    color: #000000;
-    text-align: left;
+.p4-bordertext-info span {
+  font-size: 8px;
+  font-weight: 200;
+  color: #000000;
+  text-align: left;
 }
-.p4-bordertext-info svg{
-    width: 10px;
-    height: 10px;
+.p4-bordertext-info svg {
+  width: 10px;
+  height: 10px;
 }
-.p4-info{
-    display: flex;
-    align-items: center; 
-    border-radius: 8px;
-    gap: 8px;
-    padding: 4px;
-    font-size: 8px;
-    font-weight: 200;
-    background-color: #FAE4C8;
-    color: #161616;
-    margin: 8px 0 0 0;
+.p4-info {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  gap: 8px;
+  padding: 4px;
+  font-size: 8px;
+  font-weight: 200;
+  background-color: #fae4c8;
+  color: #161616;
+  margin: 8px 0 0 0;
 }
-.p4-info svg{
-    width: 16px;
-    height: 16px;
+.p4-info svg {
+  width: 16px;
+  height: 16px;
 }
-.p4-card{
-    margin: 8px 0 0 0;
+.p4-card {
+  margin: 8px 0 0 0;
 }
-.p4-card-top{
-    background-color: #FAE4C8;
-    border-radius: 7px 7px 0 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px;
+.p4-card-top {
+  background-color: #fae4c8;
+  border-radius: 7px 7px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
 }
-.p4-card-top-num{
-    color: #CB8020;
-    font-weight: 400;
-    font-size: 16px;
+.p4-card-top-num {
+  color: #cb8020;
+  font-weight: 400;
+  font-size: 16px;
 }
-.p4-card-top-text{
-    color: #161616;
-    font-weight: 500;
-    font-size: 9px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
+.p4-card-top-text {
+  color: #161616;
+  font-weight: 500;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
-.p4-card-top-icons{
-    display: flex;
-    gap: 8px;
+.p4-card-top-icons {
+  display: flex;
+  gap: 8px;
 }
-.p4-card p{
-    font-size: 8px;
-    font-weight: 200;
-    padding: 8px;
-    white-space: nowrap;
+.p4-card p {
+  font-size: 8px;
+  font-weight: 200;
+  padding: 8px;
+  white-space: nowrap;
 }
-.p4-card p svg{
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0 0 2px 2px; 
+.p4-card p svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 0 2px 2px;
 }
-.p4-card-top-text-title{
-    white-space: nowrap;
+.p4-card-top-text-title {
+  white-space: nowrap;
 }
-.p4-card p svg{
-    width: 8px;
-    height: 8px;
+.p4-card p svg {
+  width: 8px;
+  height: 8px;
 }
-.p4-card{
-    font-size: 8px;
-    line-height: 125%;
-    font-weight: 200;
-    color: #000000;
-    text-align:left;
-    border-radius: 8px;
-    border: 1px solid #FAE4C8;
-    flex: 1 !important;
+.p4-card {
+  font-size: 8px;
+  line-height: 125%;
+  font-weight: 200;
+  color: #000000;
+  text-align: left;
+  border-radius: 8px;
+  border: 1px solid #fae4c8;
+  flex: 1 !important;
 }
-.p4-cards{
-    width: 100%;
-    margin: 10px 0 0 0;
-    gap: 10px !important;
+.p4-cards {
+  width: 100%;
+  margin: 10px 0 0 0;
+  gap: 10px !important;
 }
-.p4-cards-card{
-    flex: 1 !important;
-    border-radius: 8px;
-    border: 1px solid #FAE4C8;
+.p4-cards-card {
+  flex: 1 !important;
+  border-radius: 8px;
+  border: 1px solid #fae4c8;
 }
-.p4-cards-card-top{
-    display: flex;
-    justify-content: center;
-    gap:8px;
-    padding: 4px;
-    border-radius: 8px 8px 0 0;
-    border-bottom: 1px solid #FAE4C8;
-    color: #000000;
-    font-size: 6px;
-    font-weight: 400;
-    text-align: center;
+.p4-cards-card-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid #fae4c8;
+  color: #000000;
+  font-size: 6px;
+  font-weight: 400;
+  text-align: center;
 }
-.p4-cards-card p{
-    color: #000000;
-    font-size: 8px;
-    font-weight: 200;
-    padding: 8px;
+.p4-cards-card p {
+  color: #000000;
+  font-size: 8px;
+  font-weight: 200;
+  padding: 8px;
 }
-.p4-list{
-    list-style: disc !important;
-    padding: 0 12px;
+.p4-list {
+  list-style: disc !important;
+  padding: 0 12px;
 }
-.p4-list-last{
-    margin: 4px 0 0 0;
+.p4-list-last {
+  margin: 4px 0 0 0;
 }
 .p4-list li {
-    text-align: left !important;
-    font-size: 8px;
-    font-weight: 200;
-    line-height: 1.25;
-    color: #000000;
+  text-align: left !important;
+  font-size: 8px;
+  font-weight: 200;
+  line-height: 1.25;
+  color: #000000;
 }
-.p4-end{
-    flex: 1;
-    background-color: #CB8020;
-    color: #FFF9F1;
-    font-size: 8px;
-    font-weight: 200;
-    text-align: center;
-    padding: 8px;
-    border-radius: 8px;
+.p4-end {
+  flex: 1;
+  background-color: #cb8020;
+  color: #fff9f1;
+  font-size: 8px;
+  font-weight: 200;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
 }
-.p4-end-block{
-    margin: 12px 0 0 0;
-    gap: 10px !important;
+.p4-end-block {
+  margin: 12px 0 0 0;
+  gap: 10px !important;
 }

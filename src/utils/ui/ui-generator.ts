@@ -1,110 +1,170 @@
-import { DateTimeFormatter, LocalDate, ZonedDateTime, ZoneId } from "@js-joda/core";
-import { Locale } from "@js-joda/locale_en";
+import {
+  DateTimeFormatter,
+  LocalDate,
+  ZonedDateTime,
+  ZoneId,
+} from '@js-joda/core';
+import { Locale } from '@js-joda/locale_en';
 import '@js-joda/timezone';
-import * as fs from "fs";
-import * as path from "path";
-import puppeteer from "puppeteer";
-import { CelestialBody, NatalChart } from "src/types";
-import { PDFInfo, planetsDescription, UIGenerator } from ".";
-import { getTitle } from "..";
+import * as fs from 'fs';
+import * as path from 'path';
+import puppeteer from 'puppeteer';
+import { CelestialBody, NatalChart } from 'src/types';
+import { PDFInfo, planetsDescription, UIGenerator } from '.';
+import { getTitle } from '..';
 
-export class UIGeneratorService implements UIGenerator{
-    loadPlanetSvgByName(dir:string){
-        const directoryPath = path.resolve(__dirname, `../../../src/files/planets/${dir}.svg`);
-        return fs.readFileSync(directoryPath, 'utf-8')
-    }
-    loadSignSvgByName(dir:string){
-        const directoryPath = path.resolve(__dirname, `../../../src/files/signs_big/${dir}.svg`);
-        return fs.readFileSync(directoryPath, 'utf-8')
-    }
-    loadSvg(dir:string){
-        const directoryPath = path.resolve(__dirname, `../../../src/files/${dir}`);
+export class UIGeneratorService implements UIGenerator {
+  loadPlanetSvgByName(dir: string) {
+    const directoryPath = path.resolve(
+      __dirname,
+      `../../../src/files/planets/${dir}.svg`,
+    );
+    return fs.readFileSync(directoryPath, 'utf-8');
+  }
+  loadSignSvgByName(dir: string) {
+    const directoryPath = path.resolve(
+      __dirname,
+      `../../../src/files/signs_big/${dir}.svg`,
+    );
+    return fs.readFileSync(directoryPath, 'utf-8');
+  }
+  loadSvg(dir: string) {
+    const directoryPath = path.resolve(__dirname, `../../../src/files/${dir}`);
 
-        const svgFiles = fs.readdirSync(directoryPath)
-            .filter(file => file.endsWith('.svg')); 
-    
-        const svgArray = svgFiles.map(fileName => {
-            const filePath = path.join(directoryPath, fileName);
-            return fs.readFileSync(filePath, 'utf-8');
-        });
-    
-        return svgArray;
-    }
-    loadSingleSvg(dir:string){
-        const directoryPath = path.resolve(__dirname, `../../../src/files/${dir}.svg`);
-        return fs.readFileSync(directoryPath, 'utf-8')
-    }
-    getPlanets(data: NatalChart): string {
-        const formatDegrees = (degrees: number): string => {
-            return `${Math.floor(degrees)}°`;
-        };
-        const changeName = {
-            "Medium_Coeli":"MC",
-            "True_Node":"North Node",
-            "Ascendant":"Ascendant"
-        }
-        const allPlanets = Object.entries(data.data)
-            .filter(([_, obj]: [string, any]) => obj && (obj.point_type === "Planet" || changeName[obj.name]))
-            .map(([_, obj]) => obj)
-            .filter((planet: any) => 
-                fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${changeName[planet.name] ? changeName[planet.name].replaceAll(" ", "_").toLowerCase() : planet.name.toLowerCase()}.svg`))
+    const svgFiles = fs
+      .readdirSync(directoryPath)
+      .filter((file) => file.endsWith('.svg'));
+
+    const svgArray = svgFiles.map((fileName) => {
+      const filePath = path.join(directoryPath, fileName);
+      return fs.readFileSync(filePath, 'utf-8');
+    });
+
+    return svgArray;
+  }
+  loadSingleSvg(dir: string) {
+    const directoryPath = path.resolve(
+      __dirname,
+      `../../../src/files/${dir}.svg`,
+    );
+    return fs.readFileSync(directoryPath, 'utf-8');
+  }
+  getPlanets(data: NatalChart): string {
+    const formatDegrees = (degrees: number): string => {
+      return `${Math.floor(degrees)}°`;
+    };
+    const changeName = {
+      Medium_Coeli: 'MC',
+      True_Node: 'North Node',
+      Ascendant: 'Ascendant',
+    };
+    const allPlanets = Object.entries(data.data)
+      .filter(
+        ([_, obj]: [string, any]) =>
+          obj && (obj.point_type === 'Planet' || changeName[obj.name]),
+      )
+      .map(([_, obj]) => obj)
+      .filter((planet: any) =>
+        fs.existsSync(
+          path.join(
+            __dirname,
+            '../../../src/files/planets',
+            `${changeName[planet.name] ? changeName[planet.name].replaceAll(' ', '_').toLowerCase() : planet.name.toLowerCase()}.svg`,
+          ),
+        ),
+      );
+
+    const midpoint = Math.ceil(allPlanets.length / 2);
+    const firstHalf = allPlanets.slice(0, midpoint);
+    const secondHalf = allPlanets.slice(midpoint);
+
+    const renderList = (planets: any[]) => {
+      return (
+        `<ul class="planet-list">` +
+        planets
+          .map((planet: any) => {
+            const icon = this.loadPlanetSvgByName(
+              !changeName[planet.name]
+                ? planet.name.toLowerCase()
+                : changeName[planet.name].replaceAll(' ', '_').toLowerCase(),
             );
-    
-        const midpoint = Math.ceil(allPlanets.length / 2);
-        const firstHalf = allPlanets.slice(0, midpoint);
-        const secondHalf = allPlanets.slice(midpoint);
-    
-        const renderList = (planets: any[]) => {
-            return `<ul class="planet-list">` + planets.map((planet: any) => {
-                const icon = this.loadPlanetSvgByName(!changeName[planet.name] ? planet.name.toLowerCase() : changeName[planet.name].replaceAll(" ", "_").toLowerCase());
-                return `<li><div class="planet-icon">${icon}</div> <span>${changeName[planet.name] ? changeName[planet.name] : planet.name} in</span> <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
-            }).join('') + `</ul>`;
-        };
-    
-        return renderList(firstHalf) + renderList(secondHalf);
-    }    
-    
-createSvg(rawData: NatalChart) {
+            return `<li><div class="planet-icon">${icon}</div> <span>${changeName[planet.name] ? changeName[planet.name] : planet.name} in</span> <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
+          })
+          .join('') +
+        `</ul>`
+      );
+    };
+
+    return renderList(firstHalf) + renderList(secondHalf);
+  }
+
+  createSvg(rawData: NatalChart) {
     try {
-        const { data: natalData, aspects } = rawData;
-        const width = 265;
-        const height = 265;
-        const radius = width / 2;
-        const center = { x: radius, y: radius };
+      const { data: natalData, aspects } = rawData;
+      const width = 265;
+      const height = 265;
+      const radius = width / 2;
+      const center = { x: radius, y: radius };
 
-        const textRadius = radius - 13.56;
-        const outerRingRadius = radius - 21;
-        const innerRingRadius = radius - 42;
+      const textRadius = radius - 13.56;
+      const outerRingRadius = radius - 21;
+      const innerRingRadius = radius - 42;
 
-        const zodiacSigns = [
-            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-        ];
+      const zodiacSigns = [
+        'Aries',
+        'Taurus',
+        'Gemini',
+        'Cancer',
+        'Leo',
+        'Virgo',
+        'Libra',
+        'Scorpio',
+        'Sagittarius',
+        'Capricorn',
+        'Aquarius',
+        'Pisces',
+      ];
 
-        const exceptions = ["Mean_Node", "Medium_Coeli"];
-        const normal = ["north_node", "mc"];
-        const exceptionsMap: Record<string, string> = Object.fromEntries(
-            exceptions.map((e, i) => [e.toLowerCase(), normal[i]])
-        );
+      const exceptions = ['Mean_Node', 'Medium_Coeli'];
+      const normal = ['north_node', 'mc'];
+      const exceptionsMap: Record<string, string> = Object.fromEntries(
+        exceptions.map((e, i) => [e.toLowerCase(), normal[i]]),
+      );
 
-        const allowed_planets = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", 
-            "Uranus", "Neptune", "Pluto", "Chiron", "Ascendant", "Medium_Coeli", "Mean_Node"
-        ];
+      const allowed_planets = [
+        'Sun',
+        'Moon',
+        'Mercury',
+        'Venus',
+        'Mars',
+        'Jupiter',
+        'Saturn',
+        'Uranus',
+        'Neptune',
+        'Pluto',
+        'Chiron',
+        'Ascendant',
+        'Medium_Coeli',
+        'Mean_Node',
+      ];
 
-        let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
-        svg += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020"/>`;
+      svg += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020"/>`;
 
-        svg += `<circle cx="${center.x}" cy="${center.y}" r="${outerRingRadius}" fill="#FFFFFF"/>`;
-        svg += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
+      svg += `<circle cx="${center.x}" cy="${center.y}" r="${outerRingRadius}" fill="#FFFFFF"/>`;
+      svg += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
-        svg += `
+      svg += `
         <foreignObject x="0" y="0" width="${width}" height="${height}">
             <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-            ${[...Array(12).keys()].map(i => {
+            ${[...Array(12).keys()]
+              .map((i) => {
                 const angle = i * 30;
-                
-                const isRightSide = Boolean(angle>=30 && angle!=90 && angle<=150);
+
+                const isRightSide = Boolean(
+                  angle >= 30 && angle != 90 && angle <= 150,
+                );
                 const adjustedHeight = isRightSide ? radius - 1 : radius;
 
                 return `<div style="
@@ -118,84 +178,92 @@ createSvg(rawData: NatalChart) {
                 transform: rotate(${angle}deg);
                 transform-origin: bottom center;
                 "></div>`;
-            }).join('')}
+              })
+              .join('')}
             </div>
         </foreignObject>
         `;
 
-        svg += `<circle cx="${center.x}" cy="${center.y}" r="5" fill="#FFF7ED"/>`;
+      svg += `<circle cx="${center.x}" cy="${center.y}" r="5" fill="#FFF7ED"/>`;
 
-        zodiacSigns.forEach((_, i) => {
-            const angleFix = (i === 11) ? 1.5 : 0; 
-            const startAngle = (i * 30 - 90) * (Math.PI / 180);
-            const endAngle = ((i + 1) * 30 - 90 + angleFix) * (Math.PI / 180);
+      zodiacSigns.forEach((_, i) => {
+        const angleFix = i === 11 ? 1.5 : 0;
+        const startAngle = (i * 30 - 90) * (Math.PI / 180);
+        const endAngle = ((i + 1) * 30 - 90 + angleFix) * (Math.PI / 180);
 
-            const x1 = center.x + Math.cos(startAngle) * textRadius;
-            const y1 = center.y + Math.sin(startAngle) * textRadius;
-            const x2 = center.x + Math.cos(endAngle) * textRadius;
-            const y2 = center.y + Math.sin(endAngle) * textRadius;
+        const x1 = center.x + Math.cos(startAngle) * textRadius;
+        const y1 = center.y + Math.sin(startAngle) * textRadius;
+        const x2 = center.x + Math.cos(endAngle) * textRadius;
+        const y2 = center.y + Math.sin(endAngle) * textRadius;
 
-            const largeArcFlag = 0;
-            const sweepFlag = 1;
+        const largeArcFlag = 0;
+        const sweepFlag = 1;
 
-            const pathId = `zodiacArc${i}`;
-            const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 ${largeArcFlag} ${sweepFlag} ${x2} ${y2}`;
+        const pathId = `zodiacArc${i}`;
+        const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 ${largeArcFlag} ${sweepFlag} ${x2} ${y2}`;
 
-            svg += `<path id="${pathId}" fill="none" stroke="none" d="${pathD}" />`;
-        });
+        svg += `<path id="${pathId}" fill="none" stroke="none" d="${pathD}" />`;
+      });
 
-        zodiacSigns.forEach((sign, i) => {
+      zodiacSigns.forEach((sign, i) => {
         svg += `
             <text font-size="9.56" fill="#FFF9F1">
             <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">${sign}</textPath>
             </text>
         `;
-        });
+      });
 
-        // --- Планети
-        const planetPositions: Record<string, { x: number, y: number }> = {};
+      // --- Планети
+      const planetPositions: Record<string, { x: number; y: number }> = {};
 
-const drawSubjectPlanets = (
-    subjectData: Record<string, CelestialBody>,
-    label: string,
-    placement: "inner" | "ring"
-) => {
-    const usedAngles: number[] = [];
+      const drawSubjectPlanets = (
+        subjectData: Record<string, CelestialBody>,
+        label: string,
+        placement: 'inner' | 'ring',
+      ) => {
+        const usedAngles: number[] = [];
 
-    Object.values(subjectData || {}).forEach((planet: CelestialBody) => {
-        if (!planet || typeof planet !== "object" || planet.abs_pos === undefined) return;
-        if (!allowed_planets.includes(planet.name)) return;
+        Object.values(subjectData || {}).forEach((planet: CelestialBody) => {
+          if (
+            !planet ||
+            typeof planet !== 'object' ||
+            planet.abs_pos === undefined
+          )
+            return;
+          if (!allowed_planets.includes(planet.name)) return;
 
-        const rawName = planet.name?.toLowerCase();
-        const actualName = exceptions.includes(planet.name) ? exceptionsMap[rawName] : rawName;
+          const rawName = planet.name?.toLowerCase();
+          const actualName = exceptions.includes(planet.name)
+            ? exceptionsMap[rawName]
+            : rawName;
 
-        const angleDeg = planet.abs_pos;
-        const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+          const angleDeg = planet.abs_pos;
+          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-        // Знаходимо скільки планет близько по куту (±6 градусів)
-        const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-        const shiftIndex = nearby.length; // індекс для зсуву по радіусу
-        usedAngles.push(angleDeg);
+          // Знаходимо скільки планет близько по куту (±6 градусів)
+          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
+          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+          usedAngles.push(angleDeg);
 
-        const baseRadius = (radius - 19.7 + radius - 43.5) / 2; // базовий радіус для ring
-        const baseRadiusInner = baseRadius - (15.92 * 2.5); 
-        let planetRadius = baseRadius;
+          const baseRadius = (radius - 19.7 + radius - 43.5) / 2; // базовий радіус для ring
+          const baseRadiusInner = baseRadius - 15.92 * 2.5;
+          let planetRadius = baseRadius;
 
-        if (placement === "ring") {
+          if (placement === 'ring') {
             // Зсув по радіусу, щоб не накладатись
             // Кожен наступний "близький" по куту зсувається на +15px назовні
             planetRadius = baseRadius + shiftIndex * 15;
-        } else {
+          } else {
             // Для inner просто фіксований радіус (можна кастомізувати)
             planetRadius = baseRadiusInner - shiftIndex * 15;
-        }
+          }
 
-        const x = Math.cos(angleRad) * planetRadius + center.x;
-        const y = Math.sin(angleRad) * planetRadius + center.y;
+          const x = Math.cos(angleRad) * planetRadius + center.x;
+          const y = Math.sin(angleRad) * planetRadius + center.y;
 
-        const planetSvg = this.loadPlanetSvgByName(actualName) || "";
+          const planetSvg = this.loadPlanetSvgByName(actualName) || '';
 
-        svg += `
+          svg += `
             <g transform="translate(${x}, ${y}) scale(0.58)">
                 <g transform="translate(-7, -7)">
                     ${planetSvg}
@@ -203,91 +271,120 @@ const drawSubjectPlanets = (
             </g>
         `;
 
-        planetPositions[`${planet.name}_${label}`] = { x, y };
-    });
-};
+          planetPositions[`${planet.name}_${label}`] = { x, y };
+        });
+      };
 
+      drawSubjectPlanets(natalData.first_subject, '1', 'ring');
+      drawSubjectPlanets(natalData.second_subject, '2', 'inner');
 
-        drawSubjectPlanets(natalData.first_subject, "1", "ring");
-        drawSubjectPlanets(natalData.second_subject, "2", "inner");
+      // Аспекти
+      if (Array.isArray(aspects)) {
+        const lines: {
+          x1: number;
+          y1: number;
+          x2: number;
+          y2: number;
+          color: string;
+          stroke: number;
+          zIndex: number;
+        }[] = [];
 
-  // Аспекти
-            if (Array.isArray(aspects)) {
-                const lines: { x1: number; y1: number; x2: number; y2: number; color: string; stroke: number; zIndex: number }[] = [];
+        aspects.forEach(({ p1_name, p2_name, aspect }) => {
+          const p1 =
+            planetPositions[`${p1_name}_1`] || planetPositions[`${p1_name}_2`];
+          const p2 =
+            planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
+          if (p1 && p2) {
+            // Менший offset (наприклад, 10) зсуває ближче до центру
+            const offset = 28;
+            const angle1 = Math.atan2(p1.y - center.y, p1.x - center.x);
+            const angle2 = Math.atan2(p2.y - center.y, p2.x - center.x);
 
-                aspects.forEach(({ p1_name, p2_name, aspect }) => {
-                    const p1 = planetPositions[`${p1_name}_1`] || planetPositions[`${p1_name}_2`];
-                    const p2 = planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
-                    if (p1 && p2) {
-                        // Менший offset (наприклад, 10) зсуває ближче до центру
-                        const offset = 20;
-                        const angle1 = Math.atan2(p1.y - center.y, p1.x - center.x);
-                        const angle2 = Math.atan2(p2.y - center.y, p2.x - center.x);
+            // Зміщення координат вздовж напрямку до центру
+            const x1f = p1.x - Math.cos(angle1) * offset;
+            const y1f = p1.y - Math.sin(angle1) * offset;
+            const x2f = p2.x - Math.cos(angle2) * offset;
+            const y2f = p2.y - Math.sin(angle2) * offset;
 
-                        // Зміщення координат вздовж напрямку до центру
-                        const x1f = p1.x - Math.cos(angle1) * offset;
-                        const y1f = p1.y - Math.sin(angle1) * offset;
-                        const x2f = p2.x - Math.cos(angle2) * offset;
-                        const y2f = p2.y - Math.sin(angle2) * offset;
-
-
-                        let color = "#E4B77C", stroke = 1, zIndex = 0;
-                        switch (aspect) {
-                            case "trine": color = "#7CE483"; stroke = 2; zIndex = 3; break;
-                            case "square": color = "#EF3C25"; stroke = 2; zIndex = 2; break;
-                            case "opposition": color = "#E4B77C"; stroke = 1; zIndex = 1; break;
-                            default: zIndex = 1;
-                        }
-
-                        lines.push({ x1: x1f, y1: y1f, x2: x2f, y2: y2f, color, stroke, zIndex });
-                    }
-                });
-
-                lines.sort((a, b) => a.zIndex - b.zIndex);
-
-                lines.forEach(({ x1, y1, x2, y2, color, stroke }) => {
-                    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-linecap="round" stroke-width="${stroke}"/>`;
-                });
+            let color = '#E4B77C',
+              stroke = 1,
+              zIndex = 0;
+            switch (aspect) {
+              case 'trine':
+                color = '#7CE483';
+                stroke = 2;
+                zIndex = 3;
+                break;
+              case 'square':
+                color = '#EF3C25';
+                stroke = 2;
+                zIndex = 2;
+                break;
+              case 'opposition':
+                color = '#E4B77C';
+                stroke = 1;
+                zIndex = 1;
+                break;
+              default:
+                zIndex = 1;
             }
 
-        svg += `</svg>`;
-        return svg;
+            lines.push({
+              x1: x1f,
+              y1: y1f,
+              x2: x2f,
+              y2: y2f,
+              color,
+              stroke,
+              zIndex,
+            });
+          }
+        });
+
+        lines.sort((a, b) => a.zIndex - b.zIndex);
+
+        lines.forEach(({ x1, y1, x2, y2, color, stroke }) => {
+          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-linecap="round" stroke-width="${stroke}"/>`;
+        });
+      }
+
+      svg += `</svg>`;
+      return svg;
     } catch (e) {
-        console.error(e);
-        throw e;
+      console.error(e);
+      throw e;
     }
-}
+  }
 
+  createSvgNatal(rawData: NatalChart) {
+    try {
+      const natalData = rawData.data;
+      const aspects = rawData.aspects;
+      const width = 950;
+      const height = 950;
+      const radius = width / 2;
+      const center = { x: width / 2, y: height / 2 };
 
+      let svgString = `<svg width="226" height="226" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
 
-    createSvgNatal(rawData: NatalChart) {
-        try {
-            const natalData = rawData.data;
-            const aspects = rawData.aspects;
-            const width = 950;
-            const height = 950;
-            const radius = width/2;
-            const center = { x: width / 2, y: height / 2 };
+      // Фон
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
 
-            let svgString = `<svg width="226" height="226" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+      // Радіус центрального білого кільця (було radius - 25)
+      const baseWhiteRing = radius - 55;
+      const whiteRingDiff = radius - baseWhiteRing;
+      const adjustedWhiteRing = radius - whiteRingDiff * 1.2;
 
-            // Фон
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
+      // Малюємо кільця
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
 
-            // Радіус центрального білого кільця (було radius - 25)
-            const baseWhiteRing = radius - 55;
-            const whiteRingDiff = radius - baseWhiteRing;
-            const adjustedWhiteRing = radius - whiteRingDiff * 1.2;
-
-            // Малюємо кільця
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
-
-            svgString += `
+      svgString += `
             <foreignObject x="0" y="0" width="${width}" height="${height}">
             <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
                 ${Array.from({ length: 12 }, (_, i) => {
-                const angle = i * 30;
-                return `<div style="
+                  const angle = i * 30;
+                  return `<div style="
                     position: absolute;
                     left: ${center.x}px;
                     top: ${center.y}px;
@@ -302,30 +399,36 @@ const drawSubjectPlanets = (
             </div>
             </foreignObject>
             `;
-            svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" 
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" 
             stroke-dasharray="3,2"/>`;
 
-            const zodiacSigns = [
-                { name: "Virgo", emoji: "♈" }, { name: "Leo", emoji: "♉" },
-                { name: "Cancer", emoji: "♊" }, { name: "Gemini", emoji: "♋" },
-                { name: "Taurus", emoji: "♌" }, { name: "Aries", emoji: "♍" },
-                { name: "Pisces", emoji: "♎" }, { name: "Aquarius", emoji: "♏" },
-                { name: "Capricorn", emoji: "♐" }, { name: "Sagittarius", emoji: "♑" },
-                { name: "Scorpio", emoji: "♒" }, { name: "Libra", emoji: "♓" }
-            ];
+      const zodiacSigns = [
+        { name: 'Virgo', emoji: '♈' },
+        { name: 'Leo', emoji: '♉' },
+        { name: 'Cancer', emoji: '♊' },
+        { name: 'Gemini', emoji: '♋' },
+        { name: 'Taurus', emoji: '♌' },
+        { name: 'Aries', emoji: '♍' },
+        { name: 'Pisces', emoji: '♎' },
+        { name: 'Aquarius', emoji: '♏' },
+        { name: 'Capricorn', emoji: '♐' },
+        { name: 'Sagittarius', emoji: '♑' },
+        { name: 'Scorpio', emoji: '♒' },
+        { name: 'Libra', emoji: '♓' },
+      ];
 
-            svgString += `
+      svgString += `
             <foreignObject x="0" y="0" width="${width}" height="${height}">
             <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
                 ${Array.from({ length: 12 }, (_, i) => {
-                const angle = i * 30 - 45;
-                const rad = angle * (Math.PI / 180);
-                const labelRadius = radius - 35;
+                  const angle = i * 30 - 45;
+                  const rad = angle * (Math.PI / 180);
+                  const labelRadius = radius - 35;
 
-                const x = center.x + Math.cos(rad) * labelRadius;
-                const y = center.y + Math.sin(rad) * labelRadius;
+                  const x = center.x + Math.cos(rad) * labelRadius;
+                  const y = center.y + Math.sin(rad) * labelRadius;
 
-                return `
+                  return `
                     <div style="
                     position: absolute;
                     left: ${x}px;
@@ -345,42 +448,51 @@ const drawSubjectPlanets = (
             </foreignObject>
             `;
 
+      // console.log({ radius, center, svgString });
 
-        // console.log({ radius, center, svgString });
+      // Планети
+      const exceptions = ['Mean_Node'];
+      const normal = ['north_node'];
+      const exceptionsMap: Record<string, string> = Object.fromEntries(
+        exceptions.map((exception, index) => [
+          exception.toLowerCase(),
+          normal[index],
+        ]),
+      );
 
-            // Планети
-            const exceptions = ["Mean_Node"];
-            const normal = ["north_node"];
-            const exceptionsMap: Record<string, string> = Object.fromEntries(
-                exceptions.map((exception, index) => [exception.toLowerCase(), normal[index]])
-            );
+      let planetPositions = {};
+      const usedAngles: number[] = [];
 
-            let planetPositions = {};
-            const usedAngles: number[] = [];
+      Object.values(natalData).forEach((planet: CelestialBody) => {
+        if (
+          planet &&
+          typeof planet === 'object' &&
+          planet.abs_pos !== undefined &&
+          fs.existsSync(
+            path.join(
+              __dirname,
+              '../../../src/files/planets',
+              `${planet.name.toLowerCase()}.svg`,
+            ),
+          )
+        ) {
+          const angleDeg = planet.abs_pos;
+          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-            Object.values(natalData).forEach((planet: CelestialBody) => {
-                if (
-                    planet &&
-                    typeof planet === "object" &&
-                    planet.abs_pos !== undefined &&
-                    fs.existsSync(path.join(__dirname, '../../../src/files/planets', `${planet.name.toLowerCase()}.svg`))
-                ) {
-                    const angleDeg = planet.abs_pos;
-                    const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
+          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+          usedAngles.push(angleDeg);
 
-                    const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-                    const shiftIndex = nearby.length; // індекс для зсуву по радіусу
-                    usedAngles.push(angleDeg);
+          const baseRadius = (radius - 75 + radius - 125) / 2;
+          let planetRadius = baseRadius;
+          planetRadius = baseRadius + shiftIndex * 2.5;
 
-                    const baseRadius = (radius - 75 + radius - 125) / 2;
-                    let planetRadius = baseRadius;
-                    planetRadius = baseRadius + shiftIndex * 2.5;
+          const x = Math.cos(angleRad) * planetRadius + center.x;
+          const y = Math.sin(angleRad) * planetRadius + center.y;
+          const planetSvg =
+            this.loadPlanetSvgByName(planet.name.toLowerCase()) || '';
 
-                    const x = Math.cos(angleRad) * planetRadius + center.x;
-                    const y = Math.sin(angleRad) * planetRadius + center.y;
-                    const planetSvg = this.loadPlanetSvgByName(planet.name.toLowerCase()) || "";
-
-                    svgString += `
+          svgString += `
                         <g transform="translate(${x}, ${y}) scale(1.5)">
                             <g transform="translate(-7, -7)">
                                 ${planetSvg}
@@ -388,30 +500,32 @@ const drawSubjectPlanets = (
                         </g>
                     `;
 
-                    planetPositions[planet.name] = { x, y };
+          planetPositions[planet.name] = { x, y };
+        } else if (
+          planet &&
+          typeof planet === 'object' &&
+          planet.abs_pos !== undefined &&
+          exceptions.includes(planet.name)
+        ) {
+          const angleDeg = planet.abs_pos;
+          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-                } else if (
-                    planet &&
-                    typeof planet === "object" &&
-                    planet.abs_pos !== undefined &&
-                    exceptions.includes(planet.name)
-                ) {
-                    const angleDeg = planet.abs_pos;
-                    const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
+          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+          usedAngles.push(angleDeg);
 
-                    const nearby = usedAngles.filter(a => Math.abs(a - angleDeg) < 6);
-                    const shiftIndex = nearby.length; // індекс для зсуву по радіусу
-                    usedAngles.push(angleDeg);
+          const baseRadius = (radius - 75 + radius - 125) / 2;
+          let planetRadius = baseRadius;
+          planetRadius = baseRadius + shiftIndex * 2.5;
 
-                    const baseRadius = (radius - 75 + radius - 125) / 2;
-                    let planetRadius = baseRadius;
-                    planetRadius = baseRadius + shiftIndex * 2.5;
+          const x = Math.cos(angleRad) * planetRadius + center.x;
+          const y = Math.sin(angleRad) * planetRadius + center.y;
+          const planetSvg =
+            this.loadPlanetSvgByName(
+              exceptionsMap[planet.name.toLowerCase()],
+            ) || '';
 
-                    const x = Math.cos(angleRad) * planetRadius + center.x;
-                    const y = Math.sin(angleRad) * planetRadius + center.y;
-                    const planetSvg = this.loadPlanetSvgByName(exceptionsMap[planet.name.toLowerCase()]) || "";
-
-                    svgString += `
+          svgString += `
                         <g transform="translate(${x}, ${y}) scale(1.5)">
                             <g transform="translate(-7, -7)">
                                 ${planetSvg}
@@ -419,150 +533,128 @@ const drawSubjectPlanets = (
                         </g>
                     `;
 
-                    planetPositions[planet.name] = { x, y };
-                }
-            });
-
-            if (aspects && Array.isArray(aspects)) {
-                aspects.forEach(({ p1_name, p2_name }) => {
-                    if (planetPositions[p1_name] && planetPositions[p2_name]) {
-                        const { x: x1, y: y1 } = planetPositions[p1_name];
-                        const { x: x2, y: y2 } = planetPositions[p2_name];
-                        const offset = 12 * 2.1;
-                        const x1f = x1 + (x1 > center.x ? -offset : offset);
-                        const y1f = y1 + (y1 > center.y ? -offset : offset);
-                        const x2f = x2 + (x2 > center.x ? -offset : offset);
-                        const y2f = y2 + (y2 > center.y ? -offset : offset);
-
-                        svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="#E4B77C" stroke-width="1"/>`;
-                    }
-                });
-            }
-
-            svgString += `</svg>`;
-            return svgString;
-        } catch (error) {
-            console.error(error);
-            throw error;
+          planetPositions[planet.name] = { x, y };
         }
-    }
+      });
 
-    
-    loadStyles(){
-        const stylePath = path.resolve(__dirname, `../../../src/files/style/index.css`);
-        const style = fs.readFileSync(stylePath, 'utf-8');
-        const directoryPath = path.resolve(__dirname, `../../../src/files/style/pages`);
+      if (aspects && Array.isArray(aspects)) {
+        aspects.forEach(({ p1_name, p2_name }) => {
+          if (planetPositions[p1_name] && planetPositions[p2_name]) {
+            const { x: x1, y: y1 } = planetPositions[p1_name];
+            const { x: x2, y: y2 } = planetPositions[p2_name];
+            const offset = 12 * 2.1;
+            const x1f = x1 + (x1 > center.x ? -offset : offset);
+            const y1f = y1 + (y1 > center.y ? -offset : offset);
+            const x2f = x2 + (x2 > center.x ? -offset : offset);
+            const y2f = y2 + (y2 > center.y ? -offset : offset);
 
-        const cssFiles = fs.readdirSync(directoryPath)
-            .filter(file => file.endsWith('.css')); 
-    
-        const cssArray = cssFiles.map(fileName => {
-            const filePath = path.join(directoryPath, fileName);
-            return fs.readFileSync(filePath, 'utf-8');
+            svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="#E4B77C" stroke-width="1"/>`;
+          }
         });
-        return `
+      }
+
+      svgString += `</svg>`;
+      return svgString;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  loadStyles() {
+    const stylePath = path.resolve(
+      __dirname,
+      `../../../src/files/style/index.css`,
+    );
+    const style = fs.readFileSync(stylePath, 'utf-8');
+    const directoryPath = path.resolve(
+      __dirname,
+      `../../../src/files/style/pages`,
+    );
+
+    const cssFiles = fs
+      .readdirSync(directoryPath)
+      .filter((file) => file.endsWith('.css'));
+
+    const cssArray = cssFiles.map((fileName) => {
+      const filePath = path.join(directoryPath, fileName);
+      return fs.readFileSync(filePath, 'utf-8');
+    });
+    return `
             <style>
                 ${style}
                 ${cssArray.join('\n')}
             </style>
         `;
-    }
-    async createPdfFile(body: PDFInfo){
-        try {
-            console.log("Launching Puppeteer...");
-            const browser = await puppeteer.launch({
-                headless: true,
-                args: ["--no-sandbox", "--disable-setuid-sandbox"]
-            });        
-            
-            const page = await browser.newPage();
-            const formatter = DateTimeFormatter.ofPattern("d MMM, yyyy 'at' hh:mm a").withLocale(Locale.ENGLISH);
-            
-            // -- Content -- //
-            const twinsPath = path.join(__dirname, "../../../src/files/twins.svg");
-            const twinsContent = fs.readFileSync(twinsPath, "utf-8");
-    
-            const miniPath = path.join(__dirname, "../../../src/files/cover-picture.svg");
-            const miniContent = fs.readFileSync(miniPath, "utf-8");
-    
-            const QRPath = path.join(__dirname, "../../../src/files/QR.svg");
-            const QRContent = fs.readFileSync(QRPath, "utf-8");
-    
-            const telegramPath = path.join(__dirname, "../../../src/files/telegram.svg");
-            const telegramContent = fs.readFileSync(telegramPath, "utf-8");
-    
-            const logoPath = path.join(__dirname, "../../../src/files/logo.svg");
-            const logoContent = fs.readFileSync(logoPath, "utf-8");
-    
-            const starsPath = path.join(__dirname, "../../../src/files/stars.svg");
-            const starsContent = fs.readFileSync(starsPath, "utf-8");
-    
-            const plusPath = path.join(__dirname, "../../../src/files/plus.svg");
-            const plusContent = fs.readFileSync(plusPath, "utf-8");
-    
-            const markerPath = path.join(__dirname, "../../../src/files/marker.svg");
-            const markerContent = fs.readFileSync(markerPath, "utf-8");
-    
-            const waterPath = path.join(__dirname, "../../../src/files/water.svg");
-            const waterContent = fs.readFileSync(waterPath, "utf-8");
-    
-            const firePath = path.join(__dirname, "../../../src/files/fire.svg");
-            const fireContent = fs.readFileSync(firePath, "utf-8");
-    
-            const ariesPath = path.join(__dirname, "../../../src/files/signs_big/Aries.svg");
-            const ariesContent = fs.readFileSync(ariesPath, "utf-8");
-    
-            const moonPath = path.join(__dirname, "../../../src/files/explonation/Moon.svg");
-            const moonContent = fs.readFileSync(moonPath, "utf-8");
-    
-            const saturnPath = path.join(__dirname, "../../../src/files/explonation/Saturn.svg");
-            const saturnContent = fs.readFileSync(saturnPath, "utf-8");
-    
-            const venus_marsPath = path.join(__dirname, "../../../src/files/explonation/Venus_Mars.svg");
-            const venus_marsContent = fs.readFileSync(venus_marsPath, "utf-8");
-    
-            const n1Path = path.join(__dirname, "../../../src/files/page8/1.svg");
-            const n1Content = fs.readFileSync(n1Path, "utf-8");
-    
-            const n2Path = path.join(__dirname, "../../../src/files/page8/2.svg");
-            const n2Content = fs.readFileSync(n2Path, "utf-8");
-    
-            const n3Path = path.join(__dirname, "../../../src/files/page8/3.svg");
-            const n3Content = fs.readFileSync(n3Path, "utf-8");
-    
-            const n4Path = path.join(__dirname, "../../../src/files/page8/4.svg");
-            const n4Content = fs.readFileSync(n4Path, "utf-8");
-    
-            const thunderPath = path.join(__dirname, "../../../src/files/thunder.svg");
-            const thunderContent = fs.readFileSync(thunderPath, "utf-8");
-    
-            const calenderPath = path.join(__dirname, "../../../src/files/calender.svg");
-            const calenderContent = fs.readFileSync(calenderPath, "utf-8");
-    
-            const chartIncreasePath = path.join(__dirname, "../../../src/files/chart-increase.svg");
-            const chartIncreaseContent = fs.readFileSync(chartIncreasePath, "utf-8");
-    
-            const arrowsPath = path.join(__dirname, "../../../src/files/Arrows.svg");
-            const arrowsContent = fs.readFileSync(arrowsPath, "utf-8");
-    
-            const arrowPath = path.join(__dirname, "../../../src/files/Arrow.svg");
-            const arrowContent = fs.readFileSync(arrowPath, "utf-8");
-    
-            const importantPath = path.join(__dirname, "../../../src/files/Important.svg");
-            const importantContent = fs.readFileSync(importantPath, "utf-8");
-            // -- Content -- //
-    
-            // -- Styles -- //
-            const styles = this.loadStyles();
-            // -- Styles -- //
-    
-            // -- chart -- //
-            const chart1 = this.createSvg(body.synastry);
-            // -- chart -- //
-    
-            // -- Top -- //
-            const topElement = (title: string)=>{
-                return `
+  }
+  async createPdfFile(body: PDFInfo) {
+    try {
+      console.log('Launching Puppeteer...');
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+
+      const page = await browser.newPage();
+      const formatter = DateTimeFormatter.ofPattern(
+        "d MMM, yyyy 'at' hh:mm a",
+      ).withLocale(Locale.ENGLISH);
+
+      // -- Content -- //
+      const twinsPath = path.join(__dirname, '../../../src/files/twins.svg');
+      const twinsContent = fs.readFileSync(twinsPath, 'utf-8');
+
+      const logoPath = path.join(__dirname, '../../../src/files/logo.svg');
+      const logoContent = fs.readFileSync(logoPath, 'utf-8');
+
+      const starsPath = path.join(__dirname, '../../../src/files/stars.svg');
+      const starsContent = fs.readFileSync(starsPath, 'utf-8');
+
+      const plusPath = path.join(__dirname, '../../../src/files/plus.svg');
+      const plusContent = fs.readFileSync(plusPath, 'utf-8');
+
+      const thunderPath = path.join(
+        __dirname,
+        '../../../src/files/thunder.svg',
+      );
+      const thunderContent = fs.readFileSync(thunderPath, 'utf-8');
+
+      const calenderPath = path.join(
+        __dirname,
+        '../../../src/files/calender.svg',
+      );
+      const calenderContent = fs.readFileSync(calenderPath, 'utf-8');
+
+      const chartIncreasePath = path.join(
+        __dirname,
+        '../../../src/files/chart-increase.svg',
+      );
+      const chartIncreaseContent = fs.readFileSync(chartIncreasePath, 'utf-8');
+
+      const arrowsPath = path.join(__dirname, '../../../src/files/Arrows.svg');
+      const arrowsContent = fs.readFileSync(arrowsPath, 'utf-8');
+
+      const arrowPath = path.join(__dirname, '../../../src/files/Arrow.svg');
+      const arrowContent = fs.readFileSync(arrowPath, 'utf-8');
+
+      const importantPath = path.join(
+        __dirname,
+        '../../../src/files/Important.svg',
+      );
+      const importantContent = fs.readFileSync(importantPath, 'utf-8');
+      // -- Content -- //
+
+      // -- Styles -- //
+      const styles = this.loadStyles();
+      // -- Styles -- //
+
+      // -- chart -- //
+      const chart1 = this.createSvg(body.synastry);
+      // -- chart -- //
+
+      // -- Top -- //
+      const topElement = (title: string) => {
+        return `
                 <div class="top-element">
                     <div class="sub">
                         <div class="line"></div>
@@ -575,11 +667,11 @@ const drawSubjectPlanets = (
                     </div>
                 </div>
                 `;
-            }
-            // -- Top -- //
-             // -- down -- //
-             const downElement = (number: number)=>{
-                 return `
+      };
+      // -- Top -- //
+      // -- down -- //
+      const downElement = (number: number) => {
+        return `
                  <div class="bottom-element">
                      <div class="sub">
                          <div class="line"></div>
@@ -590,23 +682,33 @@ const drawSubjectPlanets = (
                      </div>
                  </div>
                  `;
-             }
-             // -- down -- //
-             const match = body.match.match;
-            // -- Page 1 -- //
-            const date = new Date();
-            const localDate = LocalDate.of(date.getFullYear(), date.getMonth() + 1, date.getDate());
-            const systemZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const zone = ZoneId.of(systemZone);
-            const zdt = ZonedDateTime.now(zone);
-    
-            const offset = zdt.offset().toString(); 
-    
-            const formattedOffset = offset.replace(':00', ''); 
-            const utc = `UTC${formattedOffset}`;
-            const formatted = localDate.dayOfMonth() + ' ' + localDate.month().toString().charAt(0) + localDate.month().toString().slice(1).toLowerCase()
-            + ' ' + ' ' + localDate.year();
-            const page1 = `
+      };
+      // -- down -- //
+      const match = body.match.match;
+      // -- Page 1 -- //
+      const date = new Date();
+      const localDate = LocalDate.of(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+      );
+      const systemZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const zone = ZoneId.of(systemZone);
+      const zdt = ZonedDateTime.now(zone);
+
+      const offset = zdt.offset().toString();
+
+      const formattedOffset = offset.replace(':00', '');
+      const utc = `UTC${formattedOffset}`;
+      const formatted =
+        localDate.dayOfMonth() +
+        ' ' +
+        localDate.month().toString().charAt(0) +
+        localDate.month().toString().slice(1).toLowerCase() +
+        ' ' +
+        ' ' +
+        localDate.year();
+      const page1 = `
             <div class="p1">
                 <div class="p1-content">
                         <div class="logo">${logoContent}</div>
@@ -646,78 +748,106 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 1 -- //
-            const signsSvg = this.loadSvg("signs");
-            const planetsSvg = this.loadSvg("planets");
-            const signNames = ["aries", "taurus", "gemini", "cancer",
-                "leo", "virgo", "libra", "scorpio", "sagittarius", 
-                "carpicorn", "aquarius", "pisces"
-            ];
-            const planetNames = ["sun", "moon", "mercury", "venus", "mars", "jupiter",
-                "saturn", "uranus", "neptune", "pluto", "chiron", "ascendant", "mc", 
-                "north node"
-            ];
-            const renderSignList = () => {
-                let groupedList: string = "";
+      // -- Page 1 -- //
+      const signsSvg = this.loadSvg('signs');
+      const planetsSvg = this.loadSvg('planets');
+      const signNames = [
+        'aries',
+        'taurus',
+        'gemini',
+        'cancer',
+        'leo',
+        'virgo',
+        'libra',
+        'scorpio',
+        'sagittarius',
+        'carpicorn',
+        'aquarius',
+        'pisces',
+      ];
+      const planetNames = [
+        'sun',
+        'moon',
+        'mercury',
+        'venus',
+        'mars',
+        'jupiter',
+        'saturn',
+        'uranus',
+        'neptune',
+        'pluto',
+        'chiron',
+        'ascendant',
+        'mc',
+        'north node',
+      ];
+      const renderSignList = () => {
+        let groupedList: string = '';
 
-                for (let i = 0; i < signNames.length; i += 2) {
-                    const item1 = signNames[i];
-                    const svg1 = this.loadSingleSvg(`signs/${item1}`);
-                    let pair = `
+        for (let i = 0; i < signNames.length; i += 2) {
+          const item1 = signNames[i];
+          const svg1 = this.loadSingleSvg(`signs/${item1}`);
+          let pair = `
                         <li class="text-right"><div class="text-right-svg">${svg1}</div> <span>${item1.toUpperCase()}</span></li>
                     `;
-                    if (i + 1 < signNames.length) {
-                        const item2 = signNames[i + 1];
-                        const svg2 = this.loadSingleSvg(`signs/${item2}`);
-                        pair += `
+          if (i + 1 < signNames.length) {
+            const item2 = signNames[i + 1];
+            const svg2 = this.loadSingleSvg(`signs/${item2}`);
+            pair += `
                             <li class="text-right"><div class="text-right-svg">${svg2}</div> <span>${item2.toUpperCase()}</span></li>
                         `;
-                    }
+          }
 
-                    // Обгортаємо пару у <ul>
-                    groupedList += `<ul class="signs-pair">${pair}</ul>`;
-                }
+          // Обгортаємо пару у <ul>
+          groupedList += `<ul class="signs-pair">${pair}</ul>`;
+        }
 
-                return `<ul class="p2-symbols-list">${groupedList}</ul>`;
-            }
+        return `<ul class="p2-symbols-list">${groupedList}</ul>`;
+      };
 
-            const renderPlanetList = () => {
-                let groupedList: string = "";
+      const renderPlanetList = () => {
+        let groupedList: string = '';
 
-                for (let i = 0; i < planetNames.length; i += 3) {
-                    let group = "";
+        for (let i = 0; i < planetNames.length; i += 3) {
+          let group = '';
 
-                    for (let j = 0; j < 3; j++) {
-                        const item = planetNames[i + j];
-                        if (!item) break; 
-                        const svg = this.loadSingleSvg(`planets/${item.replaceAll(" ", "_")}`);
-                        group += `
+          for (let j = 0; j < 3; j++) {
+            const item = planetNames[i + j];
+            if (!item) break;
+            const svg = this.loadSingleSvg(
+              `planets/${item.replaceAll(' ', '_')}`,
+            );
+            group += `
                             <li>${svg} <span class="text-left">${item.toUpperCase()}</span></li>
                         `;
-                    }
+          }
 
-                    groupedList += `<ul class="signs-pair">${group}</ul>`;
-                }
+          groupedList += `<ul class="signs-pair">${group}</ul>`;
+        }
 
-                return `<ul class="p2-symbols-list">${groupedList}</ul>`;
-            }
-            // -- Page 3 -- //
-            const infoIcon = this.loadSingleSvg("Info");
-            const formDate = (date: string): string => {
-                const localDate = ZonedDateTime.parse(date).withZoneSameInstant(ZoneId.of('UTC'));
-            
-                const month = localDate.month().toString().charAt(0) + localDate.month().toString().slice(1).toLowerCase();
-                const day = localDate.dayOfMonth();
-                const year = localDate.year();
-            
-                const hour = localDate.hour().toString().padStart(2, '0');
-                const minute = localDate.minute().toString().padStart(2, '0');
-            
-                return `${month} ${day}, ${year} at ${hour}:${minute}`;
-            };
-            const page3 = `
+        return `<ul class="p2-symbols-list">${groupedList}</ul>`;
+      };
+      // -- Page 3 -- //
+      const infoIcon = this.loadSingleSvg('Info');
+      const formDate = (date: string): string => {
+        const localDate = ZonedDateTime.parse(date).withZoneSameInstant(
+          ZoneId.of('UTC'),
+        );
+
+        const month =
+          localDate.month().toString().charAt(0) +
+          localDate.month().toString().slice(1).toLowerCase();
+        const day = localDate.dayOfMonth();
+        const year = localDate.year();
+
+        const hour = localDate.hour().toString().padStart(2, '0');
+        const minute = localDate.minute().toString().padStart(2, '0');
+
+        return `${month} ${day}, ${year} at ${hour}:${minute}`;
+      };
+      const page3 = `
                 <div class="p2 parent-container">
-                    ${topElement("Synastry Chart")}
+                    ${topElement('Synastry Chart')}
                     <div class="p2-content content-container">
                         <div class="p2-chart">
                             <div class="p2-text p2-start">
@@ -791,20 +921,20 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 3 -- //
-            // -- Page 2 -- //
-            const sunIcon = this.loadSingleSvg("page2/sun");
-            const moonIcon = this.loadSingleSvg("page2/moon");
-            const venusIcon = this.loadSingleSvg("page2/venus");
-            const marsIcon = this.loadSingleSvg("page2/mars");
-            const mercuryIcon = this.loadSingleSvg("page2/mercury");
-            const heartIcon = this.loadSingleSvg("page2/heart");
-            const familyIcon = this.loadSingleSvg("page2/family");
-            const calenderIcon = this.loadSingleSvg("page2/calender");
-            const chartIcon = this.loadSingleSvg("page2/chart");
-            const page2 = `
+      // -- Page 3 -- //
+      // -- Page 2 -- //
+      const sunIcon = this.loadSingleSvg('page2/sun');
+      const moonIcon = this.loadSingleSvg('page2/moon');
+      const venusIcon = this.loadSingleSvg('page2/venus');
+      const marsIcon = this.loadSingleSvg('page2/mars');
+      const mercuryIcon = this.loadSingleSvg('page2/mercury');
+      const heartIcon = this.loadSingleSvg('page2/heart');
+      const familyIcon = this.loadSingleSvg('page2/family');
+      const calenderIcon = this.loadSingleSvg('page2/calender');
+      const chartIcon = this.loadSingleSvg('page2/chart');
+      const page2 = `
                 <div class="p3 parent-container">
-                    ${topElement("What is Synastry?")}
+                    ${topElement('What is Synastry?')}
                     <div class="p3-content content-container">
                         <div class="p3-inline">
                             <p class="p3-text p3-text-width">
@@ -1021,16 +1151,17 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 2 -- //
-            // -- Page 4 -- //
-            const iconCage = this.loadSingleSvg("logos/cage");
-            const iconGeo = this.loadSingleSvg("logos/geo");
-            const iconNasa = this.loadSingleSvg("logos/nasa");
-            const iconSwiss = this.loadSingleSvg("logos/swiss");
-            const iconSwiss_orange = this.loadSingleSvg("logos/swiss_orange");
-            const page4 = `
+      // -- Page 2 -- //
+      // -- Page 4 -- //
+      const iconCage = this.loadSingleSvg('logos/cage');
+      const iconGeo = this.loadSingleSvg('logos/geo');
+      const iconNasa = this.loadSingleSvg('logos/nasa');
+      const iconAstro = this.loadSingleSvg('logos/Astrologer');
+      const iconSwiss = this.loadSingleSvg('logos/swiss');
+      const iconSwiss_orange = this.loadSingleSvg('logos/swiss_orange');
+      const page4 = `
                 <div class="p4 parent-container">
-                    ${topElement("Methodology")}
+                    ${topElement('Methodology')}
                     <div class="p4-content content-container">
                         <p class="p3-text">
                             Creating your personalized synastry report involves a careful blend of precise astronomical
@@ -1127,7 +1258,7 @@ const drawSubjectPlanets = (
                                 <p>Birth-place coordinates<br /> & time-zone history</p>
                             </div>
                             <div class="p4-cards-card">
-                                <div class="p4-cards-card-top">Astrology-API Wrapper</div>
+                                <div class="p4-cards-card-top">${iconAstro} Astrology-API Wrapper</div>
                                 <p>A unified API layer that<br /> aggregates the above<br /> services</p>
                             </div>
                         </div>
@@ -1150,43 +1281,62 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 4 -- //
-            // const rawInfoPath = path.join(__dirname, "../../../src/files/mocs/zodiac_signs.json");
-            // const rawInfo = JSON.parse(fs.readFileSync(rawInfoPath, 'utf-8'));
-            const natal1 = this.createSvgNatal(body.natal1)
-            const natal2 = this.createSvgNatal(body.natal2)
-            const planetsList1 = this.getPlanets(body.natal1);
-            const planetsList2 = this.getPlanets(body.natal2);
-            const renderZodiacInfo = (birthDate: string) => {
-                const data = body.zodiac_signs;
-                const date = ZonedDateTime.parse(birthDate).withZoneSameInstant(ZoneId.of('UTC'));
-                const day = date.dayOfMonth();
-                const month = date.monthValue();
-    
-                const element = data.find((item) => {
-                    const range1 = item.date_range.range1;
-                    const range2 = item.date_range.range2;
-                  
-                    const isAfterRange1 = (month > range1.month || (month === range1.month && day >= range1.day));
-                    const isBeforeRange2 = (month < range2.month || (month === range2.month && day <= range2.day));
-                  
-                    return isAfterRange1 && isBeforeRange2;
-                  });
-                  if(!element) throw new Error("Zodiac sign was not found");
-                  const signContent = this.loadSignSvgByName(element.Sign);
-                  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                  const { date_range, Sign, ...otherData } = element; 
-                  let form = "";
-                  Object.entries(otherData).forEach(([key, value]) => {
-                    const valueString = Array.isArray(value) ? value.join(', ') : value;
-                    form += `
+      // -- Page 4 -- //
+      // const rawInfoPath = path.join(__dirname, "../../../src/files/mocs/zodiac_signs.json");
+      // const rawInfo = JSON.parse(fs.readFileSync(rawInfoPath, 'utf-8'));
+      const natal1 = this.createSvgNatal(body.natal1);
+      const natal2 = this.createSvgNatal(body.natal2);
+      const planetsList1 = this.getPlanets(body.natal1);
+      const planetsList2 = this.getPlanets(body.natal2);
+      const renderZodiacInfo = (birthDate: string) => {
+        const data = body.zodiac_signs;
+        const date = ZonedDateTime.parse(birthDate).withZoneSameInstant(
+          ZoneId.of('UTC'),
+        );
+        const day = date.dayOfMonth();
+        const month = date.monthValue();
+
+        const element = data.find((item) => {
+          const range1 = item.date_range.range1;
+          const range2 = item.date_range.range2;
+
+          const isAfterRange1 =
+            month > range1.month ||
+            (month === range1.month && day >= range1.day);
+          const isBeforeRange2 =
+            month < range2.month ||
+            (month === range2.month && day <= range2.day);
+
+          return isAfterRange1 && isBeforeRange2;
+        });
+        if (!element) throw new Error('Zodiac sign was not found');
+        const signContent = this.loadSignSvgByName(element.Sign);
+        const monthNames = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
+        const { date_range, Sign, ...otherData } = element;
+        let form = '';
+        Object.entries(otherData).forEach(([key, value]) => {
+          const valueString = Array.isArray(value) ? value.join(', ') : value;
+          form += `
                         <div class="p5-zodiac-info-item">
                             <span class="p5-zodiac-info-item-title">${key}:</span>
                             <span class="p5-zodiac-info-item-value">${valueString}</span>
                         </div>
                     `;
-                });
-                return `
+        });
+        return `
                         <div class="p5-zodiac">
                             <div class="p5-zodiac-img">
                                 ${signContent}
@@ -1202,11 +1352,11 @@ const drawSubjectPlanets = (
                             </div>
                         </div>
                 `;
-            }
-            // -- Page 5 -- //
-            const page5 = `
+      };
+      // -- Page 5 -- //
+      const page5 = `
                 <div class="p5 parent-container">
-                    ${topElement("Individual Natal Charts")}
+                    ${topElement('Individual Natal Charts')}
                     <div class="p5-content content-container">
                         <p class="p3-text">
                             This section focuses on your <b>unique</b> astrological blueprint.
@@ -1233,11 +1383,11 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 5 -- //
-            // -- Page 6 -- //
-            const page6 = `
+      // -- Page 5 -- //
+      // -- Page 6 -- //
+      const page6 = `
                 <div class="p5 parent-container">
-                    ${topElement("Individual Natal Charts")}
+                    ${topElement('Individual Natal Charts')}
                     <div class="p5-content content-container">
                         <p class="p3-text">
                             This section focuses on your <b>unique</b> astrological blueprint.
@@ -1264,13 +1414,14 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 6 -- //
-    const renderPlanetListwithText = () => {
-    let listItems = planetsDescription.map((item) => {
-        const svg = this.loadSingleSvg(
-            `planets/${item.planet.replaceAll(" ", "_").replaceAll("midheaven", "mc")}`
-        );
-        return `
+      // -- Page 6 -- //
+      const renderPlanetListwithText = () => {
+        let listItems = planetsDescription
+          .map((item) => {
+            const svg = this.loadSingleSvg(
+              `planets/${item.planet.replaceAll(' ', '_').replaceAll('midheaven', 'mc')}`,
+            );
+            return `
             <li class="p7-card">
                 <div class="p7-bl-top">
                     ${svg} 
@@ -1281,15 +1432,16 @@ const drawSubjectPlanets = (
                 <p>${item.description}</p>
             </li>
         `;
-    }).join("");
+          })
+          .join('');
 
-    return `<ul class="p7-grid">${listItems}</ul>`;
-};
+        return `<ul class="p7-grid">${listItems}</ul>`;
+      };
 
-            // -- Page 7 -- //
-            const page7 = `
+      // -- Page 7 -- //
+      const page7 = `
                 <div class="p7 parent-container">
-                ${topElement("How to Read Your Synastry Chart")}
+                ${topElement('How to Read Your Synastry Chart')}
                     <div class="p7-content content-container">
                         <p class="p3-text">
                             Your synastry chart compares how the planets in your chart
@@ -1354,22 +1506,22 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 7 -- //
-            const socialSvg = this.loadSvg("social");
-            const renderSocial = () => {
-                let str:string = "";
-                
-                socialSvg.map((svg)=>{
-                    str += `<div>${svg}</div>`
-                })
-    
-                return str;
-            }
-            // -- Page 8 -- //
-            const lang = body.lang;
-            const circumference = 2 * Math.PI * 71;
-            const percentDisMatchp8 = circumference - ((match) / 100) * circumference;
-            const p8Ring = `
+      // -- Page 7 -- //
+      const socialSvg = this.loadSvg('social');
+      const renderSocial = () => {
+        let str: string = '';
+
+        socialSvg.map((svg) => {
+          str += `<div>${svg}</div>`;
+        });
+
+        return str;
+      };
+      // -- Page 8 -- //
+      const lang = body.lang;
+      const circumference = 2 * Math.PI * 71;
+      const percentDisMatchp8 = circumference - (match / 100) * circumference;
+      const p8Ring = `
                 <svg width="168" height="168" viewBox="0 0 168 168">
                     <!-- Фонове коло -->
                     <circle
@@ -1397,8 +1549,8 @@ const drawSubjectPlanets = (
                     />
                 </svg>
             `;
-            const promptP8 = body.pages[0];
-            const page8 = `
+      const promptP8 = body.pages[0];
+      const page8 = `
                 <div class="p8 parent-container">
                     ${topElement(`${getTitle[lang].p8.title[0]}`)}
                     <div class="p8-content content-container">
@@ -1422,9 +1574,9 @@ const drawSubjectPlanets = (
                                 </div>
                                 <div class="p8-cards-card-content">
                                     <div class="p8-cards-card-content-text">
-                                        <p>${promptP8.planets[0].description[0] ? promptP8.planets[0].description[0] : ""}</p>
-                                        <p>${promptP8.planets[0].description[1] ? promptP8.planets[0].description[1] : ""}</p>
-                                        <p>${promptP8.planets[0].description[2] ? promptP8.planets[0].description[2] : ""}</p>
+                                        <p>${promptP8.planets[0].description[0] ? promptP8.planets[0].description[0] : ''}</p>
+                                        <p>${promptP8.planets[0].description[1] ? promptP8.planets[0].description[1] : ''}</p>
+                                        <p>${promptP8.planets[0].description[2] ? promptP8.planets[0].description[2] : ''}</p>
                                     </div>
                                     <div class="p8-cards-card-content-info">
                                         <div class="p8-cards-card-content-info-el">
@@ -1448,9 +1600,9 @@ const drawSubjectPlanets = (
                                 </div>
                                 <div class="p8-cards-card-content">
                                     <div class="p8-cards-card-content-text">
-                                        <p>${promptP8.planets[1].description[0] ? promptP8.planets[1].description[0] : ""}</p>
-                                        <p>${promptP8.planets[1].description[1] ? promptP8.planets[1].description[1] : ""}</p>
-                                        <p>${promptP8.planets[1].description[2] ? promptP8.planets[1].description[2] : ""}</p>
+                                        <p>${promptP8.planets[1].description[0] ? promptP8.planets[1].description[0] : ''}</p>
+                                        <p>${promptP8.planets[1].description[1] ? promptP8.planets[1].description[1] : ''}</p>
+                                        <p>${promptP8.planets[1].description[2] ? promptP8.planets[1].description[2] : ''}</p>
                                     </div>
                                     <div class="p8-cards-card-content-info">
                                         <div class="p8-cards-card-content-info-el">
@@ -1475,9 +1627,9 @@ const drawSubjectPlanets = (
                             </div>
                             <div class="p8-last-card-content">
                                 <div class="p8-last-card-content-text">
-                                    <p>${promptP8.planets[2].description[0] ? promptP8.planets[2].description[0] : ""}</p>
-                                    <p>${promptP8.planets[2].description[1] ? promptP8.planets[2].description[1] : ""}</p>
-                                    <p>${promptP8.planets[2].description[2] ? promptP8.planets[2].description[2] : ""}</p>
+                                    <p>${promptP8.planets[2].description[0] ? promptP8.planets[2].description[0] : ''}</p>
+                                    <p>${promptP8.planets[2].description[1] ? promptP8.planets[2].description[1] : ''}</p>
+                                    <p>${promptP8.planets[2].description[2] ? promptP8.planets[2].description[2] : ''}</p>
                                 </div>
                                 <div class="p8-last-card-content-info">
                                     <div class="p8-last-card-content-info-el">
@@ -1500,10 +1652,11 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-           // -- Page 8 -- //
-            // -- Page 9 -- //
-            const percentDisMatchp9 = circumference - ((100 - match) / 100) * circumference;
-            const p9Ring = `
+      // -- Page 8 -- //
+      // -- Page 9 -- //
+      const percentDisMatchp9 =
+        circumference - ((100 - match) / 100) * circumference;
+      const p9Ring = `
                 <svg width="168" height="168" viewBox="0 0 168 168">
                     <!-- Фонове коло -->
                     <circle
@@ -1531,8 +1684,8 @@ const drawSubjectPlanets = (
                     />
                 </svg>
             `;
-            const promptP9 = body.pages[1];
-            const page9 = `
+      const promptP9 = body.pages[1];
+      const page9 = `
                 <div class="p9 parent-container">
                     ${topElement(getTitle[lang].p9.title[0])}
                     <div class="p9-content content-container">
@@ -1545,7 +1698,7 @@ const drawSubjectPlanets = (
                             <div class="p9-chart-wrapper-chart">
                                 <div class="p9-chart-wrapper-chart-svg">
                                     ${p9Ring}
-                                    <span>${getTitle[lang].p9.match}<br /> ${100-match} %</span>
+                                    <span>${getTitle[lang].p9.match}<br /> ${100 - match} %</span>
                                 </div>
                             </div>
                         </div>
@@ -1595,10 +1748,10 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 9 -- //
-            // -- Page 10 -- //
-                const promptP10 = body.pages[2]; 
-                const page10 = `
+      // -- Page 9 -- //
+      // -- Page 10 -- //
+      const promptP10 = body.pages[2];
+      const page10 = `
                 <div class="p10 parent-container">
                     ${topElement(getTitle[lang].p10.title[0])}
                         <div class="p10-content content-container">
@@ -1607,7 +1760,7 @@ const drawSubjectPlanets = (
                             </p>
                             <div class="p10-cards">
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day1")}
+                                    ${this.loadSingleSvg('page10/day1')}
                                     <span>${promptP10.planets[0].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[0].description[0]}</p>
@@ -1616,7 +1769,7 @@ const drawSubjectPlanets = (
                                     </div>
                                 </div>
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day2")}
+                                    ${this.loadSingleSvg('page10/day2')}
                                     <span>${promptP10.planets[1].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[1].description[0]}</p>
@@ -1625,7 +1778,7 @@ const drawSubjectPlanets = (
                                     </div>
                                 </div>
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day3")}
+                                    ${this.loadSingleSvg('page10/day3')}
                                     <span>${promptP10.planets[2].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[2].description[0]}</p>
@@ -1634,7 +1787,7 @@ const drawSubjectPlanets = (
                                     </div>
                                 </div>
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day4")}
+                                    ${this.loadSingleSvg('page10/day4')}
                                     <span>${promptP10.planets[3].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[3].description[0]}</p>
@@ -1643,7 +1796,7 @@ const drawSubjectPlanets = (
                                     </div>
                                 </div>
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day5")}
+                                    ${this.loadSingleSvg('page10/day5')}
                                     <span>${promptP10.planets[4].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[4].description[0]}</p>
@@ -1652,7 +1805,7 @@ const drawSubjectPlanets = (
                                     </div>
                                 </div>
                                 <div class="p10-cards-card">
-                                    ${this.loadSingleSvg("page10/day6")}
+                                    ${this.loadSingleSvg('page10/day6')}
                                     <span>${promptP10.planets[5].label}</span>
                                     <div class="p10-cards-card-text">
                                         <p>${promptP10.planets[5].description[0]}</p>
@@ -1662,7 +1815,7 @@ const drawSubjectPlanets = (
                                 </div>
                             </div>
                             <div class="p10-card-last">
-                                ${this.loadSingleSvg("page10/day7")}
+                                ${this.loadSingleSvg('page10/day7')}
                                 <div class="p10-card-last-text">
                                     <span>${promptP10.planets[6].label}</span>
                                     <div class="p10-card-last-text-long">
@@ -1677,11 +1830,11 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 10-- //
-            // -- Page 11 -- //
-            const promptP11 = body.pages[3];
-            const iconCalender = this.loadSingleSvg("page11/calender");
-            const page11 = `
+      // -- Page 10-- //
+      // -- Page 11 -- //
+      const promptP11 = body.pages[3];
+      const iconCalender = this.loadSingleSvg('page11/calender');
+      const page11 = `
                 <div class="p11 parent-container">
                     ${topElement(getTitle[lang].p11.title[0])}
                         <div class="p11-content content-container">
@@ -1749,13 +1902,13 @@ const drawSubjectPlanets = (
                 </div>
                 <div class="page-break"></div>
             `;
-            // -- Page 11 -- //
-            // -- Page 12 -- //
-        // <div class="logo p12-logo">${logoContent}</div>
-            const iconCouple = this.loadSingleSvg("page12-people");
-            const iconQR = this.loadSingleSvg("QR");
-            const iconRate = this.loadSingleSvg("rate");
-            const page12 = `
+      // -- Page 11 -- //
+      // -- Page 12 -- //
+      // <div class="logo p12-logo">${logoContent}</div>
+      const iconCouple = this.loadSingleSvg('page12-people');
+      const iconQR = this.loadSingleSvg('QR');
+      const iconRate = this.loadSingleSvg('rate');
+      const page12 = `
             <div class="p1">
                 <div class="p1-content p12-content">
                     <div class="logo">${logoContent}</div>
@@ -1798,8 +1951,8 @@ const drawSubjectPlanets = (
                 </div>
             </div>
             `;
-            // -- Page 12 -- //
-            const htmlContent = `
+      // -- Page 12 -- //
+      const htmlContent = `
             <html>
             <head>
                 ${styles}
@@ -1821,25 +1974,25 @@ const drawSubjectPlanets = (
             </body>
             </html>
             `;
-    
-            console.log("Setting page content...");
-            await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    
-            console.log("Generating PDF...");
-            const pdfBuffer = await page.pdf({
-                width:595,
-                height:842,
-                printBackground: true,
-            });
-            
-            const scale = await page.evaluate(() => window.devicePixelRatio);
-            console.log("Device Pixel Ratio:", scale);
-            await browser.close();
-            console.log("PDF generated successfully.");
-            const buffer = Buffer.from(pdfBuffer);
-            return buffer;
-        } catch (error) {
-            console.log("Error while generating, restart",  error);
-        }
+
+      console.log('Setting page content...');
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+      console.log('Generating PDF...');
+      const pdfBuffer = await page.pdf({
+        width: 595,
+        height: 842,
+        printBackground: true,
+      });
+
+      const scale = await page.evaluate(() => window.devicePixelRatio);
+      console.log('Device Pixel Ratio:', scale);
+      await browser.close();
+      console.log('PDF generated successfully.');
+      const buffer = Buffer.from(pdfBuffer);
+      return buffer;
+    } catch (error) {
+      console.log('Error while generating, restart', error);
     }
+  }
 }
