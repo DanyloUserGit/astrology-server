@@ -222,7 +222,7 @@ export class SynastryService {
     names: { name1: string; name2: string },
   ) {
     try {
-      console.log('Sending email to:', email);
+      console.log('Sending email with SendGrid to:', email);
       const sendEmail = process.env.EMAIL_USER;
       if (!sendEmail) throw new Error('Invalid sender email');
 
