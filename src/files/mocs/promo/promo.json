@@ -1,17 +1,22 @@
 [
-    {
-        "promo":"dimafree",
-        "title":"Unlimited Pdf Generation",
-        "discount":100
-    },
-    {
-        "promo":"spring30",
-        "title":"Spring 30% discount",
-        "discount":30
-    },
-    {
-        "promo":"STARS10",
-        "title":"Stars 10% discount",
-        "discount":10
-    }
+  {
+    "promo": "dimafree",
+    "title": "Unlimited Pdf Generation",
+    "discount": 100
+  },
+  {
+    "promo": "spring30",
+    "title": "Spring 30% discount",
+    "discount": 30
+  },
+  {
+    "promo": "STARS10",
+    "title": "Stars 10% discount",
+    "discount": 10
+  },
+  {
+    "promo": "promo1",
+    "title": "promo1 1$ cost",
+    "discount": 89.9
+  }
 ]
