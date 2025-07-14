@@ -460,12 +460,22 @@ export class UIGeneratorService implements UIGenerator {
           const x = Math.cos(angleRad) * planetRadius + center.x;
           const y = Math.sin(angleRad) * planetRadius + center.y;
 
-          const planetSvg =
-            this.loadPlanetSvgByName(
-              exceptions.includes(planet.name)
-                ? exceptionsMap[planet.name.toLowerCase()]
-                : planet.name.toLowerCase(),
-            ) || '';
+          const iconName = exceptions.includes(planet.name)
+            ? exceptionsMap[planet.name.toLowerCase()]
+            : planet.name.toLowerCase();
+
+          if (
+            !fs.existsSync(
+              path.join(
+                __dirname,
+                '../../../src/files/planets',
+                `${iconName}.svg`,
+              ),
+            )
+          )
+            return;
+
+          const planetSvg = this.loadPlanetSvgByName(iconName) || '';
 
           svgString += `
           <g transform="translate(${x}, ${y}) scale(1.5)">
