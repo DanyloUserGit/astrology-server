@@ -345,39 +345,36 @@ export class UIGeneratorService implements UIGenerator {
 
       let svgString = `<svg width="226" height="226" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
 
-      // Фон
       svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
 
-      // Радіус центрального білого кільця (було radius - 25)
       const baseWhiteRing = radius - 55;
       const whiteRingDiff = radius - baseWhiteRing;
       const adjustedWhiteRing = radius - whiteRingDiff * 1.2;
 
-      // Малюємо кільця
       svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
 
       svgString += `
-            <foreignObject x="0" y="0" width="${width}" height="${height}">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-                ${Array.from({ length: 12 }, (_, i) => {
-                  const angle = i * 30;
-                  return `<div style="
-                    position: absolute;
-                    left: ${center.x}px;
-                    top: ${center.y}px;
-                    width: 0;
-                    height: ${radius}px;
-                    border-left: 1px solid #edc795;
-                    opacity: 0.8;
-                    transform: rotate(${angle}deg);
-                    transform-origin: top center;
-                "></div>`;
-                }).join('')}
-            </div>
-            </foreignObject>
-            `;
+          <foreignObject x="0" y="0" width="${width}" height="${height}">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+              ${Array.from({ length: 12 }, (_, i) => {
+                const angle = i * 30;
+                return `<div style="
+                  position: absolute;
+                  left: ${center.x}px;
+                  top: ${center.y}px;
+                  width: 0;
+                  height: ${radius}px;
+                  border-left: 1px solid #edc795;
+                  opacity: 0.8;
+                  transform: rotate(${angle}deg);
+                  transform-origin: top center;
+              "></div>`;
+              }).join('')}
+          </div>
+          </foreignObject>
+          `;
       svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" 
-            stroke-dasharray="3,2"/>`;
+          stroke-dasharray="3,2"/>`;
 
       const zodiacSigns = [
         { name: 'Virgo', emoji: '♈' },
@@ -395,39 +392,36 @@ export class UIGeneratorService implements UIGenerator {
       ];
 
       svgString += `
-            <foreignObject x="0" y="0" width="${width}" height="${height}">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-                ${Array.from({ length: 12 }, (_, i) => {
-                  const angle = i * 30 - 45;
-                  const rad = angle * (Math.PI / 180);
-                  const labelRadius = radius - 35;
+          <foreignObject x="0" y="0" width="${width}" height="${height}">
+          <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+              ${Array.from({ length: 12 }, (_, i) => {
+                const angle = i * 30 - 45;
+                const rad = angle * (Math.PI / 180);
+                const labelRadius = radius - 35;
 
-                  const x = center.x + Math.cos(rad) * labelRadius;
-                  const y = center.y + Math.sin(rad) * labelRadius;
+                const x = center.x + Math.cos(rad) * labelRadius;
+                const y = center.y + Math.sin(rad) * labelRadius;
 
-                  return `
-                    <div style="
-                    position: absolute;
-                    left: ${x}px;
-                    top: ${y}px;
-                    transform: translate(-50%, -50%) rotate(${angle + 90}deg);
-                    transform-origin: center;
-                    color: #FFF9F1;
-                    font-size: 35px;
-                    font-family: sans-serif;
-                    white-space: nowrap;
-                    ">
-                    ${zodiacSigns[i].name}
-                    </div>
-                `;
-                }).join('')}
-            </div>
-            </foreignObject>
-            `;
+                return `
+                  <div style="
+                  position: absolute;
+                  left: ${x}px;
+                  top: ${y}px;
+                  transform: translate(-50%, -50%) rotate(${angle + 90}deg);
+                  transform-origin: center;
+                  color: #FFF9F1;
+                  font-size: 35px;
+                  font-family: sans-serif;
+                  white-space: nowrap;
+                  ">
+                  ${zodiacSigns[i].name}
+                  </div>
+              `;
+              }).join('')}
+          </div>
+          </foreignObject>
+          `;
 
-      // console.log({ radius, center, svgString });
-
-      // Планети
       const exceptions = ['Mean_Node'];
       const normal = ['north_node'];
       const exceptionsMap: Record<string, string> = Object.fromEntries(
@@ -444,86 +438,60 @@ export class UIGeneratorService implements UIGenerator {
         if (
           planet &&
           typeof planet === 'object' &&
-          planet.abs_pos !== undefined &&
-          fs.existsSync(
-            path.join(
-              __dirname,
-              '../../../src/files/planets',
-              `${planet.name.toLowerCase()}.svg`,
-            ),
-          )
+          planet.abs_pos !== undefined
         ) {
           const angleDeg = planet.abs_pos;
           const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
-          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
-          usedAngles.push(angleDeg);
+          const minDistanceBetweenPlanets = 15;
+          let shift = 0;
+          while (
+            usedAngles.some(
+              (a) => Math.abs(a - angleDeg + shift) < minDistanceBetweenPlanets,
+            )
+          ) {
+            shift += 5;
+          }
+          usedAngles.push(angleDeg + shift);
 
           const baseRadius = (radius - 75 + radius - 125) / 2;
-          let planetRadius = baseRadius;
-          planetRadius = baseRadius + shiftIndex * 2.5;
+          const planetRadius = baseRadius + shift;
 
           const x = Math.cos(angleRad) * planetRadius + center.x;
           const y = Math.sin(angleRad) * planetRadius + center.y;
-          const planetSvg =
-            this.loadPlanetSvgByName(planet.name.toLowerCase()) || '';
 
-          svgString += `
-                        <g transform="translate(${x}, ${y}) scale(1.5)">
-                            <g transform="translate(-7, -7)">
-                                ${planetSvg}
-                            </g>
-                        </g>
-                    `;
-
-          planetPositions[planet.name] = { x, y };
-        } else if (
-          planet &&
-          typeof planet === 'object' &&
-          planet.abs_pos !== undefined &&
-          exceptions.includes(planet.name)
-        ) {
-          const angleDeg = planet.abs_pos;
-          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
-
-          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
-          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
-          usedAngles.push(angleDeg);
-
-          const baseRadius = (radius - 75 + radius - 125) / 2;
-          let planetRadius = baseRadius;
-          planetRadius = baseRadius + shiftIndex * 2.5;
-
-          const x = Math.cos(angleRad) * planetRadius + center.x;
-          const y = Math.sin(angleRad) * planetRadius + center.y;
           const planetSvg =
             this.loadPlanetSvgByName(
-              exceptionsMap[planet.name.toLowerCase()],
+              exceptions.includes(planet.name)
+                ? exceptionsMap[planet.name.toLowerCase()]
+                : planet.name.toLowerCase(),
             ) || '';
 
           svgString += `
-                        <g transform="translate(${x}, ${y}) scale(1.5)">
-                            <g transform="translate(-7, -7)">
-                                ${planetSvg}
-                            </g>
-                        </g>
-                    `;
+          <g transform="translate(${x}, ${y}) scale(1.5)">
+            <g transform="translate(-7, -7)">
+              ${planetSvg}
+            </g>
+          </g>
+        `;
 
           planetPositions[planet.name] = { x, y };
         }
       });
 
       if (aspects && Array.isArray(aspects)) {
+        const lineRadius = radius - 135;
         aspects.forEach(({ p1_name, p2_name }) => {
           if (planetPositions[p1_name] && planetPositions[p2_name]) {
-            const { x: x1, y: y1 } = planetPositions[p1_name];
-            const { x: x2, y: y2 } = planetPositions[p2_name];
-            const offset = 12 * 2.1;
-            const x1f = x1 + (x1 > center.x ? -offset : offset);
-            const y1f = y1 + (y1 > center.y ? -offset : offset);
-            const x2f = x2 + (x2 > center.x ? -offset : offset);
-            const y2f = y2 + (y2 > center.y ? -offset : offset);
+            const getAngle = ({ x, y }) =>
+              Math.atan2(y - center.y, x - center.x);
+            const angle1 = getAngle(planetPositions[p1_name]);
+            const angle2 = getAngle(planetPositions[p2_name]);
+
+            const x1f = center.x + Math.cos(angle1) * lineRadius;
+            const y1f = center.y + Math.sin(angle1) * lineRadius;
+            const x2f = center.x + Math.cos(angle2) * lineRadius;
+            const y2f = center.y + Math.sin(angle2) * lineRadius;
 
             svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="#E4B77C" stroke-width="1"/>`;
           }
