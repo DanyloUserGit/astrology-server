@@ -1300,14 +1300,21 @@ export class UIGeneratorService implements UIGenerator {
           const range1 = item.date_range.range1;
           const range2 = item.date_range.range2;
 
-          const isAfterRange1 =
-            month > range1.month ||
-            (month === range1.month && day >= range1.day);
-          const isBeforeRange2 =
-            month < range2.month ||
-            (month === range2.month && day <= range2.day);
-
-          return isAfterRange1 && isBeforeRange2;
+          if (range1.month <= range2.month) {
+            return (
+              (month > range1.month ||
+                (month === range1.month && day >= range1.day)) &&
+              (month < range2.month ||
+                (month === range2.month && day <= range2.day))
+            );
+          } else {
+            return (
+              month > range1.month ||
+              (month === range1.month && day >= range1.day) ||
+              month < range2.month ||
+              (month === range2.month && day <= range2.day)
+            );
+          }
         });
         if (!element) throw new Error('Zodiac sign was not found');
         const signContent = this.loadSignSvgByName(element.Sign);
