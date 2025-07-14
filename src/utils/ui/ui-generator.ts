@@ -227,17 +227,21 @@ export class UIGeneratorService implements UIGenerator {
             : rawName;
 
           const angleDeg = planet.abs_pos;
-          let shift = 0;
-          while (usedAngles.some((a) => Math.abs(a - angleDeg + shift) < 5)) {
-            shift += 3;
-          }
-          usedAngles.push(angleDeg + shift);
+          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-          const angleRad = ((angleDeg + shift - 90) * Math.PI) / 180;
+          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
+          const shiftIndex = nearby.length;
+          usedAngles.push(angleDeg);
 
-          const baseRadius = (radius - 75 + radius - 125) / 2;
-          const x = Math.cos(angleRad) * baseRadius + center.x;
-          const y = Math.sin(angleRad) * baseRadius + center.y;
+          const baseRadius = (radius - 19.7 + radius - 43.5) / 2;
+          const baseRadiusInner = baseRadius - 15.92 * 2.5;
+          let planetRadius =
+            placement === 'ring'
+              ? baseRadius + shiftIndex * 15
+              : baseRadiusInner - shiftIndex * 15;
+
+          const x = Math.cos(angleRad) * planetRadius + center.x;
+          const y = Math.sin(angleRad) * planetRadius + center.y;
 
           const planetSvg = this.loadPlanetSvgByName(actualName) || '';
           svg += `
@@ -350,27 +354,27 @@ export class UIGeneratorService implements UIGenerator {
       svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
 
       svgString += `
-          <foreignObject x="0" y="0" width="${width}" height="${height}">
-          <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-              ${Array.from({ length: 12 }, (_, i) => {
-                const angle = i * 30;
-                return `<div style="
-                  position: absolute;
-                  left: ${center.x}px;
-                  top: ${center.y}px;
-                  width: 0;
-                  height: ${radius}px;
-                  border-left: 1px solid #edc795;
-                  opacity: 0.8;
-                  transform: rotate(${angle}deg);
-                  transform-origin: top center;
-              "></div>`;
-              }).join('')}
-          </div>
-          </foreignObject>
-          `;
-      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" 
-          stroke-dasharray="3,2"/>`;
+      <foreignObject x="0" y="0" width="${width}" height="${height}">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+          ${Array.from({ length: 12 }, (_, i) => {
+            const angle = i * 30;
+            return `<div style="
+              position: absolute;
+              left: ${center.x}px;
+              top: ${center.y}px;
+              width: 0;
+              height: ${radius}px;
+              border-left: 1px solid #edc795;
+              opacity: 0.8;
+              transform: rotate(${angle}deg);
+              transform-origin: top center;
+            "></div>`;
+          }).join('')}
+        </div>
+      </foreignObject>
+    `;
+
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
       const zodiacSigns = [
         { name: 'Virgo', emoji: '♈' },
@@ -388,35 +392,29 @@ export class UIGeneratorService implements UIGenerator {
       ];
 
       svgString += `
-          <foreignObject x="0" y="0" width="${width}" height="${height}">
-          <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-              ${Array.from({ length: 12 }, (_, i) => {
-                const angle = i * 30 - 45;
-                const rad = angle * (Math.PI / 180);
-                const labelRadius = radius - 35;
-
-                const x = center.x + Math.cos(rad) * labelRadius;
-                const y = center.y + Math.sin(rad) * labelRadius;
-
-                return `
-                  <div style="
-                  position: absolute;
-                  left: ${x}px;
-                  top: ${y}px;
-                  transform: translate(-50%, -50%) rotate(${angle + 90}deg);
-                  transform-origin: center;
-                  color: #FFF9F1;
-                  font-size: 35px;
-                  font-family: sans-serif;
-                  white-space: nowrap;
-                  ">
-                  ${zodiacSigns[i].name}
-                  </div>
-              `;
-              }).join('')}
-          </div>
-          </foreignObject>
-          `;
+      <foreignObject x="0" y="0" width="${width}" height="${height}">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+          ${Array.from({ length: 12 }, (_, i) => {
+            const angle = i * 30 - 45;
+            const rad = angle * (Math.PI / 180);
+            const labelRadius = radius - 35;
+            const x = center.x + Math.cos(rad) * labelRadius;
+            const y = center.y + Math.sin(rad) * labelRadius;
+            return `<div style="
+              position: absolute;
+              left: ${x}px;
+              top: ${y}px;
+              transform: translate(-50%, -50%) rotate(${angle + 90}deg);
+              transform-origin: center;
+              color: #FFF9F1;
+              font-size: 35px;
+              font-family: sans-serif;
+              white-space: nowrap;
+            ">${zodiacSigns[i].name}</div>`;
+          }).join('')}
+        </div>
+      </foreignObject>
+    `;
 
       const exceptions = ['Mean_Node'];
       const normal = ['north_node'];
@@ -437,24 +435,22 @@ export class UIGeneratorService implements UIGenerator {
           planet.abs_pos !== undefined
         ) {
           const angleDeg = planet.abs_pos;
-          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-          const minDistanceBetweenPlanets = 15;
           let shift = 0;
+          const minAngleDiff = 5;
           while (
             usedAngles.some(
-              (a) => Math.abs(a - angleDeg + shift) < minDistanceBetweenPlanets,
+              (a) => Math.abs(a - (angleDeg + shift)) < minAngleDiff,
             )
           ) {
-            shift += 5;
+            shift += 3;
           }
           usedAngles.push(angleDeg + shift);
 
+          const angleRad = ((angleDeg + shift - 90) * Math.PI) / 180;
           const baseRadius = (radius - 75 + radius - 125) / 2;
-          const planetRadius = baseRadius + shift;
-
-          const x = Math.cos(angleRad) * planetRadius + center.x;
-          const y = Math.sin(angleRad) * planetRadius + center.y;
+          const x = Math.cos(angleRad) * baseRadius + center.x;
+          const y = Math.sin(angleRad) * baseRadius + center.y;
 
           const iconName = exceptions.includes(planet.name)
             ? exceptionsMap[planet.name.toLowerCase()]
@@ -468,8 +464,9 @@ export class UIGeneratorService implements UIGenerator {
                 `${iconName}.svg`,
               ),
             )
-          )
+          ) {
             return;
+          }
 
           const planetSvg = this.loadPlanetSvgByName(iconName) || '';
 
