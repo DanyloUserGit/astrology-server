@@ -227,21 +227,17 @@ export class UIGeneratorService implements UIGenerator {
             : rawName;
 
           const angleDeg = planet.abs_pos;
-          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+          let shift = 0;
+          while (usedAngles.some((a) => Math.abs(a - angleDeg + shift) < 5)) {
+            shift += 3;
+          }
+          usedAngles.push(angleDeg + shift);
 
-          const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
-          const shiftIndex = nearby.length;
-          usedAngles.push(angleDeg);
+          const angleRad = ((angleDeg + shift - 90) * Math.PI) / 180;
 
-          const baseRadius = (radius - 19.7 + radius - 43.5) / 2;
-          const baseRadiusInner = baseRadius - 15.92 * 2.5;
-          let planetRadius =
-            placement === 'ring'
-              ? baseRadius + shiftIndex * 15
-              : baseRadiusInner - shiftIndex * 15;
-
-          const x = Math.cos(angleRad) * planetRadius + center.x;
-          const y = Math.sin(angleRad) * planetRadius + center.y;
+          const baseRadius = (radius - 75 + radius - 125) / 2;
+          const x = Math.cos(angleRad) * baseRadius + center.x;
+          const y = Math.sin(angleRad) * baseRadius + center.y;
 
           const planetSvg = this.loadPlanetSvgByName(actualName) || '';
           svg += `
