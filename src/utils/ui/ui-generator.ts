@@ -156,18 +156,14 @@ export class UIGeneratorService implements UIGenerator {
       svg += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
       svg += `
-        <foreignObject x="0" y="0" width="${width}" height="${height}">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-            ${[...Array(12).keys()]
-              .map((i) => {
-                const angle = i * 30;
-
-                const isRightSide = Boolean(
-                  angle >= 30 && angle != 90 && angle <= 150,
-                );
-                const adjustedHeight = isRightSide ? radius - 1 : radius;
-
-                return `<div style="
+      <foreignObject x="0" y="0" width="${width}" height="${height}">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
+          ${[...Array(12).keys()]
+            .map((i) => {
+              const angle = i * 30;
+              const isRightSide = angle >= 30 && angle !== 90 && angle <= 150;
+              const adjustedHeight = isRightSide ? radius - 1 : radius;
+              return `<div style="
                 position: absolute;
                 left: ${center.x}px;
                 top: ${center.y - adjustedHeight}px;
@@ -177,12 +173,12 @@ export class UIGeneratorService implements UIGenerator {
                 opacity: 0.8;
                 transform: rotate(${angle}deg);
                 transform-origin: bottom center;
-                "></div>`;
-              })
-              .join('')}
-            </div>
-        </foreignObject>
-        `;
+              "></div>`;
+            })
+            .join('')}
+        </div>
+      </foreignObject>
+    `;
 
       svg += `<circle cx="${center.x}" cy="${center.y}" r="5" fill="#FFF7ED"/>`;
 
@@ -207,14 +203,16 @@ export class UIGeneratorService implements UIGenerator {
 
       zodiacSigns.forEach((sign, i) => {
         svg += `
-            <text font-size="9.56" fill="#FFF9F1">
-            <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">${sign}</textPath>
-            </text>
-        `;
+        <text font-size="9.56" fill="#FFF9F1">
+          <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">${sign}</textPath>
+        </text>
+      `;
       });
 
-      // --- Планети
-      const planetPositions: Record<string, { x: number; y: number }> = {};
+      const planetPositions: Record<
+        string,
+        { x: number; y: number; angle: number }
+      > = {};
 
       const drawSubjectPlanets = (
         subjectData: Record<string, CelestialBody>,
@@ -240,21 +238,17 @@ export class UIGeneratorService implements UIGenerator {
           const angleDeg = planet.abs_pos;
           const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-          // Знаходимо скільки планет близько по куту (±6 градусів)
           const nearby = usedAngles.filter((a) => Math.abs(a - angleDeg) < 6);
-          const shiftIndex = nearby.length; // індекс для зсуву по радіусу
+          const shiftIndex = nearby.length;
           usedAngles.push(angleDeg);
 
-          const baseRadius = (radius - 19.7 + radius - 43.5) / 2; // базовий радіус для ring
+          const baseRadius = (radius - 19.7 + radius - 43.5) / 2;
           const baseRadiusInner = baseRadius - 15.92 * 2.5;
           let planetRadius = baseRadius;
 
           if (placement === 'ring') {
-            // Зсув по радіусу, щоб не накладатись
-            // Кожен наступний "близький" по куту зсувається на +15px назовні
             planetRadius = baseRadius + shiftIndex * 15;
           } else {
-            // Для inner просто фіксований радіус (можна кастомізувати)
             planetRadius = baseRadiusInner - shiftIndex * 15;
           }
 
@@ -264,21 +258,29 @@ export class UIGeneratorService implements UIGenerator {
           const planetSvg = this.loadPlanetSvgByName(actualName) || '';
 
           svg += `
-            <g transform="translate(${x}, ${y}) scale(0.58)">
-                <g transform="translate(-7, -7)">
-                    ${planetSvg}
-                </g>
+          <g transform="translate(${x}, ${y}) scale(0.58)">
+            <g transform="translate(-7, -7)">
+              ${planetSvg}
             </g>
+          </g>
         `;
 
-          planetPositions[`${planet.name}_${label}`] = { x, y };
+          planetPositions[`${planet.name}_${label}`] = {
+            x,
+            y,
+            angle: angleRad,
+          };
         });
       };
 
       drawSubjectPlanets(natalData.first_subject, '1', 'ring');
       drawSubjectPlanets(natalData.second_subject, '2', 'inner');
 
-      // Аспекти
+      const getPointOnCircle = (angle: number, radius: number) => ({
+        x: center.x + Math.cos(angle) * radius,
+        y: center.y + Math.sin(angle) * radius,
+      });
+
       if (Array.isArray(aspects)) {
         const lines: {
           x1: number;
@@ -296,16 +298,8 @@ export class UIGeneratorService implements UIGenerator {
           const p2 =
             planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
           if (p1 && p2) {
-            // Менший offset (наприклад, 10) зсуває ближче до центру
-            const offset = 28;
-            const angle1 = Math.atan2(p1.y - center.y, p1.x - center.x);
-            const angle2 = Math.atan2(p2.y - center.y, p2.x - center.x);
-
-            // Зміщення координат вздовж напрямку до центру
-            const x1f = p1.x - Math.cos(angle1) * offset;
-            const y1f = p1.y - Math.sin(angle1) * offset;
-            const x2f = p2.x - Math.cos(angle2) * offset;
-            const y2f = p2.y - Math.sin(angle2) * offset;
+            const point1 = getPointOnCircle(p1.angle, innerRingRadius);
+            const point2 = getPointOnCircle(p2.angle, innerRingRadius);
 
             let color = '#E4B77C',
               stroke = 1,
@@ -331,10 +325,10 @@ export class UIGeneratorService implements UIGenerator {
             }
 
             lines.push({
-              x1: x1f,
-              y1: y1f,
-              x2: x2f,
-              y2: y2f,
+              x1: point1.x,
+              y1: point1.y,
+              x2: point2.x,
+              y2: point2.y,
               color,
               stroke,
               zIndex,
