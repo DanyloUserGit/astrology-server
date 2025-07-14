@@ -109,6 +109,7 @@ export class UIGeneratorService implements UIGenerator {
       const textRadius = radius - 13.56;
       const outerRingRadius = radius - 21;
       const innerRingRadius = radius - 42;
+      const aspectRadius = innerRingRadius - 10; // відступ ліній аспектів
 
       const zodiacSigns = [
         'Aries',
@@ -151,7 +152,6 @@ export class UIGeneratorService implements UIGenerator {
       let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
       svg += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020"/>`;
-
       svg += `<circle cx="${center.x}" cy="${center.y}" r="${outerRingRadius}" fill="#FFFFFF"/>`;
       svg += `<circle cx="${center.x}" cy="${center.y}" r="${innerRingRadius}" fill="#FFF7ED" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
@@ -161,19 +161,19 @@ export class UIGeneratorService implements UIGenerator {
           ${[...Array(12).keys()]
             .map((i) => {
               const angle = i * 30;
-              const isRightSide = angle >= 30 && angle !== 90 && angle <= 150;
+              const isRightSide = angle >= 30 && angle != 90 && angle <= 150;
               const adjustedHeight = isRightSide ? radius - 1 : radius;
               return `<div style="
-                position: absolute;
-                left: ${center.x}px;
-                top: ${center.y - adjustedHeight}px;
-                width: 0;
-                height: ${adjustedHeight}px;
-                border-left: 1px dashed #edc795;
-                opacity: 0.8;
-                transform: rotate(${angle}deg);
-                transform-origin: bottom center;
-              "></div>`;
+              position: absolute;
+              left: ${center.x}px;
+              top: ${center.y - adjustedHeight}px;
+              width: 0;
+              height: ${adjustedHeight}px;
+              border-left: 1px dashed #edc795;
+              opacity: 0.8;
+              transform: rotate(${angle}deg);
+              transform-origin: bottom center;
+            "></div>`;
             })
             .join('')}
         </div>
@@ -186,18 +186,12 @@ export class UIGeneratorService implements UIGenerator {
         const angleFix = i === 11 ? 1.5 : 0;
         const startAngle = (i * 30 - 90) * (Math.PI / 180);
         const endAngle = ((i + 1) * 30 - 90 + angleFix) * (Math.PI / 180);
-
         const x1 = center.x + Math.cos(startAngle) * textRadius;
         const y1 = center.y + Math.sin(startAngle) * textRadius;
         const x2 = center.x + Math.cos(endAngle) * textRadius;
         const y2 = center.y + Math.sin(endAngle) * textRadius;
-
-        const largeArcFlag = 0;
-        const sweepFlag = 1;
-
         const pathId = `zodiacArc${i}`;
-        const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 ${largeArcFlag} ${sweepFlag} ${x2} ${y2}`;
-
+        const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 0 1 ${x2} ${y2}`;
         svg += `<path id="${pathId}" fill="none" stroke="none" d="${pathD}" />`;
       });
 
@@ -209,10 +203,7 @@ export class UIGeneratorService implements UIGenerator {
       `;
       });
 
-      const planetPositions: Record<
-        string,
-        { x: number; y: number; angle: number }
-      > = {};
+      const planetPositions: Record<string, { x: number; y: number }> = {};
 
       const drawSubjectPlanets = (
         subjectData: Record<string, CelestialBody>,
@@ -230,7 +221,7 @@ export class UIGeneratorService implements UIGenerator {
             return;
           if (!allowed_planets.includes(planet.name)) return;
 
-          const rawName = planet.name?.toLowerCase();
+          const rawName = planet.name.toLowerCase();
           const actualName = exceptions.includes(planet.name)
             ? exceptionsMap[rawName]
             : rawName;
@@ -244,19 +235,15 @@ export class UIGeneratorService implements UIGenerator {
 
           const baseRadius = (radius - 19.7 + radius - 43.5) / 2;
           const baseRadiusInner = baseRadius - 15.92 * 2.5;
-          let planetRadius = baseRadius;
-
-          if (placement === 'ring') {
-            planetRadius = baseRadius + shiftIndex * 15;
-          } else {
-            planetRadius = baseRadiusInner - shiftIndex * 15;
-          }
+          let planetRadius =
+            placement === 'ring'
+              ? baseRadius + shiftIndex * 15
+              : baseRadiusInner - shiftIndex * 15;
 
           const x = Math.cos(angleRad) * planetRadius + center.x;
           const y = Math.sin(angleRad) * planetRadius + center.y;
 
           const planetSvg = this.loadPlanetSvgByName(actualName) || '';
-
           svg += `
           <g transform="translate(${x}, ${y}) scale(0.58)">
             <g transform="translate(-7, -7)">
@@ -264,22 +251,12 @@ export class UIGeneratorService implements UIGenerator {
             </g>
           </g>
         `;
-
-          planetPositions[`${planet.name}_${label}`] = {
-            x,
-            y,
-            angle: angleRad,
-          };
+          planetPositions[`${planet.name}_${label}`] = { x, y };
         });
       };
 
       drawSubjectPlanets(natalData.first_subject, '1', 'ring');
       drawSubjectPlanets(natalData.second_subject, '2', 'inner');
-
-      const getPointOnCircle = (angle: number, radius: number) => ({
-        x: center.x + Math.cos(angle) * radius,
-        y: center.y + Math.sin(angle) * radius,
-      });
 
       if (Array.isArray(aspects)) {
         const lines: {
@@ -292,14 +269,21 @@ export class UIGeneratorService implements UIGenerator {
           zIndex: number;
         }[] = [];
 
+        const getPointOnCircle = (angle: number) => ({
+          x: center.x + Math.cos(angle) * aspectRadius,
+          y: center.y + Math.sin(angle) * aspectRadius,
+        });
+
         aspects.forEach(({ p1_name, p2_name, aspect }) => {
           const p1 =
             planetPositions[`${p1_name}_1`] || planetPositions[`${p1_name}_2`];
           const p2 =
             planetPositions[`${p2_name}_1`] || planetPositions[`${p2_name}_2`];
           if (p1 && p2) {
-            const point1 = getPointOnCircle(p1.angle, innerRingRadius);
-            const point2 = getPointOnCircle(p2.angle, innerRingRadius);
+            const angle1 = Math.atan2(p1.y - center.y, p1.x - center.x);
+            const angle2 = Math.atan2(p2.y - center.y, p2.x - center.x);
+            const { x: x1f, y: y1f } = getPointOnCircle(angle1);
+            const { x: x2f, y: y2f } = getPointOnCircle(angle2);
 
             let color = '#E4B77C',
               stroke = 1,
@@ -325,10 +309,10 @@ export class UIGeneratorService implements UIGenerator {
             }
 
             lines.push({
-              x1: point1.x,
-              y1: point1.y,
-              x2: point2.x,
-              y2: point2.y,
+              x1: x1f,
+              y1: y1f,
+              x2: x2f,
+              y2: y2f,
               color,
               stroke,
               zIndex,
@@ -337,7 +321,6 @@ export class UIGeneratorService implements UIGenerator {
         });
 
         lines.sort((a, b) => a.zIndex - b.zIndex);
-
         lines.forEach(({ x1, y1, x2, y2, color, stroke }) => {
           svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-linecap="round" stroke-width="${stroke}"/>`;
         });
