@@ -34,10 +34,7 @@
   color: #000000;
   text-align: left;
 }
-.p4-bordertext-info svg {
-  width: 10px;
-  height: 10px;
-}
+
 .p4-info {
   display: flex;
   align-items: center;
@@ -50,10 +47,10 @@
   color: #161616;
   margin: 8px 0 0 0;
 }
-.p4-info svg {
+/* .p4-info svg {
   width: 16px;
   height: 16px;
-}
+} */
 .p4-card {
   margin: 8px 0 0 0;
 }

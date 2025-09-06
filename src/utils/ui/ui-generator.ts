@@ -88,7 +88,16 @@ export class UIGeneratorService implements UIGenerator {
                 ? planet.name.toLowerCase()
                 : changeName[planet.name].replaceAll(' ', '_').toLowerCase(),
             );
-            return `<li><div class="planet-icon">${icon}</div> <span>${changeName[planet.name] ? changeName[planet.name] : planet.name} in</span> <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
+            return `<li><div class="planet-icon">${icon
+              .replace(/<style[^>]*>.*<\/style>/gs, '')
+              .replace(
+                /class="cls-1"/g,
+                'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+              )
+              .replace(
+                '<svg',
+                '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+              )}</div> <span>${changeName[planet.name] ? changeName[planet.name] : planet.name} in</span> <span style="color:#CB8020;">${formatDegrees(planet.position)} ${planet.sign}</span></li>`;
           })
           .join('') +
         `</ul>`
@@ -247,7 +256,16 @@ export class UIGeneratorService implements UIGenerator {
           svg += `
           <g transform="translate(${x}, ${y}) scale(0.58)">
             <g transform="translate(-7, -7)">
-              ${planetSvg}
+              ${planetSvg
+                .replace(/<style[^>]*>.*<\/style>/gs, '')
+                .replace(
+                  /class="cls-1"/g,
+                  'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                )
+                .replace(
+                  '<svg',
+                  '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                )}
             </g>
           </g>
         `;
@@ -338,20 +356,17 @@ export class UIGeneratorService implements UIGenerator {
     try {
       const natalData = rawData.data;
       const aspects = rawData.aspects;
-      const width = 950;
-      const height = 950;
+      const width = 265;
+      const height = 265;
       const radius = width / 2;
       const center = { x: width / 2, y: height / 2 };
 
-      let svgString = `<svg width="226" height="226" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+      let svgString = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
 
       svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius}" fill="#CB8020" stroke="none" stroke-width="3"/>`;
 
-      const baseWhiteRing = radius - 55;
-      const whiteRingDiff = radius - baseWhiteRing;
-      const adjustedWhiteRing = radius - whiteRingDiff * 1.2;
-
-      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${adjustedWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
+      const baseWhiteRing = radius - 19.12;
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${baseWhiteRing}" fill="#FFFFFF" stroke="none" stroke-width="2"/>`;
 
       svgString += `
       <foreignObject x="0" y="0" width="${width}" height="${height}">
@@ -364,7 +379,7 @@ export class UIGeneratorService implements UIGenerator {
               top: ${center.y}px;
               width: 0;
               height: ${radius}px;
-              border-left: 1px solid #edc795;
+              border-left: 1px dashed #edc795;
               opacity: 0.8;
               transform: rotate(${angle}deg);
               transform-origin: top center;
@@ -374,7 +389,9 @@ export class UIGeneratorService implements UIGenerator {
       </foreignObject>
     `;
 
-      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${radius - 121}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
+      // Зовнішнє пунктирне коло (орієнтир для планет)
+      const planetOuterRing = radius - (19.12 + 10) * 1.5;
+      svgString += `<circle cx="${center.x}" cy="${center.y}" r="${planetOuterRing}" fill="#FFFFFF" stroke="#E4B77C" stroke-width="1" stroke-dasharray="3,2"/>`;
 
       const zodiacSigns = [
         { name: 'Virgo', emoji: '♈' },
@@ -391,112 +408,101 @@ export class UIGeneratorService implements UIGenerator {
         { name: 'Libra', emoji: '♓' },
       ];
 
-      svgString += `
-      <foreignObject x="0" y="0" width="${width}" height="${height}">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="position: relative; width: ${width}px; height: ${height}px;">
-          ${Array.from({ length: 12 }, (_, i) => {
-            const angle = i * 30 - 45;
-            const rad = angle * (Math.PI / 180);
-            const labelRadius = radius - 35;
-            const x = center.x + Math.cos(rad) * labelRadius;
-            const y = center.y + Math.sin(rad) * labelRadius;
-            return `<div style="
-              position: absolute;
-              left: ${x}px;
-              top: ${y}px;
-              transform: translate(-50%, -50%) rotate(${angle + 90}deg);
-              transform-origin: center;
-              color: #FFF9F1;
-              font-size: 35px;
-              font-family: sans-serif;
-              white-space: nowrap;
-            ">${zodiacSigns[i].name}</div>`;
-          }).join('')}
-        </div>
-      </foreignObject>
-    `;
+      const textRadius = radius - 13.56;
+      zodiacSigns.forEach((_, i) => {
+        const angleFix = i === 11 ? 1.5 : 0;
+        const startAngle = (i * 30 - 90) * (Math.PI / 180);
+        const endAngle = ((i + 1) * 30 - 90 + angleFix) * (Math.PI / 180);
+        const x1 = center.x + Math.cos(startAngle) * textRadius;
+        const y1 = center.y + Math.sin(startAngle) * textRadius;
+        const x2 = center.x + Math.cos(endAngle) * textRadius;
+        const y2 = center.y + Math.sin(endAngle) * textRadius;
+        const pathId = `zodiacArc${i}`;
+        const pathD = `M ${x1} ${y1} A ${textRadius} ${textRadius} 0 0 1 ${x2} ${y2}`;
+        svgString += `<path id="${pathId}" fill="none" stroke="none" d="${pathD}" />`;
+      });
 
-      const exceptions = ['Mean_Node'];
-      const normal = ['north_node'];
+      zodiacSigns.forEach((sign, i) => {
+        svgString += `
+        <text font-size="9.56" fill="#FFF9F1">
+          <textPath href="#zodiacArc${i}" startOffset="50%" text-anchor="middle">${sign.name}</textPath>
+        </text>
+      `;
+      });
+
+      const exceptions = ['Mean_Node', 'Medium_Coeli'];
+      const normal = ['north_node', 'mc'];
       const exceptionsMap: Record<string, string> = Object.fromEntries(
-        exceptions.map((exception, index) => [
-          exception.toLowerCase(),
-          normal[index],
-        ]),
+        exceptions.map((e, i) => [e.toLowerCase(), normal[i]]),
       );
 
       let planetPositions = {};
-      const usedAngles: number[] = [];
-
+      const iconSize = 7;
+      const radiusPlanets = radius - ((19.12 + 20) * 1.5) / 2;
       Object.values(natalData).forEach((planet: CelestialBody) => {
         if (
-          planet &&
-          typeof planet === 'object' &&
-          planet.abs_pos !== undefined
-        ) {
-          const angleDeg = planet.abs_pos;
+          !planet ||
+          typeof planet !== 'object' ||
+          planet.abs_pos === undefined
+        )
+          return;
 
-          let shift = 0;
-          const minAngleDiff = 5;
-          while (
-            usedAngles.some(
-              (a) => Math.abs(a - (angleDeg + shift)) < minAngleDiff,
-            )
-          ) {
-            shift += 3;
-          }
-          usedAngles.push(angleDeg + shift);
+        const angleDeg = planet.abs_pos;
+        const angleRad = ((angleDeg - 90) * Math.PI) / 180;
 
-          const angleRad = ((angleDeg + shift - 90) * Math.PI) / 180;
-          const baseRadius = (radius - 75 + radius - 125) / 2;
-          const x = Math.cos(angleRad) * baseRadius + center.x;
-          const y = Math.sin(angleRad) * baseRadius + center.y;
+        const x = center.x + Math.cos(angleRad) * radiusPlanets;
+        const y = center.y + Math.sin(angleRad) * radiusPlanets;
 
-          const iconName = exceptions.includes(planet.name)
-            ? exceptionsMap[planet.name.toLowerCase()]
-            : planet.name.toLowerCase();
+        const iconName = exceptions.includes(planet.name)
+          ? exceptionsMap[planet.name.toLowerCase()]
+          : planet.name.toLowerCase();
 
-          if (
-            !fs.existsSync(
-              path.join(
-                __dirname,
-                '../../../src/files/planets',
-                `${iconName}.svg`,
-              ),
-            )
-          ) {
-            return;
-          }
+        if (
+          !fs.existsSync(
+            path.join(
+              __dirname,
+              '../../../src/files/planets',
+              `${iconName}.svg`,
+            ),
+          )
+        )
+          return;
 
-          const planetSvg = this.loadPlanetSvgByName(iconName) || '';
+        const planetSvg = this.loadPlanetSvgByName(iconName) || '';
 
-          svgString += `
-          <g transform="translate(${x}, ${y}) scale(1.5)">
-            <g transform="translate(-7, -7)">
-              ${planetSvg}
-            </g>
-          </g>
-        `;
+        svgString += `
+    <g transform="translate(${x}, ${y})">
+      <g transform="translate(-${iconSize / 2}, -${iconSize / 2}) scale(1.5)">
+        ${planetSvg
+          .replace(/<style[^>]*>.*<\/style>/gs, '')
+          .replace(
+            /class="cls-1"/g,
+            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+          )
+          .replace(
+            '<svg',
+            `<svg width="${iconSize}px" height="${iconSize}px" preserveAspectRatio="xMidYMid meet"`,
+          )}
+      </g>
+    </g>
+  `;
 
-          planetPositions[planet.name] = { x, y };
-        }
+        planetPositions[planet.name] = { x, y };
       });
 
       if (aspects && Array.isArray(aspects)) {
-        const lineRadius = radius - 135;
+        const lineRadius = radius - ((19.12 + 10) * 1.5 + 4);
         aspects.forEach(({ p1_name, p2_name }) => {
           if (planetPositions[p1_name] && planetPositions[p2_name]) {
             const getAngle = ({ x, y }) =>
               Math.atan2(y - center.y, x - center.x);
             const angle1 = getAngle(planetPositions[p1_name]);
             const angle2 = getAngle(planetPositions[p2_name]);
-
             const x1f = center.x + Math.cos(angle1) * lineRadius;
             const y1f = center.y + Math.sin(angle1) * lineRadius;
             const x2f = center.x + Math.cos(angle2) * lineRadius;
             const y2f = center.y + Math.sin(angle2) * lineRadius;
-
-            svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="#E4B77C" stroke-width="1"/>`;
+            svgString += `<line x1="${x1f}" y1="${y1f}" x2="${x2f}" y2="${y2f}" stroke="#E4B77C" stroke-width="1" stroke-linecap="round"/>`;
           }
         });
       }
@@ -580,16 +586,46 @@ export class UIGeneratorService implements UIGenerator {
       const chartIncreaseContent = fs.readFileSync(chartIncreasePath, 'utf-8');
 
       const arrowsPath = path.join(__dirname, '../../../src/files/Arrows.svg');
-      const arrowsContent = fs.readFileSync(arrowsPath, 'utf-8');
+      const arrowsContent = fs
+        .readFileSync(arrowsPath, 'utf-8')
+        .replace(/<style[^>]*>.*<\/style>/gs, '')
+        .replace(
+          /class="cls-1"/g,
+          'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+        )
+        .replace(
+          '<svg',
+          '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+        );
 
       const arrowPath = path.join(__dirname, '../../../src/files/Arrow.svg');
-      const arrowContent = fs.readFileSync(arrowPath, 'utf-8');
+      const arrowContent = fs
+        .readFileSync(arrowPath, 'utf-8')
+        .replace(/<style[^>]*>.*<\/style>/gs, '')
+        .replace(
+          /class="cls-1"/g,
+          'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+        )
+        .replace(
+          '<svg',
+          '<svg width="16px" height="16px" preserveAspectRatio="xMidYMid meet"',
+        );
 
       const importantPath = path.join(
         __dirname,
         '../../../src/files/Important.svg',
       );
-      const importantContent = fs.readFileSync(importantPath, 'utf-8');
+      const importantContent = fs
+        .readFileSync(importantPath, 'utf-8')
+        .replace(/<style[^>]*>.*<\/style>/gs, '')
+        .replace(
+          /class="cls-1"/g,
+          'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+        )
+        .replace(
+          '<svg',
+          '<svg width="16px" height="16px" preserveAspectRatio="xMidYMid meet"',
+        );
       // -- Content -- //
 
       // -- Styles -- //
@@ -606,11 +642,29 @@ export class UIGeneratorService implements UIGenerator {
                 <div class="top-element">
                     <div class="sub">
                         <div class="line"></div>
-                        <div class="star">${starsContent}</div>
+                        <div class="star">${starsContent
+                          .replace(/<style[^>]*>.*<\/style>/gs, '')
+                          .replace(
+                            /class="cls-1"/g,
+                            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                          )
+                          .replace(
+                            '<svg',
+                            '<svg width="12px" height="12px" preserveAspectRatio="xMidYMid meet"',
+                          )}</div>
                     </div>
                     <h2 class="page-title">${title}</h2>
                     <div class="sub">
-                        <div class="star">${starsContent}</div>
+                        <div class="star">${starsContent
+                          .replace(/<style[^>]*>.*<\/style>/gs, '')
+                          .replace(
+                            /class="cls-1"/g,
+                            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                          )
+                          .replace(
+                            '<svg',
+                            '<svg width="12px" height="12px" preserveAspectRatio="xMidYMid meet"',
+                          )}</div>
                         <div class="line"></div>
                     </div>
                 </div>
@@ -680,15 +734,42 @@ export class UIGeneratorService implements UIGenerator {
                         </div>
                         <div class="p1-cards">
                             <div class="p1-cards-card">
-                                <div class="p1-cards-card-icon">${thunderContent}</div>
+                                <div class="p1-cards-card-icon">${thunderContent
+                                  .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                  .replace(
+                                    /class="cls-1"/g,
+                                    'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                  )
+                                  .replace(
+                                    '<svg',
+                                    '<svg width="36px" height="36px" preserveAspectRatio="xMidYMid meet"',
+                                  )}</div>
                                 <p class="p1-cards-card-text">3 strongest<br /> aspects</p>
                             </div>
                             <div class="p1-cards-card">
-                                <div class="p1-cards-card-icon">${chartIncreaseContent}</div>
+                                <div class="p1-cards-card-icon">${chartIncreaseContent
+                                  .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                  .replace(
+                                    /class="cls-1"/g,
+                                    'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                  )
+                                  .replace(
+                                    '<svg',
+                                    '<svg width="36px" height="36px" preserveAspectRatio="xMidYMid meet"',
+                                  )}</div>
                                 <p class="p1-cards-card-text">2 growth<br /> areas</p>
                             </div>
                             <div class="p1-cards-card">
-                                <div class="p1-cards-card-icon">${calenderContent}</div>
+                                <div class="p1-cards-card-icon">${calenderContent
+                                  .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                  .replace(
+                                    /class="cls-1"/g,
+                                    'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                  )
+                                  .replace(
+                                    '<svg',
+                                    '<svg width="36px" height="36px" preserveAspectRatio="xMidYMid meet"',
+                                  )}</div>
                                 <p class="p1-cards-card-text">7-day action<br /> plan inside</p>
                             </div>
                         </div>
@@ -735,14 +816,15 @@ export class UIGeneratorService implements UIGenerator {
         for (let i = 0; i < signNames.length; i += 2) {
           const item1 = signNames[i];
           const svg1 = this.loadSingleSvg(`signs/${item1}`);
+          console.log(svg1.replace('<svg', '<svg width="11.4px"'));
           let pair = `
-                        <li class="text-right"><div class="text-right-svg">${svg1}</div> <span>${item1.toUpperCase()}</span></li>
+                        <li class="text-right"><div class="text-right-svg">${svg1.replace('<svg', '<svg width="11.4px"')}</div> <span>${item1.toUpperCase()}</span></li>
                     `;
           if (i + 1 < signNames.length) {
             const item2 = signNames[i + 1];
             const svg2 = this.loadSingleSvg(`signs/${item2}`);
             pair += `
-                            <li class="text-right"><div class="text-right-svg">${svg2}</div> <span>${item2.toUpperCase()}</span></li>
+                            <li class="text-right"><div class="text-right-svg">${svg2.replace('<svg', '<svg width="11.4px"')}</div> <span>${item2.toUpperCase()}</span></li>
                         `;
           }
 
@@ -766,7 +848,7 @@ export class UIGeneratorService implements UIGenerator {
               `planets/${item.replaceAll(' ', '_')}`,
             );
             group += `
-                            <li>${svg} <span class="text-left">${item.toUpperCase()}</span></li>
+                            <li>${svg.replace('<svg', '<svg width="11.4px"')} <span class="text-left">${item.toUpperCase()}</span></li>
                         `;
           }
 
@@ -776,7 +858,16 @@ export class UIGeneratorService implements UIGenerator {
         return `<ul class="p2-symbols-list">${groupedList}</ul>`;
       };
       // -- Page 3 -- //
-      const infoIcon = this.loadSingleSvg('Info');
+      const infoIcon = this.loadSingleSvg('Info')
+        .replace(/<style[^>]*>.*<\/style>/gs, '')
+        .replace(
+          /class="cls-1"/g,
+          'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+        )
+        .replace(
+          '<svg',
+          '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+        );
       const formDate = (date: string): string => {
         const localDate = ZonedDateTime.parse(date).withZoneSameInstant(
           ZoneId.of('UTC'),
@@ -820,7 +911,16 @@ export class UIGeneratorService implements UIGenerator {
                                     <span class="p2-user-text">${formDate(body.birthDate1)}<br />${body.birthPlace1}</span>
                                 </div>
                                 <div class="p2-plus">
-                                    ${plusContent}
+                                    ${plusContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="24px" height="24px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
                                 </div>
                                 <div class="p2-user">
                                     <div class="p2-content-name">${body.name2}</div>
@@ -830,9 +930,45 @@ export class UIGeneratorService implements UIGenerator {
                             <div class="p2-userinfo-content">
                                 <div class="p2-userinfo-content-text">
                                     <div class="stars-flex">
-                                        ${starsContent}
-                                        ${starsContent}
-                                        ${starsContent}
+                                        ${starsContent
+                                          .replace(
+                                            /<style[^>]*>.*<\/style>/gs,
+                                            '',
+                                          )
+                                          .replace(
+                                            /class="cls-1"/g,
+                                            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                          )
+                                          .replace(
+                                            '<svg',
+                                            '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                          )}
+                                        ${starsContent
+                                          .replace(
+                                            /<style[^>]*>.*<\/style>/gs,
+                                            '',
+                                          )
+                                          .replace(
+                                            /class="cls-1"/g,
+                                            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                          )
+                                          .replace(
+                                            '<svg',
+                                            '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                          )}
+                                        ${starsContent
+                                          .replace(
+                                            /<style[^>]*>.*<\/style>/gs,
+                                            '',
+                                          )
+                                          .replace(
+                                            /class="cls-1"/g,
+                                            'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                          )
+                                          .replace(
+                                            '<svg',
+                                            '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                          )}
                                     </div>
                                     <span>Cosmic Match: ${match} %</span>
                                     <p><b>A single number can’t</b> capture every nuance of two<br /> hearts, yet it offers a powerful <b>starting point.</b> </p>
@@ -851,7 +987,9 @@ export class UIGeneratorService implements UIGenerator {
                         </div>
                         <div class="p2-legend">
                             <p class="p2-text p2-end">
-                                ${infoIcon} The legend below decodes each sign and planet, helping you see where your energies align or clash.
+                                ${
+                                  infoIcon
+                                } The legend below decodes each sign and planet, helping you see where your energies align or clash.
                             </p>
                             <div class="p2-symbols">
                                 <div class="p2-symbols-signs">
@@ -907,7 +1045,25 @@ export class UIGeneratorService implements UIGenerator {
                                 <div class="p3-list-row">
                                 <div class="p3-list-left">
                                     <div class="text-block-list-planets">
-                                    ${sunIcon} <span>Sun</span> ${arrowsContent} ${moonIcon} <span>Moon</span>
+                                    ${sunIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="12px" height="12px" preserveAspectRatio="xMidYMid meet"',
+                                      )} <span>Sun</span> ${arrowsContent} ${moonIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )} <span>Moon</span>
                                     </div>
                                     <div class="p3-list-description"> – core identity vs. emotional needs</div>
                                 </div>
@@ -918,7 +1074,25 @@ export class UIGeneratorService implements UIGenerator {
                                 <div class="p3-list-row">
                                 <div class="p3-list-left">
                                     <div class="text-block-list-planets">
-                                    ${venusIcon} <span>Venus</span> ${arrowsContent} ${marsIcon} <span>Mars</span>
+                                    ${venusIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )} <span>Venus</span> ${arrowsContent} ${marsIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )} <span>Mars</span>
                                     </div>
                                     <div class="p3-list-description"> – love style vs. passion drive</div>
                                 </div>
@@ -929,7 +1103,16 @@ export class UIGeneratorService implements UIGenerator {
                                 <div class="p3-list-row">
                                 <div class="p3-list-left">
                                     <div class="text-block-list-planets">
-                                    ${mercuryIcon} <span>Mercury aspects</span>
+                                    ${mercuryIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )} <span>Mercury aspects</span>
                                     </div>
                                     <div class="p3-list-description"> – thinking & talk patterns</div>
                                 </div>
@@ -1002,25 +1185,61 @@ export class UIGeneratorService implements UIGenerator {
                             </span>
                             <ul class="text-block-list p3-list-flex">
                                 <li>
-                                    <div class="p3-list-flex-top">${heartIcon} Top 3 Harmonies</div>
+                                    <div class="p3-list-flex-top">${heartIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} Top 3 Harmonies</div>
                                     <p class="p3-list-flex-text">
                                         – the planetary links that<br /> make your bond feel<br /> effortless.
                                     </p>
                                 </li>
                                 <li>
-                                    <div class="p3-list-flex-top">${familyIcon} Top 3 Friction Points</div>
+                                    <div class="p3-list-flex-top">${familyIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} Top 3 Friction Points</div>
                                     <p class="p3-list-flex-text">
                                         – where sparks can inspire<br /> growth or start fires.
                                     </p>
                                 </li>
                                 <li>
-                                    <div class="p3-list-flex-top">${calenderIcon} 7-Day Action Plan</div>
+                                    <div class="p3-list-flex-top">${calenderIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} 7-Day Action Plan</div>
                                     <p class="p3-list-flex-text">
-                                        - one small, concrete step<br /> per day to anchor insights<br /> into behaviour.
+                                        – one small, concrete step<br /> per day to anchor insights<br /> into behaviour.
                                     </p>
                                 </li>
                                 <li>
-                                    <div class="p3-list-flex-top">${chartIcon} Growth Forecast</div>
+                                    <div class="p3-list-flex-top">${chartIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} Growth Forecast</div>
                                     <p class="p3-list-flex-text">
                                         – how upcoming transits<br /> may amplify (or ease)<br /> current patterns over the<br /> next 12 months.
                                     </p>
@@ -1085,9 +1304,36 @@ export class UIGeneratorService implements UIGenerator {
                                     Your relationship is the captain;<br /> these pages are only the star<br /> map.
                                 </span>
                                 <div class="stars-flex">
-                                    ${starsContent}
-                                    ${starsContent}
-                                    ${starsContent}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FAE4C8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FAE4C8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FAE4C8" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
                                 </div>
                                 <p class="p3-end-info-text">
                                     Navigate boldly, adjust the sails often,<br /> and enjoy the voyage together.
@@ -1175,7 +1421,43 @@ export class UIGeneratorService implements UIGenerator {
                                         <span class="p4-card-top-text">Scoring Algorithm</span>
                                     </div>
                                     <p>Harmonious aspects add points, challenging ones<br /> subtract.
-                                    Scores are weighted: ${sunIcon}/${moonIcon} = 3 ×, ${venusIcon}/${marsIcon} = 2 ×,<br />outer planets = 1×.
+                                    Scores are weighted: ${sunIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )}/${moonIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} = 3 ×, ${venusIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )}/${marsIcon
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="14px" height="14px" preserveAspectRatio="xMidYMid meet"',
+                                      )} = 2 ×,<br />outer planets = 1×.
                                     The result is used to calculate the<br /> <b>Compatibility % shown on the first page.</b></p>
                                 </div>
                             </div>
@@ -1379,7 +1661,16 @@ export class UIGeneratorService implements UIGenerator {
             return `
             <li class="p7-card">
                 <div class="p7-bl-top">
-                    ${svg} 
+                    ${svg
+                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                      .replace(
+                        /class="cls-1"/g,
+                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                      )
+                      .replace(
+                        '<svg',
+                        '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+                      )} 
                     <span class="p7-bl-text">${item.planet} 
                         <p>${item.title}</p>
                     </span>
@@ -1841,15 +2132,69 @@ export class UIGeneratorService implements UIGenerator {
                             </div>
                             <div class="p11-end">
                                 <div class="stars-flex p11-stars">
-                                    ${starsContent}
-                                    ${starsContent}
-                                    ${starsContent}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FFF9F1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FFF9F1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#FFF9F1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="20px" height="20px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
                                 </div>
                                 <span>${promptP11.final_message}</span>
                                 <div class="stars-flex p11-stars">
-                                    ${starsContent}
-                                    ${starsContent}
-                                    ${starsContent}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
+                                    ${starsContent
+                                      .replace(/<style[^>]*>.*<\/style>/gs, '')
+                                      .replace(
+                                        /class="cls-1"/g,
+                                        'fill="none" stroke="#cb8020" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"',
+                                      )
+                                      .replace(
+                                        '<svg',
+                                        '<svg width="10px" height="10px" preserveAspectRatio="xMidYMid meet"',
+                                      )}
                                 </div>
                             </div>
                         </div>
